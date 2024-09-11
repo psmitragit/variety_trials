@@ -1,0 +1,97 @@
+ .small-box h3 {
+     font-size: 2.2rem;
+     font-weight: 700;
+     margin: 0 0 10px;
+     padding: 0;
+     white-space: nowrap;
+ }
+
+ .small-box p {
+     font-size: 1rem;
+ }
+
+ .small-box-footer {
+     background-color: rgba(0, 0, 0, .1);
+     color: rgba(255, 255, 255, .8);
+     display: block;
+     padding: 3px 0;
+     position: relative;
+     text-align: center;
+     text-decoration: none;
+     z-index: 10;
+ }
+
+ .small-box-footer:hover {
+     background-color: rgba(0, 0, 0, .15);
+     color: #fff;
+ }
+
+ .small-box .icon {
+     color: rgba(0, 0, 0, .15);
+     z-index: 0;
+     position: relative;
+ }
+
+ .small-box .icon svg {
+     position: absolute;
+     right: 21px;
+     top: -97px;
+     transition: -webkit-transform .3s linear;
+     transition: transform .3s linear;
+     transition: transform .3s linear, -webkit-transform .3s linear;
+ }
+
+ .sidebar .nav .nav-item .nav-link i.menu-arrow::before {
+     content: "\F142" !important;
+ }
+
+ .custom-select.custom-select-sm.form-control.form-control-sm {
+     appearance: auto !important;
+     background: #fff;
+     color: #000;
+ }
+
+ .sidebar .nav.sub-menu .nav-item::before {
+     content: none;
+ }
+
+ input[type="file"] {
+     height: fit-content !important;
+ }
+
+ .need-validation.cutomwidth {
+     width: 593px;
+     margin-left: auto;
+     margin-right: auto;
+ }
+
+ .form-control {
+     height: fit-content;
+ }
+
+ select.form-control {
+     height: 49px !important;
+     background: #fff;
+     appearance: auto !important;
+ }
+
+
+ .form-control.error {
+     border: 1px solid red;
+ }
+
+ label.error {
+     color: red;
+ }
+
+ .select2-selection.select2-selection--single {
+     height: 43.5px;
+ }
+
+ .select2-selection__arrow {
+     margin-top: 7px;
+ }
+
+ .page-link:focus {
+     color: #0a58ca !important;
+ }

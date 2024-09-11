@@ -1,0 +1,243 @@
+ .small-box h3 {
+     font-size: 2.2rem;
+     font-weight: 700;
+     margin: 0 0 10px;
+     padding: 0;
+     white-space: nowrap;
+ }
+
+ .small-box p {
+     font-size: 1rem;
+ }
+
+ .small-box-footer {
+     background-color: rgba(0, 0, 0, .1);
+     color: rgba(255, 255, 255, .8);
+     display: block;
+     padding: 3px 0;
+     position: relative;
+     text-align: center;
+     text-decoration: none;
+     z-index: 10;
+ }
+
+ .small-box-footer:hover {
+     background-color: rgba(0, 0, 0, .15);
+     color: #fff;
+ }
+
+ .small-box .icon {
+     color: rgba(0, 0, 0, .15);
+     z-index: 0;
+     position: relative;
+ }
+
+ .small-box .icon svg {
+     position: absolute;
+     right: 21px;
+     top: -97px;
+     transition: -webkit-transform .3s linear;
+     transition: transform .3s linear;
+     transition: transform .3s linear, -webkit-transform .3s linear;
+ }
+
+ .sidebar .nav .nav-item .nav-link i.menu-arrow::before {
+     content: "\F142" !important;
+ }
+
+ .custom-select.custom-select-sm.form-control.form-control-sm {
+     appearance: auto !important;
+     background: #fff;
+     color: #000;
+     text-align: center;
+ }
+
+ .sidebar .nav.sub-menu .nav-item::before {
+     content: none;
+ }
+
+ input[type="file"] {
+     height: fit-content !important;
+ }
+
+ .need-validation.cutomwidth {
+     width: 593px;
+     margin-left: auto;
+     margin-right: auto;
+ }
+
+ .form-control {
+     height: fit-content;
+ }
+
+ select.form-control {
+     height: 49px !important;
+     background: #fff;
+     appearance: auto !important;
+ }
+
+
+ .form-control.error,
+ .form-control.error .select2 {
+     border: 1px solid red;
+ }
+
+ label.error {
+     color: red;
+ }
+
+ .select2-selection.select2-selection--single,
+ .select2-selection.select2-selection--multiple {
+     height: 49px;
+ }
+
+ .select2-selection__arrow {
+     top: 12px !important;
+ }
+
+ .page-link:focus {
+     color: #0a58ca !important;
+ }
+
+ .dropdown.bootstrap-select.form-control .dropdown-menu {
+     z-index: 9999;
+ }
+
+ .btn-label {
+     position: relative;
+     left: -12px;
+     display: inline-block;
+     padding: 6px 6px;
+     background: rgba(0, 0, 0, 0.15);
+     border-radius: 6px 0 0 6px;
+ }
+
+ .btn-labeled {
+     padding-top: 0;
+     padding-bottom: 0;
+     display: flex;
+     align-items: center;
+     width: fit-content;
+     margin-bottom: 0 !important;
+
+ }
+
+ .btn {
+     margin-bottom: 10px;
+ }
+
+ /* 28-11-23 */
+ /* Arif */
+
+ .i-22 {
+     font-size: 20px;
+     color: #000;
+ }
+
+ .tooltip {
+     z-index: 1099;
+ }
+
+ .loader {
+     position: fixed;
+     width: 100%;
+     height: 100vh;
+     top: 0;
+     left: 0;
+     z-index: 9999;
+     background: rgba(0, 0, 0, 0.5);
+ }
+
+ .line {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 75px;
+     height: 75px;
+     border-radius: 50%;
+     background-color: transparent;
+     border: 8px solid rgb(52, 167, 225);
+     border-top-color: #fff;
+     -webkit-animation: 1s spin linear infinite;
+     animation: 1s spin linear infinite;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+ }
+
+
+ @keyframes spin {
+     from {
+         -webkit-transform: rotate(0deg);
+         transform: rotate(0deg);
+     }
+
+     to {
+         -webkit-transform: rotate(360deg);
+         transform: rotate(360deg);
+     }
+ }
+
+ .custom-button-table .dt-buttons {
+     display: flex;
+     position: relative;
+ }
+
+ .custom-button-table .dt-button.buttons-collection.buttons-page-length,
+ .custom-button-table .dt-button.buttons-csv.buttons-html5 {
+     background: #0d6efd;
+     border: none;
+     padding: 6px 16px;
+     color: #fff;
+     border-radius: 10px;
+ }
+
+ .custom-button-table .select2-selection {
+     border: 1px solid #0d6efd !important;
+ }
+
+ .custom-button-table .dataTables_wrapper input {
+     border: 1px solid #0d6efd !important;
+     border-radius: 6px;
+     color: #0d6efd !important;
+ }
+
+ .custom-button-table .dt-button-collection {
+     position: absolute;
+     top: 10px;
+     margin-top: 6.8px;
+ }
+
+ .custom-button-table .dt-button.button-page-length.dt-button-active {
+     background: #0d6efd;
+     color: #fff;
+ }
+
+ .custom-button-table .dt-button.button-page-length {
+     background: #fff;
+     border: 1px solid #0d6efd;
+     color: #0d6efd;
+ }
+
+ .custom-button-table .dt-button.buttons-csv.buttons-html5 {
+     margin-left: 20px;
+ }
+
+ .custom-button-table #dataTable_wrapper {
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+     justify-content: space-between;
+ }
+
+ .card .card-title {
+     margin-bottom: 0;
+ }
+
+ /* .form-control.error > .error{
+    display: block !important;
+ } */
+ .form-control.error .select2-container {
+     display: none !important;
+ }

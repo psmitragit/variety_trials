@@ -1,0 +1,274 @@
+.select2-selection {
+  border: 1px solid #e91e63 !important;
+}
+
+.dataTables_wrapper input {
+  border: 1px solid #e91e63 !important;
+  border-radius: 6px;
+  color: #e91e63 !important;
+}
+
+
+.small-box h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  padding: 0;
+  white-space: nowrap;
+  color: #fff;
+  text-align: center;
+}
+
+.small-box p {
+  font-size: 1rem;
+}
+
+.small-box-footer {
+  background-color: rgba(0, 0, 0, .1);
+  color: rgba(255, 255, 255, .8);
+  display: block;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  z-index: 10;
+}
+
+.small-box-footer:hover {
+  background-color: rgba(0, 0, 0, .15);
+  color: #fff;
+}
+
+.small-box .icon {
+  color: rgba(0, 0, 0, .15);
+  z-index: 0;
+  position: relative;
+}
+
+.small-box .icon svg {
+  position: absolute;
+  right: 21px;
+  top: -97px;
+  transition: -webkit-transform .3s linear;
+  transition: transform .3s linear;
+  transition: transform .3s linear, -webkit-transform .3s linear;
+}
+
+
+
+/*Documents*/
+#datepicker-container .datepicker.datepicker-dropdown {
+  position: static !important;
+  margin-right: 20px;
+  margin-top: 10px;
+}
+
+#datepicker-container {
+  display: flex;
+  position: relative;
+  z-index: 9999999;
+}
+
+.dt-button.buttons-collection.buttons-page-length,
+.dt-button.buttons-csv.buttons-html5 {
+  background: #e0296a;
+  border: none;
+  padding: 6px 16px;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.dt-button-collection {
+  position: absolute;
+  top: 10px;
+  margin-top: 6.8px;
+}
+
+.dt-buttons {
+  display: flex;
+  position: relative;
+}
+
+.dt-button.buttons-csv.buttons-html5 {
+  margin-left: 20px;
+}
+
+.dt-button.button-page-length {
+  background: #fff;
+  border: 1px solid #df2869;
+  color: #df2869;
+}
+
+.dt-button.button-page-length.dt-button-active {
+  background: #df2869;
+  color: #fff;
+}
+
+.page-link.active,
+.active>.page-link {
+  color: #fff;
+}
+
+#yearRange {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #b5b5b5;
+  border-radius: 5px;
+}
+
+.crop-container {
+  list-style: none;
+}
+
+.crop-container {
+  list-style: none;
+  background: #fff;
+  margin-top: 21px;
+  padding: 0px;
+}
+
+.crop-container .crop-li {
+  padding: 13px;
+}
+
+.crop-container .crop-li:hover {
+  background: #e43170;
+  color: #fff;
+}
+
+.crop-container .crop-li.text-primary.active {
+  color: #fff !important;
+  background: #e0296a;
+}
+
+.fulldivs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.copy {
+  margin-right: 10px;
+}
+
+.objs {
+  width: 100%;
+  height: 100%;
+}
+
+.daterange-container.dussc.is-filled {
+  position: relative;
+  z-index: 999;
+}
+
+.navbar-vertical.navbar-expand-xs .navbar-collapse {
+  display: block;
+  overflow: auto;
+  height: calc(100vh - 140px) !important;
+}
+
+
+.datepicker-input-wrapper {
+  position: relative;
+}
+
+.datepicker-input-wrapper #confirmYear {
+  position: absolute;
+  right: 5px;
+  top: 7px;
+}
+
+.objs embed {
+  width: 100%;
+  height: 100%;
+}
+
+object.objs {
+  position: sticky;
+}
+
+.title-dashboard,
+.doc-dashboard {
+  background: #fff;
+  padding: 3px 13px;
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 10px;
+  color: #1a73e8;
+  margin-right: 10px;
+  border-radius: 6px;
+}
+
+.doc-dashboard {
+  margin-left: 10px;
+  background: #e53371;
+  color: #fff;
+}
+
+.title-dashboard:hover {
+  background: #a0a0a0;
+  color: #1a73e8;
+}
+
+.doc-dashboard:hover {
+  background: #661f38;
+  color: #fff;
+}
+
+.bg-customs-color {
+  background: #17a2b8;
+}
+
+.cropLocationMap {
+  height: calc(80vh - 50px);
+}
+
+.opentext {
+  display: flex;
+  align-items: center;
+}
+
+.fulldivs {
+  align-items: center;
+
+  margin-bottom: 15px;
+}
+
+.title-doc {
+  margin-left: 10px;
+}
+
+.sm-text-sixes {
+  font-size: 13px;
+}
+#dataTable_wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+#dataTable {
+  width: 100% !important;
+}
+.state-contaier .select2-selection.select2-selection--single {
+  background: transparent;
+  height: 45px;
+  padding-top: 10px;
+  border-color: #b5b5b5 !important;
+  margin-left: 8px;
+}
+.state-contaier {
+  margin-top: 20px;
+}
+.state-contaier  .select2-selection__arrow {
+  margin-top: 9px;
+}   
+
+.table thead th {
+ 
+  text-align: left !important;
+}
+
+.crop-table td {
+  padding: 0.75rem 1.5rem !important;
+}
