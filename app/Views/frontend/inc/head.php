@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="<?= base_url('frontend') ?>/img/apple-icon.png">
     <link rel="icon" type="image/png" href="<?= base_url('frontend') ?>/img/favicon.png">
-    <link rel="manifest" href="<?= base_url('frontend') ?>/js/manifest.json">
+    <link rel="manifest" href="<?= base_url() ?>/manifest.json">
     <title>
         VarietyTrials
     </title>
