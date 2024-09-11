@@ -5,13 +5,14 @@
     "background_color": "#fa99ca",
     "display": "standalone",
     "scope": "/",
-    "start_url": "https://varietytrials.com",
+    "start_url": "/",
     "description": "Blog and Resume for Christine Dodrill",
     "orientation": "any",
     "icons": [
-        {
-            "src": "https://christine.website/static/img/avatar.png",
-            "sizes": "1024x1024"
-        }
+      {
+        "src": "https://christine.website/static/img/avatar.png",
+        "sizes": "1024x1024"
+      }
     ]
-}
+  }
+  
