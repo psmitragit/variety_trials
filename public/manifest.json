@@ -6,12 +6,16 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "description": "Blog and Resume for Christine Dodrill",
+    "description": "Blog and Resume for Christine Dodrill", 
     "orientation": "any",
     "icons": [
       {
         "src": "https://christine.website/static/img/avatar.png",
-        "sizes": "1024x1024"
+        "sizes": "132x132"
+      },
+      {
+        "src": "https://christine.website/static/img/avatar.png",
+        "sizes": "512x512"
       }
     ]
   }
