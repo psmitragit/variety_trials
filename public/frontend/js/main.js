@@ -14,7 +14,9 @@ $(function () {
         }
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
-    if ('serviceWorker' in navigator) {
+          
+})
+if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
             console.log('Service Worker registered with scope:', registration.scope);
@@ -22,6 +24,4 @@ $(function () {
             console.log('Service Worker registration failed:', err);
           });
         });
-      }
-      
-})
+      } 
