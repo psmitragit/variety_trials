@@ -5,7 +5,7 @@
     "background_color": "#fa99ca",
     "display": "standalone",
     "scope": "/",
-    "start_url": "http://localhost:8080/",
+    "start_url": "https://varietytrials.com/",
     "description": "Blog and Resume for Christine Dodrill",
     "orientation": "any",
     "icons": [
