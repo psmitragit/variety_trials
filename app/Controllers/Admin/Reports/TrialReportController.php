@@ -80,18 +80,21 @@ class TrialReportController extends BaseController
 
             $k = 0;
 
+            // echo'<pre>';print_r($trials);exit;
+
             foreach ($trials as $l) {
 
                 $treatment_group = $l['treatment_group'];
 
-                $treatments = $treatmentModel->where('group', $treatment_group)->findAll();
+                // $treatments = $treatmentModel->where('group', $treatment_group)->findAll();
 
-                if (!empty($treatments)) {
-                    foreach ($treatments as $treatment) {
+                // if (!empty($treatments)) {
+                //     foreach ($treatments as $treatment) {
                         $data[$k]['ids'] = '<input type="checkbox" name="ids[]" class="selectId" value="' . $l['id'] . '">';
                         $data[$k]['crop'] = $l['crop'];
                         $data[$k]['treatment_group'] = $treatment_group;
-                        $data[$k]['treatment'] = $treatment['name'];
+                        // $data[$k]['treatment'] = $treatment['name'];
+                        $data[$k]['treatment'] = "-";
                         $data[$k]['year'] = $l['year'];
                         $data[$k]['trial'] = $l['trial_type_name'] ?? '-';
                         $data[$k]['trial_id'] = $l['trial_id'];
@@ -105,8 +108,8 @@ class TrialReportController extends BaseController
                                                 <a class="text-decoration-none text-danger confirmDelete" data-bs-toggle="tooltip" title="Delete" href="javascript:void(0)" data-href="' . base_url('admin/report/trials/' . $l['id'] . '/delete') . '"><i class="ti ti-trash"></i></a>';
                         $data[$k]['action'] = $action;
                         $k++;
-                    }
-                }
+                    // }
+                // }
             }
 
             $resData = [

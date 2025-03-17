@@ -223,6 +223,10 @@
                         item.text()
                     }
                     $('input[name="_token"]').val(res.hash);
+                },
+                beforeSend: function(){
+                    item.html('...');
+                    item.attr('disabled', true);
                 }
             })
         })
