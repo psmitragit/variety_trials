@@ -93,6 +93,7 @@ class TrialReportController extends BaseController
                         $data[$k]['treatment_group'] = $treatment_group;
                         $data[$k]['treatment'] = $treatment['name'];
                         $data[$k]['year'] = $l['year'];
+                        $data[$k]['trial'] = $l['trial_type_name'] ?? '-';
                         $data[$k]['trial_id'] = $l['trial_id'];
                         $data[$k]['trial_type'] = $l['trial_type_name'];
                         $data[$k]['state'] = $l['state_code'];

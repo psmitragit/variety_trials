@@ -52,7 +52,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <?php $crops = old('crop') ?? explode(',', $user['crop']) ?? "" ?>
+                        <?php $crops = old('crop') ?? explode(',', $user['crop'] ?? '') ?? "" ?>
                         <label for="crop">crop</label>
                         <select name="crop[]" id="crop" class="form-control select2" multiple>
                             <option value="">All Crops</option>
