@@ -34,7 +34,7 @@
                                     <h5 class="title-cols">Crop Details</h5>
                                     <p>
                                         <strong>Crop:</strong>
-                                        <?= $treatment['crop']; ?>
+                                        <?= $treatment['crop'] ?? '-'; ?>
                                     </p>
                                 </div>
                                 <div class="col-md-4">
@@ -43,37 +43,37 @@
                                     </h5>
                                     <p>
                                         <strong><?= $treatment['crop'] == 'Corn' ? "Hybrid" : "Variety" ?>:</strong>
-                                        <?= $treatment['variety_name']; ?>
+                                        <?= $treatment['variety_name'] ?? '-'; ?>
                                     </p>
                                     <p>
                                         <strong><?= $treatment['crop'] == 'Corn' ? "Hybrid" : "Variety" ?> Code:</strong>
-                                        <?= $treatment['short_name']; ?>
+                                        <?= $treatment['short_name'] ?? '-'; ?>
                                     </p>
                                     <p>
                                         <strong><?= $treatment['crop'] == 'Corn' ? "Hybrid" : "Variety" ?> Additional Name:</strong>
-                                        <?= $treatment['variety_name']; ?>
+                                        <?= $treatment['variety_name'] ?? '-'; ?>
                                     </p>
                                     <p>
                                         <strong><?= $treatment['crop'] == 'Corn' ? "Hybrid" : "Variety" ?> Brand/Company:</strong>
-                                        <?= $treatment['brand']; ?>
+                                        <?= $treatment['brand'] ?? '-'; ?>
                                     </p>
                                 </div>
                                 <div class="col-md-4">
                                     <h5 class="title-cols">Treatment Details </h5>
                                     <p> <strong>Entry:</strong>
-                                        <?= $treatment['name']; ?>
+                                        <?= $treatment['name'] ?? '-'; ?>
                                     </p>
                                     <p> <strong>Herbicide:</strong>
-                                        <?= $treatment['herbicide']; ?>
+                                        <?= $treatment['herbicide'] ?? '-'; ?>
                                     </p>
                                     <p> <strong>Insecticide:</strong>
-                                        <?= $treatment['insecticide']; ?>
+                                        <?= $treatment['insecticide'] ?? '-'; ?>
                                     </p>
                                     <p> <strong>Mat:</strong>
-                                        <?= $treatment['mat']; ?>
+                                        <?= $treatment['mat'] ?? '-'; ?>
                                     </p>
                                     <p> <strong>Seed Treatment:</strong>
-                                        <?= $treatment['seed_treatment']; ?>
+                                        <?= $treatment['seed_treatment'] ?? '-'; ?>
                                     </p>
                                     <?php if ($treatment['crop'] == 'Corn') : ?>
                                         <p> <strong>Refuge:</strong>
