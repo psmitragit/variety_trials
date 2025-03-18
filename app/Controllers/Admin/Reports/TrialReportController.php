@@ -532,7 +532,7 @@ class TrialReportController extends BaseController
             $csv = Writer::createFromFileObject(new \SplTempFileObject());
             $csv->insertOne($headers);
             $csv->insertAll($records);
-            $csv->output($crop_name);
+            $csv->output($crop_name.'.csv');
             exit;
         }
     }
