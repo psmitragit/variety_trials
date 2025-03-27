@@ -46,4 +46,126 @@
         </div>
     </div>
 </div>
+
+<div class="modal" tabindex="-1" id="showMap">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Locations</h5>
+                <button type="button" class="btn-close text-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="material-icons opacity-10">clear</i></button>
+            </div>
+            <div class="modal-body">
+                <div id="map" class="cropLocationMap"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&callback=initialMap" async defer></script>
+<script>
+    // window.addEventListener('load', function() {
+        console.log('Test');
+
+
+        //Open Map
+        window.helloWorld = () => {
+            initMap();
+            $('#showMap').modal('show');
+        }
+
+        let coordinates = [{
+                lat: 40.735657, // Newark, NJ
+                lng: -74.172363
+            },
+            {
+                lat: 40.717754, // Jersey City, NJ
+                lng: -74.043143
+            },
+            {
+                lat: 39.952583, // Philadelphia, PA
+                lng: -75.165222
+            },
+            {
+                lat: 41.765804, // Hartford, CT
+                lng: -72.673372
+            },
+            {
+                lat: 42.360081, // Boston, MA
+                lng: -71.058884
+            },
+            {
+                lat: 39.290386, // Baltimore, MD
+                lng: -76.612190
+            },
+            {
+                lat: 38.907192, // Washington, D.C.
+                lng: -77.036873
+            }
+        ];
+
+        let markerName = [
+            "Newark, NJ",
+            "Jersey City, NJ",
+            "Philadelphia, PA",
+            "Hartford, CT",
+            "Boston, MA",
+            "Baltimore, MD",
+            "Washington, D.C."
+        ];
+
+
+
+        // Initialize the map
+        function initMap() {
+            var myLatLng = coordinates.length > 0 ? coordinates[0] : {
+                lat: 40.712776,
+                lng: -74.005974
+            };
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: myLatLng
+            });
+
+            var marker, i;
+            var infowindow = new google.maps.InfoWindow({
+                content: ''
+            });
+
+            for (i = 0; i < coordinates.length; i++) {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(coordinates[i]['lat'], coordinates[i]['lng']),
+                    map: map
+                });
+
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infowindow.setContent(markerName[i]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+            }
+        }
+
+
+        //On page loadd map init
+        function initialMap() {
+            var myLatLng = coordinates.length > 0 ? coordinates[0] : {
+                lat: 40.712776,
+                lng: -74.005974
+            };
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: myLatLng
+            });
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: "New York"
+            });
+        }
+
+    // });
+</script>
 <?= $this->endSection() ?>
