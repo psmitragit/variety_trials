@@ -313,8 +313,8 @@
     // Initialize the map
     function initMap() {
         var myLatLng = coordinates.length > 0 ? coordinates[0] : {
-            lat: 40.7128,
-            lng: -74.0060
+            lat: 40.712776,
+            lng: -74.005974
         };
 
         var map = new google.maps.Map(document.getElementById('map'), {
@@ -322,12 +322,23 @@
             center: myLatLng
         });
 
-        for (var i = 0; i < coordinates.length; i++) {
-            var marker = new google.maps.Marker({
-                position: coordinates[i],
-                map: map,
-                title: markerName[i]
+        var marker, i;
+        var infowindow = new google.maps.InfoWindow({
+            content: ''
+        });
+
+        for (i = 0; i < coordinates.length; i++) {
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(coordinates[i]['lat'], coordinates[i]['lng']),
+                map: map
             });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                return function() {
+                    infowindow.setContent(markerName[i]);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
         }
     }
 
@@ -335,8 +346,8 @@
     //On page loadd map init
     function initialMap() {
         var myLatLng = coordinates.length > 0 ? coordinates[0] : {
-            lat: 40.7128,
-            lng: -74.0060
+            lat: 40.712776,
+            lng: -74.005974
         };
 
         var map = new google.maps.Map(document.getElementById('map'), {

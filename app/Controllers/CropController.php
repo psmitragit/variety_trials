@@ -162,8 +162,10 @@ class CropController extends BaseController
                     $data[$k][$v['name']] = $varArray->{$v['name']} ?? "";
                 }
 
-                $coordinates[$k]['lat'] = $this->getDecimalDegree($l['lat']);
-                $coordinates[$k]['lng'] = $this->getDecimalDegree($l['long']);
+                $coordinates[$k]['lat'] = (float)$l['lat'];
+                $coordinates[$k]['lng'] = (float)$l['long'];
+                // $coordinates[$k]['lat'] = $this->getDecimalDegree($l['lat']);
+                // $coordinates[$k]['lng'] = $this->getDecimalDegree($l['long']);
                 if (!empty($coordinates[$k]['lat']) && !empty($coordinates[$k]['lng'])) {
                     $locTitle[] = $l['location'] ?? "";
                 }

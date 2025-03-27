@@ -95,30 +95,30 @@
                                 if (isAllowed()) : ?>
                                     <th>Action</th>
                                 <?php endif; ?>
-                                <?php if (isAllowed()) : ?>
+                                <!-- <?php if (isAllowed()) : ?>
                                     <th>Entry</th>
-                                <?php endif; ?>
-                                <th>Group</th>
-                                <th>Crop</th>
+                                <?php endif; ?> -->
                                 <th>Assigned Variety ID</th>
-                                <th>Entered Variety ID</th>
+                                <th>Crop</th>
                                 <th>Assigned Brand</th>
-                                <th>Entered Brand</th>
+                                <th>Entered Variety ID</th>
                                 <th>Year</th>
                                 <th>State</th>
-                                <th>Trial type</th>
-                                <th>Herbicide</th>
-                                <th>Insecticide</th>
-                                <th>Relative Maturity</th>
-                                <th>SDS</th>
-                                <th>SCN</th>
-                                <th>Refuge</th>
-                                <th>Frogeye</th>
+                                <th>Treatment Group</th>
                                 <th>Seed Treatment</th>
-                                <th>Status</th>
-                                <?php if (isAllowed()) : ?>
+                                <!-- <th>Group</th> -->
+                                <!-- <th>Entered Brand</th> -->
+                                <!-- <th>Herbicide</th> -->
+                                <!-- <th>Insecticide</th> -->
+                                <!-- <th>Relative Maturity</th> -->
+                                <!-- <th>SDS</th> -->
+                                <!-- <th>SCN</th> -->
+                                <!-- <th>Refuge</th> -->
+                                <!-- <th>Frogeye</th> -->
+                                <!-- <th>Status</th> -->
+                                <!-- <?php if (isAllowed()) : ?>
                                     <th>Added By</th>
-                                <?php endif; ?>
+                                <?php endif; ?> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -136,11 +136,9 @@
                                             <a class="text-decoration-none text-danger confirmDelete" href="javascript:void(0)" data-href=" <?= base_url('admin/treatment/' . $l['id'] . '/delete') ?>"><i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i></a>
                                         </td>
                                     <?php endif; ?>
-                                    <?php if (isAllowed()) : ?>
+                                    <!-- <?php if (isAllowed()) : ?>
                                         <td><?= !empty($l['name']) ? $l['name'] : '<span class="add_entry badge badge-info" data-id="' . $l['id'] . '" role="button">Add Entry</span>' ?></td>
-                                    <?php endif; ?>
-                                    <td><?= $l['group'] ?></td>
-                                    <td><?= $l['crop_name'] ?></td>
+                                    <?php endif; ?> -->
                                     <td id="addVrBtn<?= $l['id'] ?>">
                                         <?php if (isAllowed()) : ?>
                                             <?= !empty($l['variety_id']) ? $l['variety_name'] : '<span class="add_variety badge badge-info" data-id="' . $l['id'] . '" data-var_ids="' . $varietiesByUser . '" role="button">Add Variety & Brand</span>' ?>
@@ -148,24 +146,26 @@
                                             <?= !empty($l['variety_id']) ? $l['variety_name'] : ''; ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= $l['user_entered_variety'] ?></td>
+                                    <td><?= $l['crop_name'] ?></td>
                                     <td id="brandVrBtn<?= $l['id'] ?>"><?= $l['variety_brand'] ?></td>
-                                    <td><?= $l['user_entered_brand'] ?></td>
+                                    <td><?= $l['user_entered_variety'] ?></td>
                                     <td><?= $l['year'] ?></td>
                                     <td><?= $l['state_code'] ?></td>
                                     <td><?= $l['trial_name'] ?></td>
-                                    <td><?= $l['herbicide'] ?></td>
-                                    <td><?= $l['insecticide'] ?></td>
-                                    <td><?= $l['relative_maturity'] ?></td>
-                                    <td><?= $l['sds'] ?></td>
-                                    <td><?= $l['scn'] ?></td>
-                                    <td><?= $l['refuge'] ?></td>
-                                    <td><?= $l['frogeye'] ?></td>
                                     <td><?= $l['seed_treatment'] ?></td>
-                                    <td><?= $l['is_approved'] ? '<span class="badge badge-success approve_treatment" data-bs-toggle="tooltip" data-id="' . $l['id'] . '" role="button">Approved</span>' : '<span class="badge badge-danger approve_treatment" data-id="' . $l['id'] . '" role="button">Unapproved</span>' ?></td>
-                                    <?php if (isAllowed()) : ?>
+                                    <!-- <td><?= $l['group'] ?></td> -->
+                                    <!-- <td><?= $l['user_entered_brand'] ?></td> -->
+                                    <!-- <td><?= $l['herbicide'] ?></td> -->
+                                    <!-- <td><?= $l['insecticide'] ?></td> -->
+                                    <!-- <td><?= $l['relative_maturity'] ?></td> -->
+                                    <!-- <td><?= $l['sds'] ?></td> -->
+                                    <!-- <td><?= $l['scn'] ?></td> -->
+                                    <!-- <td><?= $l['refuge'] ?></td> -->
+                                    <!-- <td><?= $l['frogeye'] ?></td> -->
+                                    <!-- <td><?= $l['is_approved'] ? '<span class="badge badge-success approve_treatment" data-bs-toggle="tooltip" data-id="' . $l['id'] . '" role="button">Approved</span>' : '<span class="badge badge-danger approve_treatment" data-id="' . $l['id'] . '" role="button">Unapproved</span>' ?></td> -->
+                                    <!-- <?php if (isAllowed()) : ?>
                                         <td><?= $l['user_name'] ?? "" ?></td>
-                                    <?php endif; ?>
+                                    <?php endif; ?> -->
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
