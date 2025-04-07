@@ -41,10 +41,10 @@
                         <label for="short_name">Variety/Hybrid <sup class="text-danger">*</sup></label>
                         <input type="text" class="form-control" id="short_name" name="short_name" value="<?= old('short_name') ?? $variety['short_name'] ?? "" ?>" placeholder="Variety" required>
                     </div>
-                    <div class="form-group col-md-6 pb-2">
+                    <!-- <div class="form-group col-md-6 pb-2">
                         <label for="additional_name">Variety/Hybrid Additional</label>
                         <input type="text" class="form-control" id="additional_name" name="additional_name" value="<?= old('additional_name') ?? $variety['additional_name'] ?? "" ?>" placeholder="Variety Additional">
-                    </div>
+                    </div> -->
                     <!-- <div class="form-group col-md-6 pb-2">
                         <label for="name">Variety/Hybrid Original</label>
                         <input type="text" class="form-control" id="name" name="name" value="<?= old('name') ?? $variety['name'] ?? "" ?>" placeholder="Variety Original">

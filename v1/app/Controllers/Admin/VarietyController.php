@@ -37,7 +37,7 @@ class VarietyController extends BaseController
                 'brand' => $this->request->getPost('brand'),
                 'variety' => $this->request->getPost('variety'),
                 'short_name' => $this->request->getPost('short_name'),
-                'additional_name' => $this->request->getPost('additional_name'),
+                // 'additional_name' => $this->request->getPost('additional_name'),
                 'name' => $this->request->getPost('name'),
                 'long' => $this->request->getPost('long'),
                 'herbicide' => $this->request->getPost('herbicide'),

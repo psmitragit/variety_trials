@@ -119,7 +119,7 @@
                                 <th>Action</th>
                                 <th>Crop</th>
                                 <th>Treatment group</th>
-                                <th>Treatment</th>
+                                <!-- <th>Treatment</th> -->
                                 <th>Year</th>
                                 <th>Trial ID</th>
                                 <th>Trial type</th>
@@ -224,9 +224,10 @@
                     data: 'crop'
                 },{
                     data: 'treatment_group'
-                },{
-                    data: 'treatment'
                 },
+                // {
+                //     data: 'treatment'
+                // },
                 {
                     data: 'year'
                 },

@@ -63,7 +63,7 @@
                                 <th>Crop</th>
                                 <th>Brand</th>
                                 <th>Variety/Hybrid</th>
-                                <th>Additional</th>
+                                <!-- <th>Additional</th> -->
                                 <th>Status</th>
                                 <?php if (isAllowed()) : ?>
                                     <th>Added By</th>
@@ -92,7 +92,7 @@
                                     <td><?= $l['crop_name'] ?></td>
                                     <td><?= $l['brand'] ?></td>
                                     <td><?= $l['short_name'] ?></td>
-                                    <td><?= $l['additional_name'] ?></td>
+                                    <!-- <td><?= $l['additional_name'] ?></td> -->
                                     <td><?= $l['status'] ? '<span class="badge badge-success approve_treatment" data-bs-toggle="tooltip" data-id="' . $l['id'] . '" role="button">Approved</span>' : '<span class="badge badge-danger approve_treatment" data-id="' . $l['id'] . '" role="button">Unapproved</span>' ?></td>
                                     <?php if (isAllowed()) : ?>
                                         <td><?= $l['user_name'] ?? "" ?></td>

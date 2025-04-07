@@ -94,7 +94,7 @@ class TrialReportController extends BaseController
                         $data[$k]['crop'] = $l['crop'];
                         $data[$k]['treatment_group'] = $treatment_group;
                         // $data[$k]['treatment'] = $treatment['name'];
-                        $data[$k]['treatment'] = "-";
+                        // $data[$k]['treatment'] = "-";
                         $data[$k]['year'] = $l['year'];
                         $data[$k]['trial'] = $l['trial_type_name'] ?? '-';
                         $data[$k]['trial_id'] = $l['trial_id'];
