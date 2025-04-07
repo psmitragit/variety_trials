@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&callback=initialMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&libraries=maps,marker&callback=initialMap" async defer></script>
 <script>
     // window.addEventListener('load', function() {
         console.log('Test');
