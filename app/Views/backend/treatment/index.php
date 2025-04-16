@@ -54,7 +54,7 @@
                                         }
                                         ?>
                                     </select>
-                                    <select class="filter-box btn " name="trial_type" id="">
+                                    <!-- <select class="filter-box btn " name="trial_type" id="">
                                         <option value="">Select Trial Type</option>
                                         <?php
                                         foreach ($trials as $trial) {
@@ -63,7 +63,7 @@
                                         <?php
                                         }
                                         ?>
-                                    </select>
+                                    </select> -->
                                     <select class="filter-box btn " name="year" id="">
                                         <option value="">Select Year</option>
                                         <?php

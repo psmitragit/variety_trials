@@ -578,7 +578,7 @@ class TrialReportController extends BaseController
         $cropModel = new Crop;
         $crop = $cropModel->find($id);
         $fileName = ($crop['name'] ?? "") . " Trial Data Format.csv";
-        $columns = ['Trial', 'Site', 'Hybrid/Variety'];
+        $columns = ['Trial', 'Site', 'Variety ID'];
         $variableModel = new CropVariable;
         $variables = $variableModel->where('crop_id', $id)->findColumn('name');
         $columns = !empty($variables) ? array_merge($columns, $variables) : $columns;
