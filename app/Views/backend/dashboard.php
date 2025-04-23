@@ -10,7 +10,7 @@
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-info rounded-3">
                         <div class="inner px-4 py-3">
-                            <h3><?= count(get_crops()) ?></h3>
+                            <h3><?= count(get_user_allowed_crops()) ?></h3>
                             <p>Crops</p>
                         </div>
                         <div class="icon">
