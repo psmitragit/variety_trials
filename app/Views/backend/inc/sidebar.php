@@ -6,9 +6,9 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        <?php if (isAllowed()) : ?>
+        <?php if (isAllowedUserCrop()) : ?>
             <li class="nav-item nav-category">Crops</li>
-            <?php foreach (get_crops() as $k => $l) : ?>
+            <?php foreach (get_user_allowed_crops() as $k => $l) : ?>
                 <li class="nav-item <?= request()->getPath() == "admin/crop/" . $l['id'] . "/trials" ? "active" : "" ?>">
                     <a class="nav-link" data-bs-toggle="collapse" href="#crop<?= $k ?>" aria-expanded="false" aria-controls="ui-basic">
                         <i class="menu-icon mdi mdi-corn"></i>

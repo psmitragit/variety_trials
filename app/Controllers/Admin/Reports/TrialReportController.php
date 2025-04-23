@@ -7,11 +7,13 @@ use App\Helpers\Helpers;
 use App\Models\Crop;
 use App\Models\CropVariable;
 use App\Models\Location;
+use App\Models\State;
 use App\Models\Treatment;
 use App\Models\TrialData;
 use App\Models\TrialLocation;
 use App\Models\Trials;
 use App\Models\TrialType;
+use App\Models\User;
 use App\Models\Variety;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -34,6 +36,8 @@ class TrialReportController extends BaseController
     {
         if ($this->request->isAJAX()) {
             $userId = \auth_admin()['id'];
+            $userModel = new User();
+            $user = $userModel->where('id', $userId)->find(); 
             $type  = \auth_admin()['type'];
             $cropId = $this->request->getPost('id');
             $draw = $this->request->getPost('draw');
@@ -49,7 +53,21 @@ class TrialReportController extends BaseController
             $trial->join('vt_trials', 'trial_data.program=vt_trials.id', 'left');
             $trial->join('crops', 'trial_data.crop_id=crops.id');
             $trial->join('trial_types', 'trial_data.trial=trial_types.id');
-            $type > 0 ? $trial->where('trial_data.user_id', $userId) : "";
+            // $type > 0 ? $trial->where('trial_data.user_id', $userId) : "";
+            if($type == 1){
+                $allowedState = isset($user[0]['state']) ? $user[0]['state']: -1;
+                if($allowedState != 0){
+                    $stateModel = new State();
+                    $state = $stateModel->select('code')->where('id', $allowedState)->find();
+                    if(!$state){
+                        $trial->where('trial_data.user_id', $userId);
+                    }else{
+                        $trial->where('trial_data.state_code', isset($state[0]['code']) ? $state[0]['code']: '');
+                    }
+                }
+            }
+
+
             $trial->join('varieties', 'trial_data.variety_code=varieties.code', 'left');
             !empty($cropId) ? $trial->where('trial_data.crop_id', $cropId) : "";
             $status >= 0 ? $trial->where('trial_data.is_approved', $status) : "";

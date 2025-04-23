@@ -18,7 +18,7 @@
                         <?php $crop_id = old('crop_id') ?? $trialData['crop_id'] ?? 0; ?>
                         <select name="crop_id" id="crop_id" class="select2 form-control" required>
                             <option value="" selected disabled>---Select----</option>
-                            <?php foreach (get_crops() as $l) : ?>
+                            <?php foreach (get_user_allowed_crops() as $l) : ?>
                                 <option value="<?= $l['id'] ?>" <?= $l['id'] == $crop_id ? "selected" : "" ?>><?= $l['name'] ?></option>
                             <?php endforeach; ?>
                         </select>

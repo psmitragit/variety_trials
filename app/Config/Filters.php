@@ -3,6 +3,7 @@
 namespace Config;
 
 use App\Filters\IsAllowed;
+use App\Filters\isAllowedUserCrop;
 use App\Filters\Login;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
@@ -25,6 +26,7 @@ class Filters extends BaseConfig
         'secureheaders' => SecureHeaders::class,
         'islogged'      => Login::class,
         'isAllowed'     => IsAllowed::class,
+        'isAllowedUserCrop' => isAllowedUserCrop::class
     ];
 
     /**

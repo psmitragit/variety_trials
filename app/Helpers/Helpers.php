@@ -116,6 +116,24 @@ class Helpers extends BaseController
         return $crops->findAll();
     }
 
+    public static function getUserAllowedCrops()
+    {
+        $admin = \auth_admin() ?? [];
+        if(!empty($admin)){
+            $cropModel = new Crop();
+            $crops = $cropModel->where('status', 1);
+            if($admin['type'] == 1){
+                $userModel = new User();
+                $user = $userModel->select('crop')->where('id', $admin['id'])->find();
+                $user_allowed_crops = isset($user[0]['crop']) ? explode(',', $user[0]['crop']) : [];
+                if(!in_array(0, $user_allowed_crops)){
+                    $crops->whereIn('id', $user_allowed_crops);
+                }
+            }
+            return $crops->findAll();
+        }
+    }
+
 
     /**
      * Upload file

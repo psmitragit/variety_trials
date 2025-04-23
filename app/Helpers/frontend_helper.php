@@ -2,6 +2,7 @@
 
 use App\Helpers\Helpers;
 use App\Models\Crop;
+use App\Models\User;
 
 /**
  * Get Authenticated admin
@@ -20,6 +21,31 @@ function isAllowed()
     }
     return false;
 }
+
+function isAllowedUserCrop($cropId = false)
+{
+    $user = auth_admin();
+    if (isset($user['type']) && $user['type'] == 0) {
+        return true;
+    }
+    //check if staff
+    if (isset($user['type']) &&  $user['type'] == 1) {
+        if(!$cropId){
+            return true;
+        }else{
+            $userModel = new User();
+            $user = $userModel->select('crop')->where('id', $user['id'])->find();
+            $user_allowed_crops = isset($user[0]['crop']) ? explode(',', $user[0]['crop']) : [];
+            if(in_array(0, $user_allowed_crops) || in_array($cropId, $user_allowed_crops)){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
 
 
 /**
@@ -51,6 +77,11 @@ function get_crops()
     return Helpers::getCrops();
 }
 
+function get_user_allowed_crops()
+{
+    return Helpers::getUserAllowedCrops();
+}
+
 
 /**
  * Get Locations by Trial
@@ -75,6 +106,9 @@ function get_crops_by_id_string($string, $column = false)
     $cropModel = new Crop();
     $crops = $cropModel->select('name')->whereIn('id', $ids)->find();
     $names = [];
+    if(in_array(0, $ids)){
+        $names[] = 'All Crops';
+    }
     foreach ($crops as $l) {
         $names[] = $l['name'];
     }

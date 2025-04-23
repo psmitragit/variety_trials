@@ -28,7 +28,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'is
         $routes->match(['get', 'post'], 'create', 'CropController::create', ['filter' => 'isAllowed']);
         $routes->match(['get', 'post'], '(:num)/edit', 'CropController::edit/$1', ['filter' => 'isAllowed']);
         $routes->get('(:num)/delete', 'CropController::delete/$1', ['filter' => 'isAllowed']);
-        $routes->get('(:num/trials)', 'CropController::cropDetails/$1', ['filter' => 'isAllowed']);
+        $routes->get('(:num/trials)', 'CropController::cropDetails/$1', ['filter' => 'isAllowedUserCrop']);
         $routes->post('get_variables', 'CropController::variables');
     });
 

@@ -55,7 +55,7 @@
                         <?php $crops = old('crop') ?? explode(',', $user['crop'] ?? '') ?? "" ?>
                         <label for="crop">crop</label>
                         <select name="crop[]" id="crop" class="form-control select2" multiple>
-                            <option value="">All Crops</option>
+                            <option value="0" <?= in_array(0, $crops) ? "selected" : ""; ?>>All Crops</option>
                             <?php foreach (get_crops() as $l) : ?>
                                 <option value="<?= $l['id']; ?>" <?= in_array($l['id'], $crops) ? "selected" : ""; ?>><?= $l['name']; ?></option>
                             <?php endforeach; ?>
