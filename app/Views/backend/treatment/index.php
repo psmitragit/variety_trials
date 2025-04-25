@@ -54,6 +54,10 @@
                                         }
                                         ?>
                                     </select>
+
+                                    <input type="text" name="trial_type" value="<?= $trial_type ?>" class="form-control d-inline filter-box" style="max-width: 200px; vertical-align: top;" placeholder="Trial type">
+
+
                                     <!-- <select class="filter-box btn " name="trial_type" id="">
                                         <option value="">Select Trial Type</option>
                                         <?php

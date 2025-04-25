@@ -43,7 +43,8 @@ class TreatmentController extends BaseController
             $treatments->where('treatments.state', $state);
         }
         if ($trial_type) {
-            $treatments->where('treatments.trial_type_id', $trial_type);
+            // $treatments->where('treatments.trial_type_id', $trial_type);
+            $treatments->like('trial_types.name', $trial_type);
         }
         // ->where('treatments.status', 1);
 
