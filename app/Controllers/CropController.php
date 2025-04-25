@@ -62,7 +62,7 @@ class CropController extends BaseController
         foreach ($trialVariables as $l) {
             $data = \json_decode(($l['variable'] ?? ""), true);
             foreach ($variables as $v) {
-                $varialeData[$v['name']][] = $data[$v['name']];
+                $varialeData[$v['name']][] = isset($data[$v['name']]) ? $data[$v['name']]: '';
             }
         }
 
