@@ -288,6 +288,76 @@
                 }
             })
         })
+
+
+        $('#trial_type').select2({
+            tags: true,
+            placeholder: "---Select---",
+            createTag: function(params) {
+                let term = $.trim(params.term);
+                if (term === '') return null;
+                return {
+                    id: 'new_' + term,
+                    text: term,
+                    newOption: true
+                };
+            },
+            templateResult: function(data) {
+                var $result = $("<span></span>");
+                $result.text(data.text);
+                if (data.newOption) {
+                    $result.append(" <em>(new)</em>");
+                }
+                return $result;
+            }
+        });
+
+        $('#trial_type').on('select2:select', function(e) {
+            const selected = e.params.data;
+            const cropId = $('#crop_id').val();
+
+            if (selected.id.startsWith('new_')) {
+                if (cropId == null) {
+                    alert('Please select a Crop first before adding a new Trial Type.');
+                    $('#trial_type').val(null).trigger('change');
+                    return;
+                }
+
+                $('#trial_type').prop('disabled', true);
+
+                $.ajax({
+                    url: '<?= base_url('admin/trials/add-new-trial-type') ?>',
+                    type: 'POST',
+                    data: {
+                        name: selected.text,
+                        crop_id: cropId,
+                        '_token': "<?= csrf_hash() ?>",
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success && response.id) {
+                            const newOption = new Option(response.name, response.id, true, true);
+                            $('#trial_type').append(newOption).trigger('change');
+                        } else {
+                            alert(response.message || 'Failed to save new item.');
+                        }
+                    },
+                    error: function(xhr) {
+                        let err = 'Something went wrong while saving!';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            err = xhr.responseJSON.message;
+                        }
+                        alert(err);
+                    },
+                    complete: function() {
+                        $('#trial_type').prop('disabled', false);
+                    }
+                });
+            }
+        });
+
+
+
     })
 </script>
 

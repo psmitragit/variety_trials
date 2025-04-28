@@ -92,6 +92,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'is
         $routes->get('type/(:num)/delete', 'TrialController::deleteTypes/$1', ['filter' => 'isAllowed']);
         $routes->post('get_trial_type_by_crop', 'TrialController::getTrialTypeByCrop');
         $routes->post('get_single', 'TrialController::getSingle');
+        $routes->post('add-new-trial-type', 'TrialController::addNewTrialType');
     });
 
     $routes->group('uploads', ['filter' => 'isAllowed'], function ($routes) {

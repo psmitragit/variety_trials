@@ -20,9 +20,9 @@
                         </div>
                     <?php endif; ?>
                     <div class="form-group col-md-6 mb-3">
-                            <label for="group">Group</label>
-                            <input type="text" class="form-control" id="group" value="<?= old('group') ?? $treatment['group'] ?? "" ?>" name="group" placeholder="Treatment Group" required>
-                        </div>
+                        <label for="group">Group</label>
+                        <input type="text" class="form-control" id="group" value="<?= old('group') ?? $treatment['group'] ?? "" ?>" name="group" placeholder="Treatment Group" required>
+                    </div>
                     <div class="form-group col-md-6 mb-3">
                         <label for="crop_id">Crop <sup class="text-danger">*</sup></label>
                         <select name="crop_id" id="crop_id" class="form-select form-control select2" required>
@@ -173,6 +173,75 @@
         $('#crop_id').change(function() {
             checkTrialType();
         });
+
+
+        $('#trial_type_id').select2({
+            tags: true,
+            placeholder: "---Select---",
+            createTag: function(params) {
+                let term = $.trim(params.term);
+                if (term === '') return null;
+                return {
+                    id: 'new_' + term,
+                    text: term,
+                    newOption: true
+                };
+            },
+            templateResult: function(data) {
+                var $result = $("<span></span>");
+                $result.text(data.text);
+                if (data.newOption) {
+                    $result.append(" <em>(new)</em>");
+                }
+                return $result;
+            }
+        });
+
+        $('#trial_type_id').on('select2:select', function(e) {
+            const selected = e.params.data;
+            const cropId = $('#crop_id').val();
+
+            if (selected.id.startsWith('new_')) {
+                if (cropId == null) {
+                    alert('Please select a Crop first before adding a new Trial Type.');
+                    $('#trial_type_id').val(null).trigger('change');
+                    return;
+                }
+
+                $('#trial_type_id').prop('disabled', true);
+
+                $.ajax({
+                    url: '<?= base_url('admin/trials/add-new-trial-type') ?>',
+                    type: 'POST',
+                    data: {
+                        name: selected.text,
+                        crop_id: cropId,
+                        '_token': "<?= csrf_hash() ?>",
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success && response.id) {
+                            const newOption = new Option(response.name, response.id, true, true);
+                            $(newOption).attr('data-crop_id', response.crop_id);
+                            $('#trial_type_id').append(newOption).trigger('change');
+                        } else {
+                            alert(response.message || 'Failed to save new item.');
+                        }
+                    },
+                    error: function(xhr) {
+                        let err = 'Something went wrong while saving!';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            err = xhr.responseJSON.message;
+                        }
+                        alert(err);
+                    },
+                    complete: function() {
+                        $('#trial_type_id').prop('disabled', false);
+                    }
+                });
+            }
+        });
+
     })
 </script>
 <?= $this->endSection() ?>

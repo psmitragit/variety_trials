@@ -165,6 +165,59 @@ class TrialController extends BaseController
         return redirect()->back()->with('error', 'Unauthorised access detected!');
     }
 
+    public function addNewTrialType()
+    {
+        if ($this->request->is('post')) {
+            $validate = $this->validate([
+                'crop_id' => 'required|is_natural_no_zero',
+                'name' => "required|is_unique[trial_types.name,id,{id}]",
+            ]);
+
+            if (!$validate) {
+                return $this->response->setJSON([
+                    'success' => 0,
+                    'message' => 'Validation failed.'
+                ]);
+            }
+
+            $typeModel = new TrialType();
+            $name = $this->request->getPost('name');
+            $cropId = $this->request->getPost('crop_id');
+
+            $existing = $typeModel
+                ->where('crop_id', $cropId)
+                ->where('name', $name)
+                ->first();
+                print_r($existing);
+
+            if ($existing) {
+                return $this->response->setJSON([
+                    'success' => 1,
+                    'id' => $existing['id'],
+                    'name' => $existing['name']
+                ]);
+            }
+
+            $typeModel->insert([
+                'crop_id' => $cropId,
+                'name' => $name
+            ]);
+            $insertedId = $typeModel->getInsertID();
+
+            return $this->response->setJSON([
+                'success' => 1,
+                'id' => $insertedId,
+                'name' => $name,
+                'crop_id' => $cropId
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => 0,
+            'message' => 'Invalid request'
+        ]);
+    }
+
     public function deleteTypes($id)
     {
         $typeModel = new TrialType();

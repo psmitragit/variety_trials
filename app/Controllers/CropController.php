@@ -46,7 +46,7 @@ class CropController extends BaseController
         $crop = $this->model->where('slug', $slug)->first();
         if (empty($crop)) return \redirect()->back()->with('error', "Crop not found");
         $variables = $this->variableModel->where('crop_id', $crop['id'])->find();
-        $states = $this->stateModel->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->find();
+        $states = $this->stateModel->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('states.code')->find();
         $brands = $this->brandModel->distinct()->select('brands.name')->join('varieties', 'brands.name=varieties.brand')
             ->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('brands.name')->find();
         $varieties  = $this->varietyModel->distinct()->select('varieties.code,varieties.short_name')->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])
