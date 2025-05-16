@@ -143,14 +143,15 @@ class LocationController extends BaseController
 
             $stateModel = new State();
             $cityModel = new City();
-            $state = $stateModel->where('code', trim($record[4]))->first();
+            $state = $stateModel->where('code', $this->clean_text($record[4]))->first();
             if ($state) {
                 $stateId = $state['id'];
             } else {
-                $stateId = $stateModel->insert(['code' => trim($record[4])]);
+                $stateId = $stateModel->insert(['code' => $this->clean_text($record[4])]);
             }
-            if (!$cityModel->where('code', trim($record[3]))->first()) {
-                $cityModel->insert(['code' => trim($record[3]), 'state_id' => $stateId]);
+            $city = $cityModel->where('code', $this->clean_text($record[3]))->first();
+            if (!$city) {
+                $cityModel->insert(['code' => $this->clean_text($record[3]), 'state_id' => $stateId]);
             }
             $data = [
                 'code'          => trim($record[0]),
@@ -172,6 +173,11 @@ class LocationController extends BaseController
             }
         }
         return \redirect()->back()->with('success', 'Data imported successfully');
+    }
+    public function clean_text($string)
+    {
+        $string = preg_replace('/[^a-zA-Z0-9,.\s]/u', '', $string);
+        return trim($string);
     }
 
     public function getCity()

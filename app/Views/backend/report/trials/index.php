@@ -222,7 +222,7 @@
                     data: 'action'
                 }, {
                     data: 'crop'
-                },{
+                }, {
                     data: 'treatment_group'
                 },
                 // {
@@ -347,6 +347,8 @@
                     } else {
                         toastr.error(res.error)
                     }
+                },
+                complete: function() {
                     $('.loader').addClass('d-none')
                 }
             })

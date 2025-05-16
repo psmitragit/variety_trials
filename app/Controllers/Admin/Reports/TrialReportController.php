@@ -15,6 +15,7 @@ use App\Models\Trials;
 use App\Models\TrialType;
 use App\Models\User;
 use App\Models\Variety;
+use Exception;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use SplTempFileObject;
@@ -29,6 +30,7 @@ class TrialReportController extends BaseController
     public function index()
     {
         $crops = Helpers::getCrops();
+        ini_set('memory_limit', '512M');
         return view('backend/report/trials/index', \compact('crops'));
     }
 
@@ -271,51 +273,56 @@ class TrialReportController extends BaseController
 
     public function bulkInsert()
     {
-        $validate = $this->validate([
-            'crop_id' => 'required|is_natural_no_zero',
-            'bulk_file' => 'uploaded[bulk_file]|ext_in[bulk_file,csv]'
-        ]);
-        if (!$validate) {
-            return response()->setJSON(['status' => false, 'error' => $this->validator->getError('crop_id') . "-" . $this->validator->getError('bulk_file')]);
-        }
-
-        $cropId = $this->request->getPost('crop_id');
-
-        $filePath = $_FILES['bulk_file']['tmp_name'];
-        $csv = Reader::createFromPath($filePath);
-        $expectedHeaders = $this->formatDownload($cropId, true);
-        $headers = $csv->getHeader();
-        $records = $csv->getRecords();
-
-        $validatedData = array();
-
-        foreach ($records as $k => $record) {
-            if ($k == 0) {
-                if (empty($headers)) {
-                    $headers = $record;
-                    if ($expectedHeaders != $headers) {
-                        return response()->setJSON(['status' => false, 'error' => 'Uploaded CSV format is not valid!']);
-                    }
-                    continue;
-                } else {
-                    if ($expectedHeaders != $headers) {
-                        return response()->setJSON(['status' => false, 'error' => 'Uploaded CSV format is not valid!']);
-                    }
-                }
+        try{
+            $validate = $this->validate([
+                'crop_id' => 'required|is_natural_no_zero',
+                'bulk_file' => 'uploaded[bulk_file]|ext_in[bulk_file,csv]'
+            ]);
+            if (!$validate) {
+                return response()->setJSON(['status' => false, 'error' => $this->validator->getError('crop_id') . "-" . $this->validator->getError('bulk_file')]);
             }
 
-            $validatedData[] = $this->validateImportRecord($cropId, $record);
+            $cropId = $this->request->getPost('crop_id');
+
+            $filePath = $_FILES['bulk_file']['tmp_name'];
+            $csv = Reader::createFromPath($filePath);
+            $expectedHeaders = $this->formatDownload($cropId, true);
+            $headers = $csv->getHeader();
+            $records = $csv->getRecords();
+
+            $validatedData = array();
+
+            foreach ($records as $k => $record) {
+                if ($k == 0) {
+                    if (empty($headers)) {
+                        $headers = $record;
+                        if ($expectedHeaders != $headers) {
+                            return response()->setJSON(['status' => false, 'error' => 'Uploaded CSV format is not valid!']);
+                        }
+                        continue;
+                    } else {
+                        if ($expectedHeaders != $headers) {
+                            return response()->setJSON(['status' => false, 'error' => 'Uploaded CSV format is not valid!']);
+                        }
+                    }
+                }
+
+                $validatedData[] = $this->validateImportRecord($cropId, $record);
+            }
+
+            if (empty($validatedData)) {
+                return response()->setJSON(['status' => false, 'error' => "No data Found!"]);
+            }
+
+
+            $view = view('backend/report/trials/validation', compact('validatedData', 'expectedHeaders'));
+            $returnUrl = $_SERVER['HTTP_REFERER'];
+
+            return response()->setJSON(['status' => true, 'html' => $view, 'data' => json_encode($validatedData), 'header' => json_encode($expectedHeaders), 'crop_id' => $cropId, 'return' => $returnUrl]);
+        }catch(Exception $err){
+            return response()->setJSON(['status' => false, 'error' => $err->getMessage()]);
         }
-
-        if (empty($validatedData)) {
-            return response()->setJSON(['status' => false, 'error' => "No data Found!"]);
-        }
-
-
-        $view = view('backend/report/trials/validation', compact('validatedData', 'expectedHeaders'));
-        $returnUrl = $_SERVER['HTTP_REFERER'];
-
-        return response()->setJSON(['status' => true, 'html' => $view, 'data' => json_encode($validatedData), 'header' => json_encode($expectedHeaders), 'crop_id' => $cropId, 'return' => $returnUrl]);
+       
     }
 
     /**
