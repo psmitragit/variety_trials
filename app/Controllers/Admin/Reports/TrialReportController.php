@@ -291,9 +291,9 @@ class TrialReportController extends BaseController
             $records = $csv->getRecords();
 
             $validatedData = array();
-            
+
             if (iterator_count($records) > 3000) {
-                return response()->setJSON(['status' => false, 'error' => "A maximum of 1000 rows can be processed at a time. You provided " . iterator_count($records) . " rows."]);
+                return response()->setJSON(['status' => false, 'error' => "A maximum of 3000 rows can be processed at a time. You provided " . iterator_count($records) . " rows."]);
             }
 
             foreach ($records as $k => $record) {

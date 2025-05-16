@@ -188,7 +188,7 @@ class TrialController extends BaseController
                 ->where('crop_id', $cropId)
                 ->where('name', $name)
                 ->first();
-                print_r($existing);
+            print_r($existing);
 
             if ($existing) {
                 return $this->response->setJSON([
@@ -282,6 +282,8 @@ class TrialController extends BaseController
         $headers = $csv->getHeader();
         $records = $csv->getRecords();
 
+        $notInsertList = [];
+        $insertedRecord = 0;
         foreach ($records as $k => $record) {
             if (empty($headers) && $k == 0) {
                 $headers = $record;
@@ -300,16 +302,29 @@ class TrialController extends BaseController
 
             $crop = trim($record[1]);
             $crop = $cropModel->where('name', $crop)->first();
-            if (!$crop) continue;
+
+            if (!$crop) {
+                $notInsertList[] = [$record, 'No crop found'];
+                continue;
+            }
+
             $trialType = trim($record[2]);
             $trialType = $trialTypeModel->where('name', $trialType)->first();
-            if (!$trialType) continue;
+
+            if (!$trialType) {
+                $notInsertList[] = [$record, 'No trial found'];
+                continue;
+            }
 
             $treatment_group = trim($record[4]);
 
             $location = trim($record[5]);
             $location = $locationModel->where('code', $location)->first();
-            if (!$location) continue;
+
+            if (!$location) {
+                $notInsertList[] = [$record, 'No location found'];
+                continue;
+            }
 
             $trial = $this->model->where('name', $trialName)
                 ->where('crop_id', $crop['id'])
@@ -327,7 +342,6 @@ class TrialController extends BaseController
                 'crop_id' => $crop['id'],
                 'user_id' => \auth_admin()['id']
             ];
-
             if ($trial) {
                 $locations = [];
                 $trial = $trial[0];
@@ -341,15 +355,43 @@ class TrialController extends BaseController
                 $trialId = $this->model->insert($data);
                 $this->addTrialLocation($trialId, $location['id'], trim($record[7]), trim($record[6]));
             }
+            $insertedRecord++;
         }
-        return \redirect()->back()->with('success', 'Data imported successfully');
+        if (!empty($notInsertList)) {
+            $html = '<table class="w-100 table table-striped">';
+            $html .= '<tr>';
+            $html .= '<td><strong>Validation Error</strong></td>';
+            foreach ($expectedHeaders as $h) {
+                $html .= '<td><strong>'.$h.'</strong></td>';
+            }
+            $html .= '</tr>';
+            foreach ($notInsertList as $key => $err) {
+                if ($key > 100) {
+                    $html .= '<tr><td colspan="9" class="text-center">'.((int)count($notInsertList) - 100).' Rows More.</td>';
+                    break;
+                }
+                $html .= '<tr>';
+                $html .= '<td>' . ($err[1] ?? '-') . '</td>';
+                foreach ($err[0] ?? [] as $v) {
+                    $html .= '<td>' . $v . '</td>';
+                }
+                $html .= '</tr>';
+            }
+            $html .= '</table>';
+            session()->setFlashdata('trial_bulk_insert_err', $html);
+        }
+        if ($insertedRecord > 0) {
+            return \redirect()->back()->with('success', $insertedRecord . ' data imported successfully');
+        } else {
+            return \redirect()->back()->with('error', 'No data imported');
+        }
     }
 
     public function addTrialLocation($trialId, $location_id, $planting_date, $harvest_date)
     {
         $trialLocationModel = new TrialLocation();
 
-        if ($trialLocationModel->where(['trial_id' => $trialId, 'location_id'=> $location_id])->first()) {
+        if ($trialLocationModel->where(['trial_id' => $trialId, 'location_id' => $location_id])->first()) {
             $trialLocationModel->where(['trial_id' => $trialId, 'location_id' => $location_id])->update('null', ['planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date))]);
         } else {
             $trialLocationModel->insert(['trial_id' => $trialId, 'location_id' => $location_id, 'planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date))]);
