@@ -312,8 +312,10 @@ class TrialController extends BaseController
             $trialType = $trialTypeModel->where('name', $trialType)->first();
 
             if (!$trialType) {
-                $notInsertList[] = [$record, 'No trial found'];
-                continue;
+                $trialType = ['crop_id' => $crop['id'], 'name' => trim($record[2]), 'status' => 1, 'created_at' => date('Y-m-d h:i:s'), 'created_at' => date('Y-m-d h:i:s')];
+                $trialTypeModel->insert($trialType);
+                $insertedId = $trialTypeModel->getInsertID();
+                $trialType['id'] = $insertedId;
             }
 
             $treatment_group = trim($record[4]);
