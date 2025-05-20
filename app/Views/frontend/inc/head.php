@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/select2/select2.min.css">
-    <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/datatables/datatables.min.css">
+    <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/datatables/datatables.min.css?v=1.0.0">
     <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/datatables/responsive.dataTables.css">
     <link rel="stylesheet" href="<?= base_url('backend') ?>/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css">
 

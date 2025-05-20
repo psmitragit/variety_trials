@@ -87,12 +87,27 @@ class CropController extends BaseController
             $herbicide = $this->request->getPost('herbicide') ?? false;
             $fVariables = $this->request->getPost('variables') ?? '';
             $fVariables = \json_decode($fVariables, true) ?? [];
+            $otherVariables = [];
+            foreach ($fVariables as $key => $value) {
+                $otherVariables[] = $key;
+            }
 
             $variables = $this->variableModel->where('crop_id', $cropId)->find();
 
-            $columns = ['trial_data.year', 'trial_data.state_code', 'trial_data.entry', 'trial_types.name', 'trial_data.location_code', 'trial_data.location', 'trial_data.variety_code', 'v.brand', 'v.additional_name', 'v.short_name', 'v.herbicide'];
+            $columns = ['trial_data.year', 'trial_data.state_code', 'trial_data.entry', 'trial_types.name', 'trial_data.location_code', 'trial_data.location', 'trial_data.variety_code', 'v.brand', 'variety', 'variety_additional'];
 
-            $trial = $this->trialDataModel->select('trial_data.*,v.brand,v.short_name as variety,v.additional_name as variety_additional,v.herbicide,l.lat,l.long,,trial_types.name as trial_type_name');
+            $select = 'trial_data.*,v.brand,v.short_name as variety,v.additional_name as variety_additional,v.herbicide,l.lat,l.long,trial_types.name as trial_type_name';
+
+            if ($order && (count($columns) - 1) < $order['column']) {
+                $index = $order['column'] - (count($columns));
+                $columnName = $otherVariables[$index] ?? '';
+
+                if (!empty($columnName)) {
+                    $select .= ", LOWER(JSON_UNQUOTE(JSON_EXTRACT(variable, '$.\"$columnName\"'))) AS variable_data";
+                }
+            }
+
+            $trial = $this->trialDataModel->select($select);
             $trial->join('varieties v', 'trial_data.variety_code=v.code', 'left');
             $trial->join('locations l', 'trial_data.location_code=l.code', 'left');
             $trial->join('trial_types', 'trial_data.trial=trial_types.id');
@@ -131,10 +146,10 @@ class CropController extends BaseController
                 // $trial->orWhere('v.herbicide like ', '%' . $search . '%');
                 $trial->groupEnd();
             }
-            if ($order && count($columns) > $order['column']) {
+            if  ($order && (count($columns) - 1) >= $order['column']) {
                 $trial->orderBy($columns[$order['column'] ?? 0], $order['dir'] ?? 'asc');
-            } elseif ($order && count($columns) <= $order['column']) {
-                $trial->orderBy('rand()');
+            } elseif ($order && (count($columns) - 1) < $order['column']) {
+                $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
             } else {
                 $trial->orderBy('trial_data.year', 'DESC');
             }

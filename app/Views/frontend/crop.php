@@ -47,7 +47,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sYear" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Year</option>
+                            <?php
+                            $insertedYear = [];
+                            ?>
                             <?php foreach ($years as $s) : ?>
+                                <?php
+                                if (in_array($s['year'], $insertedYear)) {
+                                    continue;
+                                } else {
+                                    $insertedYear[] = $s['year'];
+                                }
+                                ?>
                                 <option value="<?= $s['year'] ?>"><?= $s['year'] ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -55,7 +65,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sState" class="form-control filter-input select2 ps-4">
                             <option value="0">Select State</option>
+                            <?php
+                            $insertedState = [];
+                            ?>
                             <?php foreach ($states as $s) : ?>
+                                <?php
+                                if (in_array($s['name'], $insertedState)) {
+                                    continue;
+                                } else {
+                                    $insertedState[] = $s['name'];
+                                }
+                                ?>
                                 <option value="<?= $s['code'] ?>"><?= strtoupper($s['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -63,7 +83,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sBrand" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Brand</option>
+                            <?php
+                            $insertedBrand = [];
+                            ?>
                             <?php foreach ($brands as $s) : ?>
+                                <?php
+                                if (in_array($s['name'], $insertedBrand)) {
+                                    continue;
+                                } else {
+                                    $insertedBrand[] = $s['name'];
+                                }
+                                ?>
                                 <option value="<?= $s['name'] ?>"><?= strtoupper($s['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -71,7 +101,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sVariety" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Variety</option>
+                            <?php
+                            $insertedVariety = [];
+                            ?>
                             <?php foreach ($varieties as $s) : ?>
+                                <?php
+                                if (in_array(strtoupper($s['short_name']), $insertedVariety)) {
+                                    continue;
+                                } else {
+                                    $insertedVariety[] = strtoupper($s['short_name']);
+                                }
+                                ?>
                                 <option value="<?= $s['code'] ?>"><?= strtoupper($s['short_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -79,7 +119,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sTrial" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Trial</option>
+                            <?php
+                            $insertedTrials = [];
+                            ?>
                             <?php foreach ($trials as $s) : ?>
+                                <?php
+                                if (in_array($s['name'], $insertedTrials)) {
+                                    continue;
+                                } else {
+                                    $insertedTrials[] = $s['name'];
+                                }
+                                ?>
                                 <option value="<?= $s['id'] ?>"><?= strtoupper($s['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -87,7 +137,17 @@
                     <div class="col-md-2 form-group mb-3">
                         <select id="sHerbicide" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Herbicide</option>
+                            <?php
+                            $insertedHerbicides = [];
+                            ?>
                             <?php foreach ($herbicides as $s) : ?>
+                                <?php
+                                if (in_array($s['herbicide'], $insertedHerbicides)) {
+                                    continue;
+                                } else {
+                                    $insertedHerbicides[] = $s['herbicide'];
+                                }
+                                ?>
                                 <option value="<?= $s['herbicide'] ?>"><?= strtoupper($s['herbicide']) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -113,29 +173,34 @@
                         <button  class="btn btn-danger">Reset</button>
                     </div>
                 </div> -->
-                <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0 crop-table" id="dataTable">
-                        <thead class="">
-                            <tr>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Year</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">State</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entry</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trial</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">LocID</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Location</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">VarietyID</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Brand</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety</th>
-                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety Additional</th>
-                                <?php foreach ($variables as $l) : ?>
-                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"><?= $l['name'] ?></th>
-                                <?php endforeach; ?>
-                            </tr>
-                        </thead>
-                        <tbody class="">
+                <div>
+                    <div class="table-responsive p-0" id="scrollableTable">
+                        <table class="table align-items-center mb-0 crop-table" id="dataTable">
+                            <thead class="">
+                                <tr>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Year</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">State</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entry</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trial</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">LocID</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Location</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">VarietyID</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Brand</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety</th>
+                                    <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety Additional</th>
+                                    <?php foreach ($variables as $l) : ?>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"><?= $l['name'] ?></th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody class="">
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="custom-scrollbar-container" id="customScrollbar">
+                        <div class="custom-scrollbar-thumb" id="customThumb"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,6 +216,22 @@
             </div>
             <div class="modal-body">
                 <div id="map" class="cropLocationMap"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="showDataCustomModal" tabindex="-1" aria-labelledby="sitemapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="showDataCustomModalLabel">Trials Data</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="my-3 d-flex justify-content-center">
+                <button class="btn btn-success m-auto" style="max-width: 250px;" data-bs-dismiss="modal" aria-label="Close">Close</button>
             </div>
         </div>
     </div>
@@ -361,5 +442,104 @@
         });
     }
 </script>
+<script>
+    const scrollContainer = document.getElementById('scrollableTable');
+    const customScrollbar = document.getElementById('customScrollbar');
+    const customThumb = document.getElementById('customThumb');
 
+    function updateThumb() {
+        const containerWidth = scrollContainer.clientWidth;
+        const contentWidth = scrollContainer.scrollWidth;
+        const scrollLeft = scrollContainer.scrollLeft;
+
+        // Calculate thumb width proportional to visible area
+        const scrollbarWidth = customScrollbar.clientWidth;
+        const thumbWidth = Math.max((containerWidth / contentWidth) * scrollbarWidth, 30);
+
+        // Calculate thumb left position proportional to scrollLeft
+        const maxThumbLeft = scrollbarWidth - thumbWidth;
+        const thumbLeft = (scrollLeft / (contentWidth - containerWidth)) * maxThumbLeft;
+
+        customThumb.style.width = thumbWidth + 'px';
+        customThumb.style.left = thumbLeft + 'px';
+    }
+
+    // Update thumb when the table scrolls
+    scrollContainer.addEventListener('scroll', updateThumb);
+
+    // Update on window resize (responsive)
+    window.addEventListener('resize', updateThumb);
+
+    // Initialize thumb position/size on load
+    updateThumb();
+
+    // Dragging functionality
+    let isDragging = false;
+    let startX;
+    let startScrollLeft;
+
+    customThumb.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX;
+        startScrollLeft = scrollContainer.scrollLeft;
+        document.body.style.userSelect = 'none'; // prevent text selection while dragging
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.body.style.userSelect = 'auto';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.pageX - startX;
+        const contentWidth = scrollContainer.scrollWidth;
+        const containerWidth = scrollContainer.clientWidth;
+        const scrollableWidth = contentWidth - containerWidth;
+        const scrollbarWidth = customScrollbar.clientWidth;
+        const maxThumbLeft = scrollbarWidth - customThumb.clientWidth;
+
+        // Calculate how much to scroll in the container relative to thumb drag
+        const scrollChange = (dx / maxThumbLeft) * scrollableWidth;
+        scrollContainer.scrollLeft = Math.min(Math.max(startScrollLeft + scrollChange, 0), scrollableWidth);
+    });
+
+    const headering = [
+        "Year",
+        "State",
+        "Entry",
+        "Trial",
+        "LocID",
+        "Location",
+        "VarietyID",
+        "Brand",
+        "Variety",
+        "Variety Additional",
+        <?php foreach ($variables as $l) : ?> "<?= addslashes($l['name']) ?>",
+        <?php endforeach; ?>
+    ];
+
+    $('#dataTable').on('click', 'tbody td', function(e) {
+        $('.current_selected_tr').removeClass('current_selected_tr');
+        let parent = $(this).parent('tr');
+        parent.addClass('current_selected_tr');
+        let tds = $('.current_selected_tr td');
+
+        let html = '<table class="table table-striped"><tbody>';
+        let index = 0;
+
+        tds.each(function() {
+            const value = $(this).text();
+            html += `<tr>
+            <td>${headering[index]}</td>
+            <td>${value}</td>
+        </tr>`;
+            index++;
+        });
+
+        html += '</tbody></table>';
+        $('#showDataCustomModal .modal-body').html(html);
+        $('#showDataCustomModal').modal('show');
+    });
+</script>
 <?= $this->endSection() ?>
