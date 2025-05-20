@@ -157,7 +157,17 @@
                         <div class="col-md-2 form-group mb-3">
                             <select id="s<?= ucfirst($k); ?>" class="form-control select2 filter-input ps-4 filter-variables" data-type="<?= $k; ?>">
                                 <option value="0">Select <?= ucfirst($k); ?></option>
+                                <?php
+                                $newArray = [];
+                                ?>
                                 <?php foreach ($l as $s) : ?>
+                                    <?php
+                                    if (in_array(strtoupper($s), $newArray) || empty($s)) {
+                                        continue;
+                                    } else {
+                                        $newArray[] = strtoupper($s);
+                                    }
+                                    ?>
                                     <option value="<?= $s ?>"><?= strtoupper($s) ?></option>
                                 <?php endforeach; ?>
                             </select>
