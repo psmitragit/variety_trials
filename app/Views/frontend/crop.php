@@ -185,7 +185,7 @@
                 </div> -->
                 <div>
                     <div class="table-responsive p-0" id="scrollableTable">
-                        <table class="table align-items-center mb-0 crop-table" id="dataTable">
+                        <table class="table align-items-center mb-0 crop-table" id="dataTable" style="margin-top: 45px !important;">
                             <thead class="">
                                 <tr>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Year</th>
@@ -401,7 +401,6 @@
         $('#showMap').modal('show');
     })
 
-    // Initialize the map
     function initMap() {
         var myLatLng = coordinates.length > 0 ? coordinates[0] : {
             lat: 40.712776,
@@ -434,7 +433,6 @@
     }
 
 
-    //On page loadd map init
     function initialMap() {
         var myLatLng = coordinates.length > 0 ? coordinates[0] : {
             lat: 40.712776,
@@ -462,11 +460,9 @@
         const contentWidth = scrollContainer.scrollWidth;
         const scrollLeft = scrollContainer.scrollLeft;
 
-        // Calculate thumb width proportional to visible area
         const scrollbarWidth = customScrollbar.clientWidth;
         const thumbWidth = Math.max((containerWidth / contentWidth) * scrollbarWidth, 30);
 
-        // Calculate thumb left position proportional to scrollLeft
         const maxThumbLeft = scrollbarWidth - thumbWidth;
         const thumbLeft = (scrollLeft / (contentWidth - containerWidth)) * maxThumbLeft;
 
@@ -474,16 +470,12 @@
         customThumb.style.left = thumbLeft + 'px';
     }
 
-    // Update thumb when the table scrolls
     scrollContainer.addEventListener('scroll', updateThumb);
 
-    // Update on window resize (responsive)
     window.addEventListener('resize', updateThumb);
 
-    // Initialize thumb position/size on load
     updateThumb();
 
-    // Dragging functionality
     let isDragging = false;
     let startX;
     let startScrollLeft;
@@ -492,7 +484,7 @@
         isDragging = true;
         startX = e.pageX;
         startScrollLeft = scrollContainer.scrollLeft;
-        document.body.style.userSelect = 'none'; // prevent text selection while dragging
+        document.body.style.userSelect = 'none';
     });
 
     document.addEventListener('mouseup', () => {
@@ -508,8 +500,6 @@
         const scrollableWidth = contentWidth - containerWidth;
         const scrollbarWidth = customScrollbar.clientWidth;
         const maxThumbLeft = scrollbarWidth - customThumb.clientWidth;
-
-        // Calculate how much to scroll in the container relative to thumb drag
         const scrollChange = (dx / maxThumbLeft) * scrollableWidth;
         scrollContainer.scrollLeft = Math.min(Math.max(startScrollLeft + scrollChange, 0), scrollableWidth);
     });
