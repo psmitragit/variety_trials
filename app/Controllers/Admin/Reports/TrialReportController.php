@@ -292,7 +292,7 @@ class TrialReportController extends BaseController
 
             $validatedData = array();
 
-            if (iterator_count($records) > 3000) {
+            if (iterator_count($records) > 4000) {
                 return response()->setJSON(['status' => false, 'error' => "A maximum of 3000 rows can be processed at a time. You provided " . iterator_count($records) . " rows."]);
             }
 
@@ -406,7 +406,13 @@ class TrialReportController extends BaseController
 
         $trialModel = new Trials();
 
+        $data = [];
+
         foreach ($records as $record) {
+
+            $data[trim($record[0]) . trim($record[1]) . trim($record[2])] = trim($record[0]) . trim($record[1]) . trim($record[2]);
+            continue;
+
             if (!empty($record['error'])) continue;
 
             $headers = (string) $this->request->getPost('header');
@@ -443,6 +449,8 @@ class TrialReportController extends BaseController
                 'variety_code' => $variety_code,
             ];
 
+           
+
             if ($chk_trial = $this->model->where($chkData)->first()) {
                 $this->model->update($chk_trial['id'], $data);
                 $trialId = $chk_trial['id'];
@@ -470,6 +478,10 @@ class TrialReportController extends BaseController
             $this->model->update($trialId, ['variable' => \json_encode($varData)]);
         }
 
+        print_r(count($data));
+        echo '<pre>';
+        print_r($data);
+        exit;
 
 
         return \redirect()->to($return)->with('success', 'Data imported successfully');

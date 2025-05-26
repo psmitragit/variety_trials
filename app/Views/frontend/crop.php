@@ -134,40 +134,12 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-md-2 form-group mb-3">
-                        <select id="sHerbicide" class="form-control filter-input select2 ps-4">
-                            <option value="0">Select Herbicide</option>
-                            <?php
-                            $insertedHerbicides = [];
-                            ?>
-                            <?php foreach ($herbicides as $s) : ?>
-                                <?php
-                                if (in_array($s['herbicide'], $insertedHerbicides)) {
-                                    continue;
-                                } else {
-                                    $insertedHerbicides[] = $s['herbicide'];
-                                }
-                                ?>
-                                <option value="<?= $s['herbicide'] ?>"><?= strtoupper($s['herbicide']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
 
                     <?php foreach ($varialeData as $k => $l) : ?>
                         <div class="col-md-2 form-group mb-3">
                             <select id="s<?= ucfirst($k); ?>" class="form-control select2 filter-input ps-4 filter-variables" data-type="<?= $k; ?>">
                                 <option value="0">Select <?= ucfirst($k); ?></option>
-                                <?php
-                                $newArray = [];
-                                ?>
                                 <?php foreach ($l as $s) : ?>
-                                    <?php
-                                    if (in_array(strtoupper($s), $newArray) || empty($s)) {
-                                        continue;
-                                    } else {
-                                        $newArray[] = strtoupper($s);
-                                    }
-                                    ?>
                                     <option value="<?= $s ?>"><?= strtoupper($s) ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -199,7 +171,7 @@
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety</th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety Additional</th>
                                     <?php foreach ($variables as $l) : ?>
-                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"><?= $l['name'] ?></th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"><?= $l ?></th>
                                     <?php endforeach; ?>
                                 </tr>
                             </thead>
@@ -350,7 +322,7 @@
                     data: 'variety_additional'
                 },
                 <?php foreach ($variables as $l) : ?> {
-                        data: '<?= $l['name'] ?>'
+                        data: '<?= $l ?>'
                     },
                 <?php endforeach; ?>
             ],
@@ -515,7 +487,7 @@
         "Brand",
         "Variety",
         "Variety Additional",
-        <?php foreach ($variables as $l) : ?> "<?= addslashes($l['name']) ?>",
+        <?php foreach ($variables as $l) : ?> "<?= addslashes($l) ?>",
         <?php endforeach; ?>
     ];
 

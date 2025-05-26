@@ -30,15 +30,15 @@ function isAllowedUserCrop($cropId = false)
     }
     //check if staff
     if (isset($user['type']) &&  $user['type'] == 1) {
-        if(!$cropId){
+        if (!$cropId) {
             return true;
-        }else{
+        } else {
             $userModel = new User();
             $user = $userModel->select('crop')->where('id', $user['id'])->find();
             $user_allowed_crops = isset($user[0]['crop']) ? explode(',', $user[0]['crop']) : [];
-            if(in_array(0, $user_allowed_crops) || in_array($cropId, $user_allowed_crops)){
+            if (in_array(0, $user_allowed_crops) || in_array($cropId, $user_allowed_crops)) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
@@ -106,11 +106,27 @@ function get_crops_by_id_string($string, $column = false)
     $cropModel = new Crop();
     $crops = $cropModel->select('name')->whereIn('id', $ids)->find();
     $names = [];
-    if(in_array(0, $ids)){
+    if (in_array(0, $ids)) {
         $names[] = 'All Crops';
     }
     foreach ($crops as $l) {
         $names[] = $l['name'];
     }
     return implode(', ', array_filter($names));
+}
+
+function dd($text = "~")
+{
+    echo '<pre class="pre-code">';
+    if (is_array($text)) {
+        foreach ($text as $key => $value) {
+            print_r($value);
+            echo '</pre>';
+            echo '<br><br>';
+            echo '<pre class="pre-code">';
+        }
+    } else {
+        print_r($text);
+    }
+    exit();
 }

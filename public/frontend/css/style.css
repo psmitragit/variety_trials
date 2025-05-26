@@ -241,15 +241,18 @@ object.objs {
 .sm-text-sixes {
   font-size: 13px;
 }
+
 #dataTable_wrapper {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
 }
+
 #dataTable {
   width: 100% !important;
 }
+
 .state-contaier .select2-selection.select2-selection--single {
   background: transparent;
   height: 45px;
@@ -257,18 +260,21 @@ object.objs {
   border-color: #b5b5b5 !important;
   margin-left: 8px;
 }
+
 .state-contaier {
   margin-top: 20px;
 }
-.state-contaier  .select2-selection__arrow {
+
+.state-contaier .select2-selection__arrow {
   margin-top: 9px;
-}   
+}
 
 .table thead th {
- 
+
   text-align: left !important;
 }
-.ascx i:hover{
+
+.ascx i:hover {
   color: #4f772d;
 
 }
@@ -276,6 +282,7 @@ object.objs {
 .crop-table td {
   padding: 0.75rem 1.5rem !important;
 }
+
 .table-responsive.p-0 {
   position: relative;
   overflow-x: auto;
@@ -322,4 +329,11 @@ object.objs {
 
 .custom-scrollbar-thumb:hover {
   background-color: #357ABD;
+}
+
+.pre-code {
+  background: black;
+  color: green;
+  font-weight: bold;
+  font-size: 15px;
 }

@@ -45,27 +45,51 @@ class CropController extends BaseController
     {
         $crop = $this->model->where('slug', $slug)->first();
         if (empty($crop)) return \redirect()->back()->with('error', "Crop not found");
-        $variables = $this->variableModel->where('crop_id', $crop['id'])->find();
-        $states = $this->stateModel->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('states.code')->find();
-        $brands = $this->brandModel->distinct()->select('brands.name')->join('varieties', 'brands.name=varieties.brand')
-            ->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('brands.name')->find();
-        $varieties  = $this->varietyModel->distinct()->select('varieties.code,varieties.short_name')->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])
-            ->orderBy('varieties.code')->find();
 
-        $years = $this->trialDataModel->select('DISTINCT(year)')->where('crop_id', $crop['id'])->orderBy('year', 'desc')->find();
-        $trials = $this->trialTypeModel->select('trial_types.id,trial_types.name')->distinct()->join('trial_data', 'trial_data.trial=trial_types.id')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('trial_types.name')->find();
-        $herbicides = $this->treatmentModel->select('DISTINCT(herbicide)')->join('trial_data', 'trial_data.entry=treatments.name')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('treatments.herbicide')->find();
+        //YEAR
+        $years = $this->trialDataModel->select('year')->where('crop_id', $crop['id'])->orderBy('year', 'desc')->groupBy('year')->distinct()->findAll();
 
-        $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->find();
+        //STATES
+        $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
 
-        $varialeData = array();
-        foreach ($trialVariables as $l) {
-            $data = \json_decode(($l['variable'] ?? ""), true);
-            foreach ($variables as $v) {
-                $varialeData[$v['name']][] = isset($data[$v['name']]) ? $data[$v['name']]: '';
-            }
+        //BRAND
+        $brands = $this->brandModel->select('brands.name')->join('varieties', 'brands.name=varieties.brand')
+            ->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('brands.name')->groupBy('trial_data.variety_code')->distinct()->findAll();
+
+        //VARIETIES
+        $varieties  = $this->varietyModel->select('varieties.code,varieties.short_name')->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('varieties.code')
+            ->groupBy('trial_data.variety_code')->distinct()->findAll();
+
+        //TRIALS
+        $trials = $this->trialTypeModel->select('trial_types.id,trial_types.name')->join('trial_data', 'trial_data.trial=trial_types.id')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->groupBy('trial_types.name')
+            ->orderBy('trial_types.name')->distinct()->findAll();
+
+        //HERBICIDES
+        // $herbicides = $this->treatmentModel->select('treatments.herbicide')->join('trial_data', 'trial_data.entry=treatments.name')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->groupBy('treatments.herbicide')
+        $herbicides = [];
+
+        //VARIABLES
+        $variables = $this->variableModel->select('crop_variables.name')->where('crop_id', $crop['id'])->findColumn('name');
+        $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->groupBy('variable')->distinct()->findAll();
+        $decoded = array_map(fn($item) => json_decode($item['variable'], true), $trialVariables);
+
+        $varialeData = [];
+        foreach ($variables as $i) {
+            $varialeData[$i] = [];
+            $valueSet[$i] = [];
         }
 
+        foreach ($decoded as $trialVariable) {
+            foreach ($variables as $name) {
+                if (!empty($trialVariable[$name])) {
+                    $value = $trialVariable[$name];
+                    if (!isset($valueSet[$name][$value])) {
+                        $varialeData[$name][] = $value;
+                        $valueSet[$name][$value] = true;
+                    }
+                }
+            }
+        }
 
         return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData'));
     }
@@ -146,7 +170,7 @@ class CropController extends BaseController
                 // $trial->orWhere('v.herbicide like ', '%' . $search . '%');
                 $trial->groupEnd();
             }
-            if  ($order && (count($columns) - 1) >= $order['column']) {
+            if ($order && (count($columns) - 1) >= $order['column']) {
                 $trial->orderBy($columns[$order['column'] ?? 0], $order['dir'] ?? 'asc');
             } elseif ($order && (count($columns) - 1) < $order['column']) {
                 $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
