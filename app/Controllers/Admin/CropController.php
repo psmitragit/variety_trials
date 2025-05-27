@@ -60,6 +60,7 @@ class CropController extends BaseController
                 'name' => 'required|trim|is_unique[crops.name,id,{id}]',
                 'v_title.*' => 'if_exist|required',
                 'v_value.*' => 'if_exist|required',
+                'v_filter.*' => 'if_exist|required'
             ]);
             if (!$validate) return \redirect()->back()->with('error', 'Fill all required fields')->withInput();
 
@@ -72,6 +73,7 @@ class CropController extends BaseController
             $variables = Helpers::getVariables($id);
             $oldVariableTitles = array();
             $variablesTitle = $this->request->getPost('v_title') ?? [];
+            $variablesFilter = $this->request->getPost('v_filter') ?? [];
             \array_walk($variablesTitle, function ($value) {
                 return \trim($value);
             });
@@ -80,7 +82,7 @@ class CropController extends BaseController
                 !in_array($v['name'], $variablesTitle) ? $varibaleModel->where(['name' => $v['name'], 'crop_id' => $cropId])->delete() : "";
             }
             foreach ($variablesTitle as $k => $l) {
-                $this->addVariables($l, $cropId);
+                $this->addVariables($l, $cropId, $variablesFilter[$k] ?? 'other');
             }
 
             return \redirect('admin/crop')->with('success', 'Crop updated successfully');
@@ -164,16 +166,20 @@ class CropController extends BaseController
     // }
 
 
-    public function addVariables($title, $cropId)
+    public function addVariables($title, $cropId, $filter = 'other')
     {
         if (!empty($title)) {
             $varibaleModel = new CropVariable();
             $data = [
                 'crop_id' => $cropId,
-                'name' => \trim($title)
+                'name' => \trim($title),
+                'filter' => $filter
             ];
-            if (!$varibaleModel->where(['crop_id' => $cropId, 'name' => \trim($title)])->first()) {
+            $variable= $varibaleModel->where(['crop_id' => $cropId, 'name' => \trim($title)])->first();
+            if(!$variable){
                 return $varibaleModel->insert($data);
+            }else{
+                return $varibaleModel->update($variable['id'], ['filter' => $filter]);
             }
         }
     }

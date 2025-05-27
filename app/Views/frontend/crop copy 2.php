@@ -436,6 +436,7 @@
 
     $(function() {
         const dataTable = $('#dataTable').DataTable({
+            // searching: false,
             processing: true,
             serverSide: true,
             serverMethod: 'post',

@@ -13,7 +13,7 @@ class CropVariable extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'crop_id', 'value'];
+    protected $allowedFields    = ['name', 'crop_id', 'value', 'filter'];
 
     // Dates
     protected $useTimestamps = true;

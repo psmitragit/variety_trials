@@ -69,7 +69,31 @@ class CropController extends BaseController
         $herbicides = [];
 
         //VARIABLES
-        $variables = $this->variableModel->select('crop_variables.name')->where('crop_id', $crop['id'])->findColumn('name');
+        $allVariables = $this->variableModel->select('crop_variables.name,crop_variables.filter')->where('crop_id', $crop['id'])->findAll();
+
+        $variables = [];
+
+        $trait = [];
+        $management = [];
+        $numeric = [];
+        $other = [];
+
+        foreach ($allVariables as $key => $value) {
+            if ($value['filter'] == 'trait') {
+                $trait[] = $value['name'];
+            } else if ($value['filter'] == 'management') {
+                $management[] = $value['name'];
+            } else if ($value['filter'] == 'numeric') {
+                $numeric[$value['name']] =  [
+                    'max' => 0,
+                    'min' => 0
+                ];
+            } else {
+                $other[] = $value['name'];
+            }
+            $variables[] = $value['name'];
+        }
+
         $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->groupBy('variable')->distinct()->findAll();
         $decoded = array_map(fn($item) => json_decode($item['variable'], true), $trialVariables);
 
@@ -81,17 +105,34 @@ class CropController extends BaseController
 
         foreach ($decoded as $trialVariable) {
             foreach ($variables as $name) {
-                if (!empty($trialVariable[$name])) {
-                    $value = $trialVariable[$name];
-                    if (!isset($valueSet[$name][$value])) {
-                        $varialeData[$name][] = $value;
-                        $valueSet[$name][$value] = true;
+                if (array_key_exists($name, $numeric)) {
+                    if(is_numeric($trialVariable[$name])){
+                        if (empty($numeric[$name]['min'])) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] < $numeric[$name]['min']) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        }
+                        if (empty($numeric[$name]['max'])) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] > $numeric[$name]['max']) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        }
+                    }                   
+                } else {
+                    if (!empty($trialVariable[$name])) {
+                        $value = $trialVariable[$name];
+                        if (!isset($valueSet[$name][$value])) {
+                            $varialeData[$name][] = $value;
+                            $valueSet[$name][$value] = true;
+                        }
                     }
                 }
             }
         }
 
-        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData'));
+
+        // dd([$variables]);
+        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other'));
     }
 
     public function ajaxLoad()
@@ -117,6 +158,13 @@ class CropController extends BaseController
             }
 
             $variables = $this->variableModel->where('crop_id', $cropId)->find();
+            $numericFilter = [];
+
+            foreach ($variables as $key => $value) {
+                if($value['filter'] == 'numeric'){
+                    $numericFilter[] = $value['name'];
+                }
+            }
 
             $columns = ['trial_data.year', 'trial_data.state_code', 'trial_data.entry', 'trial_types.name', 'trial_data.location_code', 'trial_data.location', 'trial_data.variety_code', 'v.brand', 'variety', 'variety_additional'];
 
@@ -149,7 +197,11 @@ class CropController extends BaseController
 
             foreach ($fVariables as $k => $v) {
                 if (!empty($v)) {
-                    $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                    if(in_array($k, $numericFilter)){
+                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <", $v);
+                    }else{ 
+                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                    }
                 }
             }
 

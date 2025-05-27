@@ -22,8 +22,18 @@
                             <?php foreach ($variables as $k => $v) : ?>
                                 <div class="col-md-6 var-container">
                                     <div class="row form-group">
-                                        <div class="col-md-10"><input type="text" class="form-control" name="v_title[<?= $v['id'] ?? $k ?>]" value="<?= $v['name'] ?? "" ?>" placeholder="Enter variable name..." required></div>
-                                        <div class="col-md-2"><button type="button" class="btn btn-danger btn-sm delete"><i class="ti ti-trash"></i></button></div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" name="v_title[<?= $v['id'] ?? $k ?>]" value="<?= $v['name'] ?? "" ?>" placeholder="Enter variable name..." required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-control text-dark" autocomplete="off" name="v_filter[<?= $v['id'] ?? $k ?>]">
+                                                <option value="trait" <?= $v['filter'] == 'trait' ? 'selected' : '' ?>>Traits</option>
+                                                <option value="management" <?= $v['filter'] == 'management' ? 'selected' : '' ?>>Management</option>
+                                                <option value="numeric" <?= $v['filter'] == 'numeric' ? 'selected' : '' ?>>Numeric</option>
+                                                <option value="other" <?= $v['filter'] == 'other' ? 'selected' : '' ?>>Others</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3"><button type="button" class="btn btn-danger btn-sm delete"><i class="ti ti-trash"></i></button></div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -48,7 +58,15 @@
         let i = "<?= !empty($variables) ? 999999 : 0 ?>";
         $('#addMore').click(function() {
             $('#varibale-container').append(`<div class="col-md-6 var-container"><div class="row form-group">
-                                <div class="col-md-10"><input type="text" class="form-control" name="v_title[${i}]" placeholder="Enter variable name..." required></div>
+                                <div class="col-md-6"><input type="text" class="form-control" name="v_title[${i}]" placeholder="Enter variable name..." required></div>
+                                <div class="col-md-3">
+                                    <select class="form-control text-dark" autocomplete="off" name="v_filter[${i}]">
+                                        <option value="trait">Traits</option>
+                                        <option value="management">Management</option>
+                                        <option value="numeric">Numeric</option>
+                                        <option value="other">Others</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-2"><button type="button" class="btn btn-danger btn-sm delete"><i class="ti ti-trash"></i></button></div>
                             </div></div>`);
             i++;

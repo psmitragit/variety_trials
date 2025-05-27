@@ -24,10 +24,6 @@
         display: flex;
         align-items: center;
     }
-
-    #dataTable_filter {
-        display: none;
-    }
 </style>
 <div class="row">
     <input type="hidden" name="_token" value="<?= csrf_hash() ?>">
@@ -45,10 +41,10 @@
 
 
             </div>
-            <div class="card-body px-3 pb-2 search-filter">
-                <!-- <div class="row pb-3"> -->
-                <!-- <div class="col-md-12 mb-3">Filter By</div> -->
-                <!-- <div class="col-md-2 form-group mb-3">
+            <div class="card-body px-3 pb-2">
+                <div class="row pb-3">
+                    <div class="col-md-12 mb-3">Filter By</div>
+                    <div class="col-md-2 form-group mb-3">
                         <select id="sYear" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Year</option>
                             <?php
@@ -137,8 +133,9 @@
                                 <option value="<?= $s['id'] ?>"><?= strtoupper($s['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
-                    </div> -->
-                <!-- <?php foreach ($varialeData as $k => $l) : ?>
+                    </div>
+
+                    <?php foreach ($varialeData as $k => $l) : ?>
                         <div class="col-md-2 form-group mb-3">
                             <select id="s<?= ucfirst($k); ?>" class="form-control select2 filter-input ps-4 filter-variables" data-type="<?= $k; ?>">
                                 <option value="0">Select <?= ucfirst($k); ?></option>
@@ -147,175 +144,12 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    <?php endforeach; ?> -->
-                <!-- <div class="col-md-2 d-none">
+                    <?php endforeach; ?>
+
+                    <div class="col-md-2 d-none">
                         <button class="btn btn-danger custom-h">Reset</button>
-                    </div> -->
-                <!-- </div> -->
-
-                <div class="row g-4 mb-3">
-                    <!-- Filter By -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Filter By</label>
-                        <div class="w-100 mb-3">
-                            <select id="sYear" class="form-select mb-3 px-3 select2 filter-input">
-                                <option value="0">Select Year</option>
-                                <?php foreach ($years as $s) : ?>
-                                    <option value="<?= $s['year'] ?>"><?= $s['year'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="w-100 mb-3">
-                            <select id="sState" class="form-select mb-3 px-3 select2 filter-input">
-                                <option value="0">Select State</option>
-                                <?php foreach ($states as $s) : ?>
-                                    <option value="<?= $s['code'] ?>"><?= strtoupper($s['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="w-100 mb-3">
-                            <select id="sBrand" class="form-select mb-3 px-3 select2 filter-input">
-                                <option value="0">Select Brand</option>
-                                <?php foreach ($brands as $s) : ?>
-                                    <option value="<?= $s['name'] ?>"><?= strtoupper($s['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="w-100 mb-3">
-                            <select id="sVariety" class="form-select mb-3 px-3 select2 filter-input">
-                                <option value="0">Select Variety</option>
-                                <?php foreach ($varieties as $s) : ?>
-                                    <option value="<?= $s['code'] ?>"><?= strtoupper($s['short_name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="w-100 mb-3">
-                            <select id="sTrial" class="form-select mb-3 px-3 select2 filter-input">
-                                <option value="0">Select Trial</option>
-                                <?php foreach ($trials as $s) : ?>
-                                    <option value="<?= $s['id'] ?>"><?= strtoupper($s['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <?php
-                        $allOverIndex = 0;
-                        foreach ($other as $key => $value) {
-                            $array = $varialeData[$value] ?? [];
-                        ?>
-                            <div class="w-100 mb-3">
-                                <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>">
-                                    <option value="">Select <?= $value ?></option>
-                                    <?php
-                                    foreach ($array as $k => $v) {
-                                    ?>
-                                        <option value="<?= $v ?>"><?= $v ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        <?php
-                        }
-                        ?>
-                    </div>
-
-                    <!-- Agronomic Traits -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Agronomic Traits</label>
-                        <?php
-                        foreach ($trait as $key => $value) {
-                            $array = $varialeData[$value] ?? [];
-                        ?>
-                            <div class="w-100 mb-3">
-                                <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>">
-                                    <option value="">Select <?= $value ?></option>
-                                    <?php
-                                    foreach ($array as $k => $v) {
-                                    ?>
-                                        <option value="<?= $v ?>"><?= $v ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        <?php
-                        }
-                        ?>
-                    </div>
-
-                    <!-- Numeric -->
-                    <div class="col-md-6">
-                        <div class="row">
-                            <?php
-                            $index = 0;
-                            foreach ($numeric as $key => $value) {
-                            ?>
-                                <div class="col-md-6 position-relative">
-                                    <label class="form-label fw-semibold"><?= $key ?> <span id="show_value_<?= $index ?>">- <?= $value['min'] ?></span></label>
-
-                                    <input type="range"
-                                        class="form-range filter-range" data-type="<?= $key ?>"
-                                        min="<?= $value['min'] ?>"
-                                        max="<?= $value['max']  + 1 ?>"
-                                        value="<?= $value['min'] ?>"
-                                        data-key="<?= $index ?>" step="0.1" data-min="<?= $value['min'] ?>" />
-
-                                    <div class="d-flex justify-content-between text-muted small">
-                                        <span><?= $value['min'] ?></span>
-                                        <span><?= $value['max'] ?></span>
-                                    </div>
-                                </div>
-                            <?php
-                                $index++;
-                            }
-                            ?>
-                            <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-3">
-                                <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Show Trials</button>
-                                <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Management -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Management</label>
-                        <?php
-                        foreach ($management as $key => $value) {
-                            $array = $varialeData[$value] ?? [];
-                        ?>
-                            <div class="w-100 mb-3">
-                                <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>">
-                                    <option value="">Select <?= $value ?></option>
-                                    <?php
-                                    foreach ($array as $k => $v) {
-                                    ?>
-                                        <option value="<?= $v ?>"><?= $v ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        <?php
-                        }
-                        ?>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="position-relative">
-                            <div class="position-absolute search-variety-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <input type="text" id="search_keyword" placeholder="Search by variety, brand, or location…" class="form-control variety-search">
-                        </div>
                     </div>
                 </div>
-
-
                 <!-- <div class="row text-center">
                     <div class="col-md-12">
                         <button  class="btn btn-danger">Reset</button>
@@ -524,26 +358,11 @@
             dataTable.ajax.reload()
         })
 
-        $('#show_trials').on('click', function() {
-            dataTable.ajax.reload()
-        });
-
-        $('#search_keyword').on('input', function() {
-            const value = $(this).val();
-            $('#dataTable_filter input[type="search"]').val(value).trigger('input');
-            dataTable.ajax.reload();
-        });
-
         function getvariables() {
             let data = {}
             $('.filter-variables').each((i, v) => {
                 data[$(v).attr('data-type')] = $(v).val()
             })
-            $('.filter-range').each((i, v) => {
-                if ($(v).val() > $(v).attr('data-min')) {
-                    data[$(v).attr('data-type')] = $(v).val()
-                }
-            });
             return JSON.stringify(data);
         }
     })
@@ -693,10 +512,6 @@
         html += '</tbody></table>';
         $('#showDataCustomModal .modal-body').html(html);
         $('#showDataCustomModal').modal('show');
-    });
-
-    $('input[type="range"]').on('input', function() {
-        $('#show_value_' + $(this).data('key')).html('- ' + $(this).val());
     });
 </script>
 <?= $this->endSection() ?>
