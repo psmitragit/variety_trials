@@ -198,7 +198,7 @@ class CropController extends BaseController
             foreach ($fVariables as $k => $v) {
                 if (!empty($v)) {
                     if(in_array($k, $numericFilter)){
-                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <", $v);
+                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <=", $v)->where("JSON_EXTRACT(variable, '$.\"$k\"') >", 0);
                     }else{ 
                         $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
                     }
