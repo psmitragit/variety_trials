@@ -33,6 +33,7 @@
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/trials" ? "active bg-gradient-secondary" : "" ?>" href="<?= base_url($l['slug'] . "/trials") ?>">Trials</a></li>
                             <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/documents" ? "active" : "" ?>" href="<?= base_url($l['slug'] . "/documents") ?>">Documents</a></li>
+                            <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/avarage" ? "active" : "" ?>" href="<?= base_url($l['slug'] . "/avarage") ?>">Avarage View</a></li>
                         </ul>
                     </div>
                 </li>

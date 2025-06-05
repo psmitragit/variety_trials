@@ -14,6 +14,7 @@ use App\Models\Trials;
 use App\Models\TrialType;
 use App\Models\Upload;
 use App\Models\Variety;
+use Exception;
 
 class CropController extends BaseController
 {
@@ -236,10 +237,10 @@ class CropController extends BaseController
                 if (!empty($v) || ($k == 'water_management' && $v == 0) || ($k == 'production_pratice' && $v == 0)) {
                     if (in_array($k, $numericFilter)) {
                         $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <=", $v)->where("JSON_EXTRACT(variable, '$.\"$k\"') >", 0);
-                    } else {                        
+                    } else {
                         if (is_array($v)) {
                             if (key_exists($k, $location_table)) {
-                                $trial->whereIn('trial_location.' . $k , $v);
+                                $trial->whereIn('trial_location.' . $k, $v);
                             } else {
                                 $trial->whereIn("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
                             }
@@ -299,13 +300,13 @@ class CropController extends BaseController
                 } elseif ($orderColumnIndex < ($baseColumnCount + $variableColumnCount)) {
                     $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
                 } elseif ($orderColumnIndex < ($baseColumnCount + $variableColumnCount + $extraColumnsCount)) {
-                    $orderColummnArray = ['water_management','production_pratice','avarage_percipitation', 'avarage_temparature'];
+                    $orderColummnArray = ['water_management', 'production_pratice', 'avarage_percipitation', 'avarage_temparature'];
                     $index = ($baseColumnCount + $variableColumnCount + $extraColumnsCount) - ($orderColumnIndex + 1);
-                    $trial->orderBy('trial_location.'.$orderColummnArray[$index], $order['dir'] ?? 'asc');
+                    $trial->orderBy('trial_location.' . $orderColummnArray[$index], $order['dir'] ?? 'asc');
                 } else {
                     $trial->orderBy('trial_data.year', 'DESC');
                 }
-            }else{
+            } else {
                 $trial->orderBy('trial_data.year', 'DESC');
             }
             $totalEntry = $trial->countAllResults(false);
@@ -330,17 +331,17 @@ class CropController extends BaseController
                 $data[$k]['avarage_percipitation'] = $l['avarage_percipitation'];
                 $production_pratice = $l['production_pratice'];
                 $production_pratice_show = "-";
-                if("".$production_pratice == "0"){
+                if ("" . $production_pratice == "0") {
                     $production_pratice_show = 'Full-Season';
-                }else if("".$production_pratice == "1"){
+                } else if ("" . $production_pratice == "1") {
                     $production_pratice_show = 'Double-Crop';
                 }
                 $data[$k]['production_pratice'] = $production_pratice_show;
                 $water_management = $l['water_management'];
                 $water_management_show = "-";
-                if("".$water_management == "0"){
+                if ("" . $water_management == "0") {
                     $water_management_show = 'Irrigated';
-                }else if("".$water_management == "1"){
+                } else if ("" . $water_management == "1") {
                     $water_management_show = 'Non-Irrigated';
                 }
                 $data[$k]['water_management'] = $water_management_show;
@@ -467,5 +468,322 @@ class CropController extends BaseController
         } else {
             return;
         }
+    }
+
+    public function avarage($slug)
+    {
+        $crop = $this->model->where('slug', $slug)->first();
+        if (empty($crop)) return \redirect()->back()->with('error', "Crop not found");
+
+        //YEAR
+        $years = $this->trialDataModel->select('year')->where('crop_id', $crop['id'])->orderBy('year', 'desc')->groupBy('year')->distinct()->findAll();
+
+        //VARIETY
+        $varieties  = $this->trialDataModel->select('varieties.code,varieties.short_name')
+            ->join('varieties', 'varieties.code=trial_data.variety_code')
+            ->where('trial_data.crop_id', $crop['id'])
+            ->groupBy('varieties.id')
+            ->distinct()
+            ->findAll();
+
+        return view('frontend/avarage', compact('crop', 'years', 'varieties'));
+    }
+
+    public function location($slug)
+    {
+        $crop = $this->model->where('slug', $slug)->first();
+        if (empty($crop)) return \redirect()->back()->with('error', "Crop not found");
+
+        //LOCATIONS
+        $locations = $this->trialDataModel->select('location')
+            ->where('crop_id', $crop['id'])->orderBy('location', 'asc')
+            ->groupBy('location')
+            ->distinct()
+            ->findAll();
+
+        //VARIETY
+        $varieties  = $this->trialDataModel->select('varieties.code,varieties.short_name')
+            ->join('varieties', 'varieties.code=trial_data.variety_code')
+            ->where('trial_data.crop_id', $crop['id'])
+            ->groupBy('varieties.id')
+            ->distinct()
+            ->findAll();
+
+        $cropVariableModel = new CropVariable();
+        $numeric = $cropVariableModel
+            ->select('name')
+            ->where('crop_id', $crop['id'])
+            ->where('filter', 'numeric')
+            ->findAll();
+        $numericFilters = array_column($numeric, 'name');
+
+        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters'));
+    }
+
+    public function getAvarage()
+    {
+        $varieties = $this->request->getPost('varieties');
+        $years = $this->request->getPost('years');
+        $crop_id = $this->request->getPost('crop_id');
+        $page = (int) $this->request->getPost('page');
+        $perPage = (int) $this->request->getPost('per_page');
+        $orderBy = $this->request->getPost('order_by') ?? '';
+        $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+
+        $offset = ($page - 1) * $perPage;
+
+        $trialDataQuery = $this->trialDataModel
+            ->select('varieties.short_name, trial_data.variable,trial_data.year')
+            ->where('trial_data.crop_id', $crop_id)
+            ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
+
+        if (!empty($varieties)) {
+            $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
+        }
+
+        if (!empty($years)) {
+            $trialDataQuery->whereIn('trial_data.year', $years);
+        }
+
+        $allTrials = $trialDataQuery->findAll();
+
+        $cropVariableModel = new CropVariable();
+        $numeric = $cropVariableModel
+            ->select('name')
+            ->where('crop_id', $crop_id)
+            ->where('filter', 'numeric')
+            ->findAll();
+        $numericFilters = array_column($numeric, 'name');
+
+        // Sort if needed
+        if (!empty($orderBy) && in_array($orderBy, $numericFilters)) {
+            usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
+                $aData = json_decode($a['variable'], true);
+                $bData = json_decode($b['variable'], true);
+                $valA = $aData[$orderBy] ?? 0;
+                $valB = $bData[$orderBy] ?? 0;
+                return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
+            });
+        }
+
+        $averages = [];
+        $validCounts = [];
+
+        foreach ($allTrials as $trial) {
+            $jsonData = json_decode($trial['variable'], true);
+            foreach ($numericFilters as $field) {
+                $val = isset($jsonData[$field]) && is_numeric($jsonData[$field]) ? floatval($jsonData[$field]) : null;
+                if ($val !== null) {
+                    $averages[$field] = ($averages[$field] ?? 0) + $val;
+                    $validCounts[$field] = ($validCounts[$field] ?? 0) + 1;
+                }
+            }
+        }
+
+        foreach ($averages as $key => $total) {
+            $averages[$key] = round($total / $validCounts[$key], 2);
+        }
+
+        $totalRecords = count($allTrials);
+        $paginatedTrials = array_slice($allTrials, $offset, $perPage);
+
+        $html = "<table class='table table-bordered table-striped'>
+            <thead class='table-light'>
+            <tr>
+                <th scope='col' style='padding-bottom:0px;'>
+                    <div class='d-flex justify-content-between align-items-center'>
+                        <span>Variety</span>
+                    </div>
+                </th>
+                <th scope='col' style='padding-bottom:0px;'>
+                    <div class='d-flex justify-content-between align-items-center'>
+                        <span>Year</span>
+                    </div>
+                </th>";
+
+        foreach ($numericFilters as $value) {
+            $isActive = ($orderBy === $value);
+            $ascClass = $isActive && $orderDir === 'asc' ? 'text-primary' : '';
+            $descClass = $isActive && $orderDir === 'desc' ? 'text-primary' : '';
+
+            $html .= "<th scope='col' class='sortable' data-field='" . $value . "' style='padding-bottom:0px; cursor:pointer;'>
+                <div class='d-flex justify-content-between align-items-center'>
+                    <span>" . htmlspecialchars($value) . "</span>
+                    <span class='sort-icons'>
+                        <i class='bi bi-caret-up-fill sort-icon $ascClass' data-dir='asc' title='Sort Asc'></i>
+                        <i class='bi bi-caret-down-fill sort-icon $descClass' data-dir='desc' title='Sort Desc'></i>
+                    </span>
+                </div>
+            </th>";
+        }
+
+        $html .= "</tr><tr><th style='padding-top:0px;'></th><th style='padding-top:0px;'></th>";
+
+        foreach ($numericFilters as $field) {
+            $avg = $averages[$field] ?? 0;
+            $html .= "<th align='center' style='padding-top:0px; text-align:center;'>(" . htmlspecialchars($avg) . ")</th>";
+        }
+
+        $html .= "</tr></thead><tbody>";
+
+        foreach ($paginatedTrials as $value) {
+            try {
+                $html .= "<tr>";
+                $html .= "<td>" . htmlspecialchars($value['short_name']) . "</td>";
+                $html .= "<td>" . htmlspecialchars($value['year']) . "</td>";
+                $jsonData = json_decode($value['variable'], true);
+                foreach ($numericFilters as $field) {
+                    $cellValue = !empty($jsonData[$field]) ? $jsonData[$field] : 0;
+                    $html .= "<td>" . htmlspecialchars($cellValue) . "</td>";
+                }
+                $html .= "</tr>";
+            } catch (Exception $err) {
+                continue;
+            }
+        }
+
+        $html .= "</tbody></table>";
+
+        echo json_encode([
+            'success' => 1,
+            'html' => $html,
+            'total_records' => $totalRecords,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'order_by' => $orderBy,
+            'order_dir' => $orderDir
+        ]);
+        exit;
+    }
+
+    public function getLocationData()
+    {
+        $varieties = $this->request->getPost('varieties');
+        $locations = $this->request->getPost('locations');
+        $crop_id = $this->request->getPost('crop_id');
+        $traitName = $this->request->getPost('trait_name');
+        $page = (int) $this->request->getPost('page');
+        $perPage = (int) $this->request->getPost('per_page');
+        $orderBy = $this->request->getPost('order_by') ?? '';
+        $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+
+        $offset = ($page - 1) * $perPage;
+        if (empty($traitName)) {
+            echo json_encode([
+                'success' => 2,
+                'html' => "<table class='table table-bordered table-striped'>
+                    <thead class='table-light'>
+                    <tr>
+                        <th scope='col'>Variety</th>
+                        <th scope='col'>Location</th>
+                        <th scope='col' class='sortable'>-</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan='3' class='text-center'>Please select a trait</td>
+                        </tr>
+                    </tbody>
+                </table>"
+            ]);
+            return;
+        }
+
+
+        $trialDataQuery = $this->trialDataModel
+            ->select('varieties.short_name, trial_data.variable, trial_data.location')
+            ->where('trial_data.crop_id', $crop_id)
+            ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
+
+        if (!empty($varieties)) {
+            $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
+        }
+
+        if (!empty($locations)) {
+            $trialDataQuery->whereIn('trial_data.location', $locations);
+        }
+
+        $allTrials = $trialDataQuery->findAll();
+
+        if (!empty($orderBy) && $orderBy === $traitName) {
+            usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
+                $aData = json_decode($a['variable'], true);
+                $bData = json_decode($b['variable'], true);
+                $valA = $aData[$orderBy] ?? 0;
+                $valB = $bData[$orderBy] ?? 0;
+                return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
+            });
+        }
+
+
+        $filteredTrials = [];
+        foreach ($allTrials as $trial) {
+            $jsonData = json_decode($trial['variable'], true);
+            $traitVal = $jsonData[$traitName] ?? null;
+            if (!empty($traitVal)) {
+                $trial['trait_value'] = $traitVal;
+                $filteredTrials[] = $trial;
+            }
+        }
+
+        $totalRecords = count($filteredTrials);
+        $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
+        $html = "<table class='table table-bordered table-striped'>
+            <thead class='table-light'>
+            <tr>
+                <th scope='col'>Variety</th>
+                <th scope='col'>Location</th>
+                <th scope='col' class='sortable' data-field='" . htmlspecialchars($traitName) . "'>
+                    <div class='d-flex justify-content-between align-items-center'>
+                        <span>" . htmlspecialchars($traitName) . "</span>
+                        <span class='sort-icons'>
+                            <i class='bi bi-caret-up-fill sort-icon " . (!empty($orderBy) &&  $orderDir === 'asc' ? 'text-primary' : '') . "' data-dir='asc' title='Sort Asc'></i>
+                            <i class='bi bi-caret-down-fill sort-icon " . (!empty($orderBy) && $orderDir === 'desc' ? 'text-primary' : '') . "' data-dir='desc' title='Sort Desc'></i>
+                        </span>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>";
+
+        // Step 1: Collect trait values for classification
+        $traitValues = array_column($filteredTrials, 'trait_value');
+        $numericTraitValues = array_filter($traitValues, 'is_numeric');
+
+        // Step 1: Collect and sort numeric trait values
+        $traitValues = array_column($filteredTrials, 'trait_value');
+        $numericTraitValues = array_filter($traitValues, 'is_numeric');
+        sort($numericTraitValues);
+        $total = count($numericTraitValues);
+
+        $p10 = getPercentile($numericTraitValues, 10);
+        $p30 = getPercentile($numericTraitValues, 30);
+        $p70 = getPercentile($numericTraitValues, 70);
+        $p90 = getPercentile($numericTraitValues, 90);
+
+        foreach ($paginatedTrials as $value) {
+            $traitVal = floatval($value['trait_value']);
+            $bgColor = getTraitColorByPercentile($traitVal, $p10, $p30, $p70, $p90);
+            $color = $bgColor == '#e8ebed' ? '#7b809a' : 'white';
+
+            $html .= "<tr>
+                <td>" . htmlspecialchars($value['short_name']) . "</td>
+                <td>" . htmlspecialchars($value['location']) . "</td>
+                <td style='background-color: ".$bgColor."; color:".$color.";'>" . htmlspecialchars($value['trait_value']) . "</td>
+            </tr>";
+        }
+
+        $html .= "</tbody></table>";
+
+        echo json_encode([
+            'success' => 1,
+            'html' => $html,
+            'total_records' => $totalRecords,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'order_by' => $orderBy,
+            'order_dir' => $orderDir
+        ]);
+        exit;
     }
 }

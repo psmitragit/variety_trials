@@ -32,6 +32,10 @@ require('RoutesAdmin.php');
 
 
 $routes->get('(:segment)/trials', [CropController::class, 'index']);
+$routes->get('(:segment)/avarage', [CropController::class, 'avarage']);
+$routes->get('(:segment)/location', [CropController::class, 'location']);
+$routes->post('get-avarage', [CropController::class, 'getAvarage']);
+$routes->post('get-location-data', [CropController::class, 'getLocationData']);
 
 
 /*

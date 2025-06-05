@@ -131,3 +131,25 @@ function dd(...$params)
     echo "</pre>";
     exit;
 }
+
+function getTraitColorByPercentile($val, $p10, $p30, $p70, $p90) {
+    if ($val >= $p90) return '#44b4a6';         // Best
+    if ($val >= $p70) return '#6495d2';         // Above Average
+    if ($val >= $p30) return '#e8ebed';         // Mean Range
+    if ($val >= $p10) return '#f3c076';         // Below Average
+    return '#d26a5c';                           // Worst
+}
+
+// Worst	Bottom 10%	#d26a5c
+// Below Average	10% - 30%	#f3c076
+// Mean Range	30% - 70%	#e8ebed
+// Above Average	70% - 90%	#6495d2
+// Best	Top 10%	#44b4a6
+
+function getPercentile($sorted, $percent) {
+    $index = ($percent / 100) * (count($sorted) - 1);
+    $floor = floor($index);
+    $ceil = ceil($index);
+    if ($floor == $ceil) return $sorted[$floor];
+    return $sorted[$floor] + ($sorted[$ceil] - $sorted[$floor]) * ($index - $floor);
+}
