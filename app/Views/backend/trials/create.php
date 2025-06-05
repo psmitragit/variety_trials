@@ -74,13 +74,83 @@
                     <?php if (!empty($trial) && !empty($trialLocations)) : ?>
                         <div class="row col-12" id="repeterappend">
                             <?php foreach ($trialLocations as $tk => $tl) : ?>
+                                <fieldset class="repeat-fieldset">
+                                    <div class="row col-12 repeter-repete">
+                                        <div class="form-group col-md-2 mb-3">
+                                            <label for="locid0">Assign State <sup class="text-danger">*</sup></label>
+                                            <select class="select2 assign_state form-control" placeholder="Assign Locations" required>
+                                                <option value="" disabled selected>--- Select ----</option>
+                                                <?php foreach (get_states() as $l) : ?>
+                                                    <option value="<?= $l['code'] ?>" <?= $tl['state_code'] == $l['code'] ? "selected" : ""; ?>>
+                                                        <?= $l['name'] ?? $l['code'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="locid0">Assign Locations <sup class="text-danger">*</sup></label>
+                                            <select name="locids[<?= $tk; ?>]" id="locid<?= $tk; ?>" class="select2 locations form-control" placeholder="Assign Locations" required>
+                                                <option value="" disabled selected>--- Select ----</option>
+                                                <?php foreach ($locations as $l) : ?>
+                                                    <option value="<?= $l['id'] ?>" <?= $tl['location_id'] == $l['id'] ? "selected" : ""; ?>>
+                                                        <?= $l['code'] . " - " . $l['location'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="harvest_date">Harvest Date</label>
+                                            <input type="date" class="form-control" id="harvest_date<?= $tk; ?>" name="harvest_date[<?= $tk; ?>]" value="<?= $tl['harvest_date'] ?? ""; ?>" placeholder=" Harvest Date">
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="planting_date">Planting Date</label>
+                                            <input type="date" class="form-control" id="planting_date<?= $tk; ?>" name="planting_date[<?= $tk; ?>]" value="<?= $tl['planting_date'] ?? ""; ?>" placeholder=" Planting Date">
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="avarage_temparature">Average Temperature(°F)</label>
+                                            <input type="text" class="form-control" id="avarage_temparature<?= $tk ?>" name="avarage_temparature[<?= $tk ?>]" placeholder="Average Temperature(°F)" value="<?= $tl['avarage_temparature'] ?? '' ?>">
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="avarage_percipitation">Average Precipitation(inch)</label>
+                                            <input type="text" class="form-control" id="avarage_percipitation<?= $tk ?>" name="avarage_percipitation[<?= $tk ?>]" placeholder="Average Precipitation(inch)" value="<?= $tl['avarage_percipitation'] ?? '' ?>">
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="production_pratice">Production Practice</label>
+                                            <select name="production_pratice[<?= $tk ?>]" id="production_pratice<?= $tk ?>" class="select2 form-control" placeholder="Production Practice">
+                                                <option value="">---Select One---</option>
+                                                <option value="0" <?= ($tl['production_pratice'] ?? '') == '0' ? 'selected' : '' ?>>Full-Season</option>
+                                                <option value="1" <?= ($tl['production_pratice'] ?? '') == '1' ? 'selected' : '' ?>>Double-Crop</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3 mb-3">
+                                            <label for="water_management">Water Management</label>
+                                            <select name="water_management[<?= $tk ?>]" id="water_management<?= $tk ?>" class="select2 form-control" placeholder="Water Management">
+                                                <option value="">---Select One---</option>
+                                                <option value="0" <?= ($tl['water_management'] ?? '') == '0' ? 'selected' : '' ?>>Irrigated</option>
+                                                <option value="1" <?= ($tl['water_management'] ?? '') == '1' ? 'selected' : '' ?>>Non-Irrigated</option>
+                                            </select>
+                                        </div>
+                                        <?php if ($tk > 0) : ?>
+                                            <div class="col-md-1 mb-3 custommargin form-group">
+                                                <a href="javascript:void(0)" class="btn remove-location btn-danger mb-0 btn-sm">
+                                                    <i class="ti ti-trash"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </fieldset>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else : ?>
+                        <div class="row col-12" id="repeterappend">
+                            <fieldset class="repeat-fieldset">
                                 <div class="row col-12 repeter-repete">
                                     <div class="form-group col-md-2 mb-3">
-                                        <label for="locid0">Assign State <sup class="text-danger">*</sup></label>
-                                        <select class="select2 assign_state form-control" placeholder="Assign Locations" required>
-                                            <option value="" disabled selected>--- Select ----</option>
+                                        <label for="state">Assign State <sup class="text-danger">*</sup></label>
+                                        <select class="select2 assign_state form-control" placeholder="Assign State" name="state[0]" required>
+                                            <option value="" disabled selected>Select</option>
                                             <?php foreach (get_states() as $l) : ?>
-                                                <option value="<?= $l['code'] ?>" <?= $tl['state_code'] == $l['code'] ? "selected" : ""; ?>>
+                                                <option value="<?= $l['code'] ?>">
                                                     <?= $l['name'] ?? $l['code'] ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -88,62 +158,45 @@
                                     </div>
                                     <div class="form-group col-md-3 mb-3">
                                         <label for="locid0">Assign Locations <sup class="text-danger">*</sup></label>
-                                        <select name="locids[<?= $tk; ?>]" id="locid<?= $tk; ?>" class="select2 locations form-control" placeholder="Assign Locations" required>
+                                        <select name="locids[0]" id="locid0" class="select2 locations form-control" placeholder="Assign Locations" required>
                                             <option value="" disabled selected>--- Select ----</option>
-                                            <?php foreach ($locations as $l) : ?>
-                                                <option value="<?= $l['id'] ?>" <?= $tl['location_id'] == $l['id'] ? "selected" : ""; ?>>
-                                                    <?= $l['code'] . " - " . $l['location'] ?>
-                                                </option>
-                                            <?php endforeach; ?>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-3 mb-3">
                                         <label for="harvest_date">Harvest Date</label>
-                                        <input type="date" class="form-control" id="harvest_date<?= $tk; ?>" name="harvest_date[<?= $tk; ?>]" value="<?= $tl['harvest_date'] ?? ""; ?>" placeholder=" Harvest Date">
+                                        <input type="date" class="form-control" id="harvest_date0" name="harvest_date[0]" value="" placeholder=" Harvest Date">
                                     </div>
                                     <div class="form-group col-md-3 mb-3">
                                         <label for="planting_date">Planting Date</label>
-                                        <input type="date" class="form-control" id="planting_date<?= $tk; ?>" name="planting_date[<?= $tk; ?>]" value="<?= $tl['planting_date'] ?? ""; ?>" placeholder=" Planting Date">
+                                        <input type="date" class="form-control" id="planting_date0" name="planting_date[0]" placeholder=" Planting Date">
                                     </div>
-                                    <?php if ($tk > 0) : ?>
-                                        <div class="col-md-1 mb-3 custommargin form-group">
-                                            <a href="javascript:void(0)" class="btn remove-location btn-danger mb-0 btn-sm">
-                                                <i class="ti ti-trash"></i>
-                                            </a>
-                                        </div>
-                                    <?php endif; ?>
+                                    <div class="form-group col-md-3 mb-3">
+                                        <label for="avarage_temparature">Average Temperature(°F)</label>
+                                        <input type="text" class="form-control" id="avarage_temparature0" name="avarage_temparature[0]" placeholder="Average Temperature(°F)">
+                                    </div>
+                                    <div class="form-group col-md-3 mb-3">
+                                        <label for="avarage_percipitation">Average Precipitation(inch)</label>
+                                        <input type="text" class="form-control" id="avarage_percipitation0" name="avarage_percipitation[0]" placeholder="Average Precipitation(inch)">
+                                    </div>
+                                    <div class="form-group col-md-3 mb-3">
+                                        <label for="production_pratice">Production Practice</label>
+                                        <select name="production_pratice[0]" id="production_pratice0" class="select2 form-control" placeholder="Production Practice">
+                                            <option value="">---Select One---</option>
+                                            <option value="0">Full-Season</option>
+                                            <option value="1">Double-Crop</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-3 mb-3">
+                                        <label for="water_management">Water Management</label>
+                                        <select name="water_management[0]" id="water_management0" class="select2 form-control" placeholder="Water Management">
+                                            <option value="">---Select One---</option>
+                                            <option value="0">Irrigated</option>
+                                            <option value="1">Non-Irrigated</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else : ?>
-                        <div class="row col-12" id="repeterappend">
-                            <div class="row col-12 repeter-repete">
-                                <div class="form-group col-md-2 mb-3">
-                                    <label for="locid0">Assign State <sup class="text-danger">*</sup></label>
-                                    <select class="select2 assign_state form-control" placeholder="Assign State" required>
-                                        <option value="" disabled selected>Select</option>
-                                        <?php foreach (get_states() as $l) : ?>
-                                            <option value="<?= $l['code'] ?>">
-                                                <?= $l['name'] ?? $l['code'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-3 mb-3">
-                                    <label for="locid0">Assign Locations <sup class="text-danger">*</sup></label>
-                                    <select name="locids[0]" id="locid0" class="select2 locations form-control" placeholder="Assign Locations" required>
-                                        <option value="" disabled selected>--- Select ----</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-3 mb-3">
-                                    <label for="harvest_date">Harvest Date</label>
-                                    <input type="date" class="form-control" id="harvest_date0" name="harvest_date[0]" value="" placeholder=" Harvest Date">
-                                </div>
-                                <div class="form-group col-md-3 mb-3">
-                                    <label for="planting_date">Planting Date</label>
-                                    <input type="date" class="form-control" id="planting_date0" name="planting_date[0]" placeholder=" Planting Date">
-                                </div>
-                            </div>
+
+                            </fieldset>
                         </div>
                     <?php endif; ?>
 
@@ -224,10 +277,10 @@
         let i = 999999999;
 
         $("#addMore").on("click", function() {
-            var clonedDiv = `<div class="row col-12 repeter-repete">
+            var clonedDiv = ` <fieldset class="repeat-fieldset"> <div class="row col-12 repeter-repete">
                                 <div class="form-group col-md-2 mb-3">
-                                    <label for="locid0">Assign State <sup class="text-danger">*</sup></label>
-                                    <select class="select2 assign_state form-control" placeholder="Assign State" required>
+                                    <label for="state">Assign State <sup class="text-danger">*</sup></label>
+                                    <select class="select2 assign_state form-control" placeholder="Assign State" name="state[${i}]" required>
                                         <option value="" disabled selected>Select</option>
                                         <?php foreach (get_states() as $l) : ?>
                                             <option value="<?= $l['code'] ?>">
@@ -250,12 +303,36 @@
                                     <label for="planting_date">Planting Date</label>
                                     <input type="date" class="form-control" id="planting_date${i}" name="planting_date[${i}]" placeholder=" Planting Date">
                                 </div>
+                            <div class="form-group col-md-3 mb-3">
+                                <label for="avarage_temparature">Average Temperature(°F)</label>
+                                <input type="text" class="form-control" id="avarage_temparature${i}" name="avarage_temparature[${i}]" placeholder="Average Temperature(°F)">
+                            </div>
+                            <div class="form-group col-md-3 mb-3">
+                                <label for="avarage_percipitation">Average Precipitation(inch)</label>
+                                <input type="text" class="form-control" id="avarage_percipitation${i}" name="avarage_percipitation[${i}]" placeholder="Average Precipitation(inch)">
+                            </div>
+                            <div class="form-group col-md-3 mb-3">
+                                <label for="production_pratice">Production Practice</label>
+                                <select name="production_pratice[${i}]" id="production_pratice${i}" class="select2 form-control" placeholder="Production Practice">
+                                    <option value="">---Select One---</option>
+                                    <option value="0">Full-Season</option>
+                                    <option value="1">Double-Crop</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3 mb-3">
+                                <label for="water_management">Water Management</label>
+                                <select name="water_management[${i}]" id="water_management${i}" class="select2 form-control" placeholder="Water Management">
+                                    <option value="">---Select One---</option>
+                                    <option value="0">Irrigated</option>
+                                    <option value="1">Non-Irrigated</option>
+                                </select>
+                            </div>
                             <div class="col-md-1 mb-3 custommargin form-group">
                                 <a href="javascript:void(0)" class="btn remove-location btn-danger mb-0 btn-sm">
                                     <i class="ti ti-trash"></i>
                                 </a>
                             </div>
-                        </div>`;
+                        </div></fieldset>`;
             $("#repeterappend").append(clonedDiv);
             $('.select2').off();
             initializeSelect2()
@@ -263,7 +340,7 @@
         });
 
         $("#repeterappend").on("click", ".remove-location", function() {
-            $(this).closest(".repeter-repete").remove();
+            $(this).closest(".repeat-fieldset").remove();
         });
 
 

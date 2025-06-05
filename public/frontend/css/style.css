@@ -353,12 +353,45 @@ object.objs {
   border-color: #d2d6da !important;
 }
 
-.search-filter .select2 .selection .select2-selection  {
+.search-filter .select2 .selection .select2-selection {
   padding: 7px 0px;
   height: 42px;
   /* margin-bottom: 15px; */
 }
 
-.search-filter .select2 .select2-selection__arrow{
+.custom-button-for-datatable {
+  background: #4f772d;
+  border: none;
+  padding: 6px 16px;
+  color: #fff;
+  border-radius: 10px;
+  margin-left: 20px;
+}
+
+.search-filter .select2-selection--multiple {
+  height: fit-content !important;
+}
+
+.search-filter .select2 .select2-selection__arrow {
   height: 42px;
+}
+
+.closeBtn {
+  background-color: #000;
+  color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.closeBtn i {
+  font-size: 20px;
+  color: #fff;
+}
+
+#mobileFilterContainer .select2-container {
+  width: 100% !important;
 }

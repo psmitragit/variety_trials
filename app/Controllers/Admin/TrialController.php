@@ -22,13 +22,20 @@ class TrialController extends BaseController
     }
     public function index()
     {
-        $trials = $this->model->select('trials.*,crops.name as crop_name,trial_types.name as trial_type,GROUP_CONCAT(vt_locations.location) as location_names')
+        $trials = $this->model->select('trials.*,
+        crops.name as crop_name,
+        trial_types.name as trial_type,
+        GROUP_CONCAT(vt_locations.location) as location_names,
+        GROUP_CONCAT(production_pratice) as production_pratices,
+        GROUP_CONCAT(avarage_percipitation) as avarage_percipitations,
+        GROUP_CONCAT(avarage_temparature) as avarage_temparatures,
+        GROUP_CONCAT(water_management) as water_managements')
             ->join('crops', 'crops.id=trials.crop_id')
             ->join('trial_types', 'trial_types.id=trials.trial_type_id')
             ->join('trial_location', 'trial_location.trial_id=trials.id', 'left')
             ->join('locations', 'locations.id=trial_location.location_id', 'left')
             ->groupBy('trials.id')
-            ->where('crops.status', 1);
+            ->where('crops.status', 1);       
         !\isAllowed() ? $trials->where('trials.user_id', \auth_admin()['id']) : "";
         $trials = $trials->where('trials.status', 1)
             ->findAll();
@@ -59,7 +66,10 @@ class TrialController extends BaseController
             $locationIds = $this->request->getPost('locids');
             $harvestDates = $this->request->getPost('harvest_date');
             $plantingDates = $this->request->getPost('planting_date');
-
+            $avarage_temparature = $this->request->getPost('avarage_temparature');
+            $avarage_percipitation = $this->request->getPost('avarage_percipitation');
+            $production_pratice = $this->request->getPost('production_pratice');
+            $water_management = $this->request->getPost('water_management');
             $locations = !empty($locationIds) ? array_values($locationIds) : [];
 
             // foreach ($locationIds as $k => $loc) {
@@ -89,7 +99,8 @@ class TrialController extends BaseController
             }
 
             foreach ($locationIds as $k => $lid) {
-                $trialLocationModel->insert(['trial_id' => $id, 'location_id' => $lid, 'harvest_date' => $harvestDates[$k], 'planting_date' => $plantingDates[$k]]);
+                $data = ['trial_id' => $id, 'location_id' => $lid, 'harvest_date' => $harvestDates[$k], 'planting_date' => $plantingDates[$k], 'avarage_temparature' =>$avarage_temparature[$k], 'avarage_percipitation' =>$avarage_percipitation[$k], 'production_pratice' =>$production_pratice[$k], 'water_management' =>$water_management[$k]];
+                $trialLocationModel->insert($data);
             }
 
             return redirect()->to(base_url('admin/trials'))->with('success', $message);
@@ -278,7 +289,7 @@ class TrialController extends BaseController
 
         $filePath = $_FILES['bulk_file']['tmp_name'];
         $csv = Reader::createFromPath($filePath);
-        $expectedHeaders = ['trial name', 'crop', 'trial type', 'year', 'treatment_group', 'location_code', 'harvest date', 'planting date'];
+        $expectedHeaders = ['trial name', 'crop', 'trial type', 'year', 'treatment_group', 'location_code', 'harvest date', 'planting date', 'Average_Temperature', 'Average_Precipitation', 'Production Practice', 'Water Management'];
         $headers = $csv->getHeader();
         $records = $csv->getRecords();
 
@@ -328,6 +339,29 @@ class TrialController extends BaseController
                 continue;
             }
 
+            $avarage_temparature = trim($record[8]);
+            $avarage_percipitation =  trim($record[9]);
+            $production_pratice = trim($record[10]);
+            $water_management = trim($record[11]);
+
+            if($production_pratice == 'Full-Season'){
+                $production_pratice = 0;
+            }else if($production_pratice == 'Double-Crop'){
+                $production_pratice = 1;
+            }else if(!empty($production_pratice)){
+                $notInsertList[] = [$record, 'production pratice should be "Full-Season" or "Double-Crop"'];
+                continue;
+            }
+
+             if($water_management == 'Irrigated'){
+                $water_management = 0;
+            }else if($water_management == 'Non-Irrigated'){
+                $water_management = 1;
+            }else if(!empty($water_management)){
+                $notInsertList[] = [$record, 'production pratice should be "Irrigated" or "Non-Irrigated"'];
+                continue;
+            }
+
             $trial = $this->model->where('name', $trialName)
                 ->where('crop_id', $crop['id'])
                 ->where('trial_type_id', $trialType['id'])
@@ -347,7 +381,7 @@ class TrialController extends BaseController
             if ($trial) {
                 $locations = [];
                 $trial = $trial[0];
-                $this->addTrialLocation($trial['id'], $location['id'], trim($record[7]), trim($record[6]));
+                $this->addTrialLocation($trial['id'], $location['id'], trim($record[7]), trim($record[6]), $avarage_temparature, $avarage_percipitation, $production_pratice, $water_management);
                 $locations = json_decode($trial['locations']);
                 array_push($locations, $location['id']);
                 $locations = array_unique($locations);
@@ -355,7 +389,7 @@ class TrialController extends BaseController
             } else {
                 $data['locations'] = json_encode([$location['id']]);
                 $trialId = $this->model->insert($data);
-                $this->addTrialLocation($trialId, $location['id'], trim($record[7]), trim($record[6]));
+                $this->addTrialLocation($trialId, $location['id'], trim($record[7]), trim($record[6]), $avarage_temparature, $avarage_percipitation, $production_pratice, $water_management);
             }
             $insertedRecord++;
         }
@@ -389,14 +423,14 @@ class TrialController extends BaseController
         }
     }
 
-    public function addTrialLocation($trialId, $location_id, $planting_date, $harvest_date)
+    public function addTrialLocation($trialId, $location_id, $planting_date, $harvest_date, $avarage_temparature, $avarage_percipitation, $production_pratice, $water_management)
     {
         $trialLocationModel = new TrialLocation();
 
         if ($trialLocationModel->where(['trial_id' => $trialId, 'location_id' => $location_id])->first()) {
-            $trialLocationModel->where(['trial_id' => $trialId, 'location_id' => $location_id])->update('null', ['planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date))]);
+            $trialLocationModel->where(['trial_id' => $trialId, 'location_id' => $location_id])->update('null', ['planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date)), 'avarage_temparature' => $avarage_temparature, 'avarage_percipitation' => $avarage_percipitation, 'production_pratice' => $production_pratice, 'water_management' => $water_management]);
         } else {
-            $trialLocationModel->insert(['trial_id' => $trialId, 'location_id' => $location_id, 'planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date))]);
+            $trialLocationModel->insert(['trial_id' => $trialId, 'location_id' => $location_id, 'planting_date' => date('Y-m-d', strtotime($planting_date)), 'harvest_date' => date('Y-m-d', strtotime($harvest_date)), 'avarage_temparature' => $avarage_temparature, 'avarage_percipitation' => $avarage_percipitation, 'production_pratice' => $production_pratice, 'water_management' => $water_management]);
         }
     }
 }

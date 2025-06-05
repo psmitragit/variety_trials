@@ -43,6 +43,10 @@
                                 <th>Crop</th>
                                 <th>Type</th>
                                 <th>Locations</th>
+                                <th>Avarage Temparature</th>
+                                <th>Avarage Percipitation</th>
+                                <th>Production Pratice</th>
+                                <th>Water Management</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,6 +63,78 @@
                                     <td><?= $l['crop_name'] ?? "" ?></td>
                                     <td><?= $l['trial_type'] ?? "" ?></td>
                                     <td><?= $l['location_names'] ?? "" ?></td>
+                                    <td>
+                                        <?php
+                                        if (!empty($l['avarage_temparatures'])) {
+                                            $explodedPratices = explode(',', $l['avarage_temparatures']);
+                                            $implodeData = [];
+                                            foreach ($explodedPratices as $v) {
+                                                $implodeData[] = $v . '°F';
+                                            }
+                                            echo implode(', ', $implodeData);
+                                        } else {
+                                        ?>
+                                            -
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if (!empty($l['avarage_percipitations'])) {
+                                            $explodedPratices = explode(',', $l['avarage_percipitations']);
+                                            $implodeData = [];
+                                            foreach ($explodedPratices as $v) {
+                                                $implodeData[] = $v . 'inches';
+                                            }
+                                            echo implode(', ', $implodeData);
+                                        } else {
+                                        ?>
+                                            -
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if ($l['production_pratices'] != '') {
+                                            $explodedPratices = explode(',', $l['production_pratices']);
+                                            $implodeData = [];
+                                            foreach ($explodedPratices as $v) {
+                                                if ($v == 1) {
+                                                    $implodeData[] = 'Double-Crop';
+                                                } else {
+                                                    $implodeData[] = 'Full-Season';
+                                                }
+                                            }
+                                            echo implode(', ', $implodeData);
+                                        } else {
+                                        ?>
+                                            -
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if ($l['water_managements'] != '') {
+                                            $explodedManagements = explode(',', $l['water_managements']);
+                                            $implodeData = [];
+                                            foreach ($explodedManagements as $v) {
+                                                if ($v == 1) {
+                                                    $implodeData[] = 'Non-Irrigated';
+                                                } else {
+                                                    $implodeData[] = 'Irrigated';
+                                                }
+                                            }
+                                            echo implode(', ', $implodeData);
+                                        } else {
+                                        ?>
+                                            -
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

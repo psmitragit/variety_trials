@@ -115,18 +115,19 @@ function get_crops_by_id_string($string, $column = false)
     return implode(', ', array_filter($names));
 }
 
-function dd($text = "~")
+function dd(...$params)
 {
     echo '<pre class="pre-code">';
-    if (is_array($text)) {
-        foreach ($text as $key => $value) {
-            print_r($value);
+    if(count($params) > 0){
+        foreach ($params as $index => $param) {
+            print_r($param);
             echo '</pre>';
             echo '<br><br>';
             echo '<pre class="pre-code">';
         }
-    } else {
-        print_r($text);
+    }else{
+        echo '~';
     }
-    exit();
+    echo "</pre>";
+    exit;
 }

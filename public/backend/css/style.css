@@ -241,3 +241,12 @@
  .form-control.error .select2-container {
      display: none !important;
  }
+
+ .repeat-fieldset{
+    padding: 14px 29px;
+    border: 1px solid #dee2e6;
+    margin: 5px;
+    margin-left: 15px;
+    border-radius: 6px;
+    margin-top: 10px;     
+ }

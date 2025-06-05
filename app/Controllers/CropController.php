@@ -9,6 +9,7 @@ use App\Models\CropVariable;
 use App\Models\State;
 use App\Models\Treatment;
 use App\Models\TrialData;
+use App\Models\TrialLocation;
 use App\Models\Trials;
 use App\Models\TrialType;
 use App\Models\Upload;
@@ -25,7 +26,8 @@ class CropController extends BaseController
         $brandModel,
         $varietyModel,
         $trialTypeModel,
-        $treatmentModel;
+        $treatmentModel,
+        $trialLocationModel;
 
     public function __construct()
     {
@@ -39,6 +41,7 @@ class CropController extends BaseController
         $this->varietyModel = new Variety();
         $this->trialTypeModel = new TrialType();
         $this->treatmentModel = new Treatment();
+        $this->trialLocationModel = new TrialLocation();
     }
 
     public function index($slug)
@@ -51,6 +54,9 @@ class CropController extends BaseController
 
         //STATES
         $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
+
+        //LOCATIONS
+        $locations = $this->trialDataModel->select('location')->where('crop_id', $crop['id'])->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
 
         //BRAND
         $brands = $this->brandModel->select('brands.name')->join('varieties', 'brands.name=varieties.brand')
@@ -67,11 +73,22 @@ class CropController extends BaseController
         //HERBICIDES
         // $herbicides = $this->treatmentModel->select('treatments.herbicide')->join('trial_data', 'trial_data.entry=treatments.name')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->groupBy('treatments.herbicide')
         $herbicides = [];
+        //LOCATION DATA's
+        $locationResult = $this->trialLocationModel
+            ->select('MIN(avarage_temparature) as min_temp, MAX(avarage_temparature) as max_temp, MIN(avarage_percipitation) as min_precip, MAX(avarage_percipitation) as max_precip')
+            ->first();
+        $min_temp = $locationResult['min_temp'];
+        $max_temp = $locationResult['max_temp'];
+        $min_precip = $locationResult['min_precip'];
+        $max_precip = $locationResult['max_precip'];
+        // $minTemp  = $this->trialLocationModel->select('')
+
 
         //VARIABLES
-        $allVariables = $this->variableModel->select('crop_variables.name,crop_variables.filter')->where('crop_id', $crop['id'])->findAll();
-
+        $allVariables = $this->variableModel->select('crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
+        $multiselect = [];
         $variables = [];
+
 
         $trait = [];
         $management = [];
@@ -92,6 +109,9 @@ class CropController extends BaseController
                 $other[] = $value['name'];
             }
             $variables[] = $value['name'];
+            if ($value['multiselect'] == 1) {
+                $multiselect[] = $value['name'];
+            }
         }
 
         $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->groupBy('variable')->distinct()->findAll();
@@ -106,7 +126,7 @@ class CropController extends BaseController
         foreach ($decoded as $trialVariable) {
             foreach ($variables as $name) {
                 if (array_key_exists($name, $numeric)) {
-                    if(is_numeric($trialVariable[$name])){
+                    if (is_numeric($trialVariable[$name])) {
                         if (empty($numeric[$name]['min'])) {
                             $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
                         } else if ($trialVariable[$name] < $numeric[$name]['min']) {
@@ -117,7 +137,7 @@ class CropController extends BaseController
                         } else if ($trialVariable[$name] > $numeric[$name]['max']) {
                             $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
                         }
-                    }                   
+                    }
                 } else {
                     if (!empty($trialVariable[$name])) {
                         $value = $trialVariable[$name];
@@ -132,7 +152,7 @@ class CropController extends BaseController
 
 
         // dd([$variables]);
-        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other'));
+        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other', 'locations', 'multiselect', 'min_temp', 'max_temp', 'min_precip', 'max_precip'));
     }
 
     public function ajaxLoad()
@@ -145,9 +165,25 @@ class CropController extends BaseController
             $search = $this->request->getPost('search')['value'] ?? "";
             $order = $this->request->getPost('order')[0] ?? false;
             $year = $this->request->getPost('year') ?? false;
+            if ($year) {
+                $year = explode(',', $year);
+            }
             $state = $this->request->getPost('state') ?? false;
+            if ($state) {
+                $state = explode(',', $state);
+            }
+            $location = $this->request->getPost('location') ?? false;
+            if ($location) {
+                $location = explode(',', $location);
+            }
             $brand = $this->request->getPost('brand') ?? false;
+            if ($brand) {
+                $brand = explode(',', $brand);
+            }
             $variety = $this->request->getPost('variety') ?? false;
+            if ($variety) {
+                $variety = explode(',', $variety);
+            }
             $trial_type = $this->request->getPost('trial') ?? false;
             $herbicide = $this->request->getPost('herbicide') ?? false;
             $fVariables = $this->request->getPost('variables') ?? '';
@@ -161,19 +197,18 @@ class CropController extends BaseController
             $numericFilter = [];
 
             foreach ($variables as $key => $value) {
-                if($value['filter'] == 'numeric'){
+                if ($value['filter'] == 'numeric') {
                     $numericFilter[] = $value['name'];
                 }
             }
 
             $columns = ['trial_data.year', 'trial_data.state_code', 'trial_data.entry', 'trial_types.name', 'trial_data.location_code', 'trial_data.location', 'trial_data.variety_code', 'v.brand', 'variety', 'variety_additional'];
 
-            $select = 'trial_data.*,v.brand,v.short_name as variety,v.additional_name as variety_additional,v.herbicide,l.lat,l.long,trial_types.name as trial_type_name';
+            $select = 'trial_data.*,v.brand,v.short_name as variety,v.additional_name as variety_additional,v.herbicide,l.lat,l.long,trial_types.name as trial_type_name,trial_location.avarage_temparature,trial_location.avarage_percipitation,trial_location.production_pratice,trial_location.water_management';
 
             if ($order && (count($columns) - 1) < $order['column']) {
                 $index = $order['column'] - (count($columns));
                 $columnName = $otherVariables[$index] ?? '';
-
                 if (!empty($columnName)) {
                     $select .= ", LOWER(JSON_UNQUOTE(JSON_EXTRACT(variable, '$.\"$columnName\"'))) AS variable_data";
                 }
@@ -183,24 +218,43 @@ class CropController extends BaseController
             $trial->join('varieties v', 'trial_data.variety_code=v.code', 'left');
             $trial->join('locations l', 'trial_data.location_code=l.code', 'left');
             $trial->join('trial_types', 'trial_data.trial=trial_types.id');
+            $trial->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
             $trial->where(['trial_data.crop_id' => $cropId, 'trial_data.status' => 1, 'trial_data.is_approved' => 1]);
-            !empty($year) ? $trial->where('trial_data.year', $year) : "";
-            !empty($state) ? $trial->where('trial_data.state_code', $state) : "";
-            !empty($variety) ? $trial->where('trial_data.variety_code', $variety) : "";
+            !empty($year) ? $trial->whereIn('trial_data.year', $year) : "";
+            !empty($state) ? $trial->whereIn('trial_data.state_code', $state) : "";
+            !empty($variety) ? $trial->whereIn('trial_data.variety_code', $variety) : "";
             !empty($trial_type) ? $trial->where('trial_data.trial', $trial_type) : "";
-            !empty($brand) ? $trial->where('v.brand', $brand) : "";
+            !empty($brand) ? $trial->whereIn('v.brand', $brand) : "";
+            !empty($location) ? $trial->whereIn('trial_data.location', $location) : "";
 
             if (!empty($herbicide)) {
                 $trial->join('treatments t', 't.name=trial_data.entry')->where('t.herbicide', $herbicide);
             }
 
-
+            $location_table = ['avarage_temparature' => '<=', 'avarage_percipitation' => '<=', 'production_pratice' => '=', 'water_management' => '='];
             foreach ($fVariables as $k => $v) {
-                if (!empty($v)) {
-                    if(in_array($k, $numericFilter)){
+                if (!empty($v) || ($k == 'water_management' && $v == 0) || ($k == 'production_pratice' && $v == 0)) {
+                    if (in_array($k, $numericFilter)) {
                         $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <=", $v)->where("JSON_EXTRACT(variable, '$.\"$k\"') >", 0);
-                    }else{ 
-                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                    } else {                        
+                        if (is_array($v)) {
+                            if (key_exists($k, $location_table)) {
+                                $trial->whereIn('trial_location.' . $k , $v);
+                            } else {
+                                $trial->whereIn("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                            }
+                        } else {
+                            if (key_exists($k, $location_table)) {
+                                if ($k == 'water_management' || $k == 'production_pratice') {
+                                    $v = explode(',', $v);
+                                    $trial->whereIn('trial_location.' . $k . ' ' . $location_table[$k], $v);
+                                } else {
+                                    $trial->where('trial_location.' . $k . ' ' . $location_table[$k], $v);
+                                }
+                            } else {
+                                $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                            }
+                        }
                     }
                 }
             }
@@ -222,11 +276,36 @@ class CropController extends BaseController
                 // $trial->orWhere('v.herbicide like ', '%' . $search . '%');
                 $trial->groupEnd();
             }
-            if ($order && (count($columns) - 1) >= $order['column']) {
-                $trial->orderBy($columns[$order['column'] ?? 0], $order['dir'] ?? 'asc');
-            } elseif ($order && (count($columns) - 1) < $order['column']) {
-                $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
-            } else {
+            // if ($order && (count($columns) - 1) >= $order['column']) {
+            //     $trial->orderBy($columns[$order['column'] ?? 0], $order['dir'] ?? 'asc');
+            // } elseif ($order && ((count($columns) + count($variables)) - 1) <= $order['column']) {
+            //     dD('d');
+            //     $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
+            // } elseif ($order && (((count($columns) + count($variables)) + 4) - 1) < $order['column']){
+            //     dd('4th');
+            //     $trial->orderBy('trial_location.', $order['dir'] ?? 'asc');
+            // }else {
+            //     dd($order && (((count($columns) + count($variables)) + 4) - 1) , $order['column']);
+            //     $trial->orderBy('trial_data.year', 'DESC');
+            // }
+            if ($order) {
+                $orderColumnIndex = $order['column'] ?? 0;
+                $orderDir = $order['dir'] ?? 'asc';
+                $baseColumnCount = count($columns);
+                $variableColumnCount = count($variables);
+                $extraColumnsCount = 4;
+                if ($orderColumnIndex < $baseColumnCount) {
+                    $trial->orderBy($columns[$orderColumnIndex], $orderDir);
+                } elseif ($orderColumnIndex < ($baseColumnCount + $variableColumnCount)) {
+                    $trial->orderBy('variable_data', $order['dir'] ?? 'asc');
+                } elseif ($orderColumnIndex < ($baseColumnCount + $variableColumnCount + $extraColumnsCount)) {
+                    $orderColummnArray = ['water_management','production_pratice','avarage_percipitation', 'avarage_temparature'];
+                    $index = ($baseColumnCount + $variableColumnCount + $extraColumnsCount) - ($orderColumnIndex + 1);
+                    $trial->orderBy('trial_location.'.$orderColummnArray[$index], $order['dir'] ?? 'asc');
+                } else {
+                    $trial->orderBy('trial_data.year', 'DESC');
+                }
+            }else{
                 $trial->orderBy('trial_data.year', 'DESC');
             }
             $totalEntry = $trial->countAllResults(false);
@@ -247,6 +326,24 @@ class CropController extends BaseController
                 $data[$k]['brand'] = $l['brand'];
                 $data[$k]['variety'] = $l['variety'];
                 $data[$k]['variety_additional'] = $l['variety_additional'];
+                $data[$k]['avarage_temparature'] = $l['avarage_temparature'];
+                $data[$k]['avarage_percipitation'] = $l['avarage_percipitation'];
+                $production_pratice = $l['production_pratice'];
+                $production_pratice_show = "-";
+                if("".$production_pratice == "0"){
+                    $production_pratice_show = 'Full-Season';
+                }else if("".$production_pratice == "1"){
+                    $production_pratice_show = 'Double-Crop';
+                }
+                $data[$k]['production_pratice'] = $production_pratice_show;
+                $water_management = $l['water_management'];
+                $water_management_show = "-";
+                if("".$water_management == "0"){
+                    $water_management_show = 'Irrigated';
+                }else if("".$water_management == "1"){
+                    $water_management_show = 'Non-Irrigated';
+                }
+                $data[$k]['water_management'] = $water_management_show;
                 // $data[$k]['herbicide'] = $l['herbicide'];
                 $varArray = \json_decode($l['variable']);
                 foreach ($variables as $v) {

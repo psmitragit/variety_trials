@@ -13,7 +13,7 @@ class TrialLocation extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['trial_id', 'location_id', 'harvest_date', 'planting_date'];
+    protected $allowedFields    = ['trial_id', 'location_id', 'harvest_date', 'planting_date', 'water_management', 'production_pratice', 'avarage_percipitation', 'avarage_temparature'];
 
     // Dates
     protected $useTimestamps = false;
