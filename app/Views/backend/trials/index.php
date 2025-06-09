@@ -43,8 +43,8 @@
                                 <th>Crop</th>
                                 <th>Type</th>
                                 <th>Locations</th>
-                                <th>Avarage Temparature</th>
-                                <th>Avarage Percipitation</th>
+                                <th>Average Temparature</th>
+                                <th>Average Percipitation</th>
                                 <th>Production Pratice</th>
                                 <th>Water Management</th>
                             </tr>

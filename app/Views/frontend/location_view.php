@@ -225,7 +225,7 @@
                 getVarietyData();
             });
             $('#toggleSwitch').on('change', function() {
-                window.location.href = "<?= base_url() . $crop['slug'] ?>/avarage";
+                window.location.href = "<?= base_url() . $crop['slug'] ?>/average";
             });
         });
 

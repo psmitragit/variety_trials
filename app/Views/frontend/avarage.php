@@ -1,6 +1,6 @@
 <?= $this->extend('frontend/layouts/app') ?>
 <?= $this->section('title') ?>
-<?= $crop['name'] . " Avarage" ?>
+<?= $crop['name'] . " Average" ?>
 <?= $this->endSection() ?>
 <?= $this->section('content') ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -85,7 +85,7 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="  bg-gradient-primary shadow-primary border-radius-lg pt-3 pb-2">
                     <div class="row px-3 align-items-center">
-                        <h3 class="col-md-9 text-white text-capitalize ps-3"><?= $crop['name'] . " Avarage" ?></h3>
+                        <h3 class="col-md-9 text-white text-capitalize ps-3"><?= $crop['name'] . " Average" ?></h3>
                     </div>
                 </div>
 

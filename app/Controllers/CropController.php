@@ -94,7 +94,7 @@ class CropController extends BaseController
         $other = [];
 
         foreach ($allVariables as $key => $value) {
-            if($value['show_frontent'] < 1){
+            if ($value['show_frontent'] < 1) {
                 continue;
             }
             if ($value['filter'] == 'trait') {
@@ -256,7 +256,12 @@ class CropController extends BaseController
                             if (key_exists($k, $location_table)) {
                                 $trial->whereIn('trial_location.' . $k, $v);
                             } else {
-                                $trial->whereIn("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
+                                $escaped_values = implode(",", array_map(function ($val) {
+                                    return "'" . addslashes($val) . "'";
+                                }, $v));
+
+                                $trial->where("JSON_UNQUOTE(JSON_EXTRACT(variable, '$.\"$k\"')) IN ($escaped_values)");
+                                // $trial->whereIn("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
                             }
                         } else {
                             if (key_exists($k, $location_table)) {

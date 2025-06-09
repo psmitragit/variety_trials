@@ -320,7 +320,7 @@
                                 }
                                 ?>
                                 <div class="col-md-6 position-relative">
-                                    <label class="form-label fw-semibold">Avarage Temparature <span id="show_value_avarage_temparature">- <?= $min_temp ?></span></label>
+                                    <label class="form-label fw-semibold">Average Temparature <span id="show_value_avarage_temparature">- <?= $min_temp ?></span></label>
 
                                     <input type="range"
                                         class="form-range filter-range" data-type="avarage_temparature"
@@ -335,7 +335,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 position-relative">
-                                    <label class="form-label fw-semibold">Avarage Percipitation <span id="show_value_avarage_percipitation">- <?= $min_precip ?></span></label>
+                                    <label class="form-label fw-semibold">Average Percipitation <span id="show_value_avarage_percipitation">- <?= $min_precip ?></span></label>
 
                                     <input type="range"
                                         class="form-range filter-range" data-type="avarage_percipitation"
@@ -423,10 +423,10 @@
                                         <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 <?= $safeClass ?>_colummn_filter"><?= $l ?></th>
                                     <?php endforeach; ?>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Avarage Temparature
+                                        Average Temparature
                                     </th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Avarage Percipitation
+                                        Average Percipitation
                                     </th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Production Pratice
