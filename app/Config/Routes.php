@@ -36,6 +36,7 @@ $routes->get('(:segment)/avarage', [CropController::class, 'avarage']);
 $routes->get('(:segment)/location', [CropController::class, 'location']);
 $routes->post('get-avarage', [CropController::class, 'getAvarage']);
 $routes->post('get-location-data', [CropController::class, 'getLocationData']);
+$routes->post('get-locations-by-state', [CropController::class, 'get_locations_by_state']);
 
 
 /*

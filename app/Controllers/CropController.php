@@ -56,9 +56,6 @@ class CropController extends BaseController
         //STATES
         $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
 
-        //LOCATIONS
-        $locations = $this->trialDataModel->select('location')->where('crop_id', $crop['id'])->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
-
         //BRAND
         $brands = $this->brandModel->select('brands.name')->join('varieties', 'brands.name=varieties.brand')
             ->join('trial_data', 'trial_data.variety_code=varieties.code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('brands.name')->groupBy('trial_data.variety_code')->distinct()->findAll();
@@ -86,7 +83,7 @@ class CropController extends BaseController
 
 
         //VARIABLES
-        $allVariables = $this->variableModel->select('crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
+        $allVariables = $this->variableModel->select('crop_variables.show_frontent,crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
         $multiselect = [];
         $variables = [];
 
@@ -97,6 +94,9 @@ class CropController extends BaseController
         $other = [];
 
         foreach ($allVariables as $key => $value) {
+            if($value['show_frontent'] < 1){
+                continue;
+            }
             if ($value['filter'] == 'trait') {
                 $trait[] = $value['name'];
             } else if ($value['filter'] == 'management') {
@@ -153,7 +153,21 @@ class CropController extends BaseController
 
 
         // dd([$variables]);
-        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other', 'locations', 'multiselect', 'min_temp', 'max_temp', 'min_precip', 'max_precip'));
+        return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other', 'multiselect', 'min_temp', 'max_temp', 'min_precip', 'max_precip'));
+    }
+
+    public function get_locations_by_state()
+    {
+        $cropId = $this->request->getPost('id');
+        $states = $this->request->getPost('states');
+        if (empty($states)) {
+            echo json_encode(['success' => 1, 'location' => []]);
+            exit;
+        }
+        //LOCATIONS
+        $locations = $this->trialDataModel->select('location')->where('crop_id', $cropId)->whereIn('state_code', $states)->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
+        echo json_encode(['success' => 1, 'location' => $locations]);
+        exit;
     }
 
     public function ajaxLoad()
@@ -769,7 +783,7 @@ class CropController extends BaseController
             $html .= "<tr>
                 <td>" . htmlspecialchars($value['short_name']) . "</td>
                 <td>" . htmlspecialchars($value['location']) . "</td>
-                <td style='background-color: ".$bgColor."; color:".$color.";'>" . htmlspecialchars($value['trait_value']) . "</td>
+                <td style='background-color: " . $bgColor . "; color:" . $color . ";'>" . htmlspecialchars($value['trait_value']) . "</td>
             </tr>";
         }
 

@@ -194,9 +194,6 @@
 
                             <div class="w-100 mb-3">
                                 <select id="sLocation" class="form-select mb-3 px-3 select2 filter-input" data-placeholder="Select Location(s)" multiple>
-                                    <?php foreach ($locations as $s) : ?>
-                                        <option value="<?= $s['location'] ?>"><?= $s['location'] ?></option>
-                                    <?php endforeach; ?>
                                 </select>
                             </div>
 
@@ -231,8 +228,14 @@
                                 $array = $varialeData[$value] ?? [];
                             ?>
                                 <div class="w-100 mb-3">
-                                    <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>">
-                                        <option value="">Select <?= $value ?></option>
+                                    <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>" <?= in_array($value, $multiselect) ? 'multiple data-placeholder="Select ' . $value . '(s)"' : '' ?>>
+                                        <?php
+                                        if (!in_array($value, $multiselect)) {
+                                        ?>
+                                            <option value="">Select <?= $value ?></option>
+                                        <?php
+                                        }
+                                        ?>
                                         <?php
                                         foreach ($array as $k => $v) {
                                         ?>
@@ -255,8 +258,14 @@
                                 $array = $varialeData[$value] ?? [];
                             ?>
                                 <div class="w-100 mb-3">
-                                    <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>">
-                                        <option value="">Select <?= $value ?></option>
+                                    <select id="variable_<?= $allOverIndex++ ?>" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="<?= $value ?>" <?= in_array($value, $multiselect) ? 'multiple data-placeholder="Select ' . $value . '(s)"' : '' ?>>
+                                        <?php
+                                        if (!in_array($value, $multiselect)) {
+                                        ?>
+                                            <option value="">Select <?= $value ?></option>
+                                        <?php
+                                        }
+                                        ?>
                                         <?php
                                         foreach ($array as $k => $v) {
                                         ?>
@@ -275,7 +284,7 @@
                                     <option value="1">Double-Crop</option>
                                 </select>
                             </div>
-                             <div class="w-100 mb-3">
+                            <div class="w-100 mb-3">
                                 <select id="water_management" class="form-select mb-3 px-3 select2 filter-input filter-variables" data-type="water_management" multiple data-placeholder="Select Water Management(s)">
                                     <option value=""></option>
                                     <option value="0">Irrigated </option>
@@ -408,11 +417,11 @@
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Brand</th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety</th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Variety Additional</th>
-                                    <?php foreach ($variables as $l) :                         
-                                    $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $l);
+                                    <?php foreach ($variables as $l) :
+                                        $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $l);
                                     ?>
                                         <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 <?= $safeClass ?>_colummn_filter"><?= $l ?></th>
-                                    <?php endforeach; ?>                                    
+                                    <?php endforeach; ?>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Avarage Temparature
                                     </th>
@@ -479,17 +488,17 @@
                 <button type="button" class="btn closeBtn" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-            <?php
-            foreach ($variables as $key => $v) {
-                $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $v);
-                ?>
-                <div class="form-group mb-1">
-                    <input type="checkbox" value="<?= $safeClass ?>" name="show_hide_field_checkbox" class="show_hide_field_checkbox" id="<?=$safeClass?>_checkbox">
-                    <label for="<?=$safeClass?>_checkbox"><?= $v ?></label>
-                </div>                    
                 <?php
-            }
-            ?>            
+                foreach ($variables as $key => $v) {
+                    $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $v);
+                ?>
+                    <div class="form-group mb-1">
+                        <input type="checkbox" value="<?= $safeClass ?>" name="show_hide_field_checkbox" class="show_hide_field_checkbox" id="<?= $safeClass ?>_checkbox">
+                        <label for="<?= $safeClass ?>_checkbox"><?= $v ?></label>
+                    </div>
+                <?php
+                }
+                ?>
             </div>
         </div>
     </div>
@@ -504,11 +513,11 @@
     let markerName = [];
 
     function toggleColumns(dt) {
-        $('.show_hide_field_checkbox').each(function () {
+        $('.show_hide_field_checkbox').each(function() {
             const columnClass = $(this).val();
             const isChecked = $(this).is(':checked');
 
-            dt.columns().every(function (index) {
+            dt.columns().every(function(index) {
                 const header = $(dt.column(index).header());
                 if (header.hasClass(columnClass + '_colummn_filter')) {
                     dt.column(index).visible(isChecked);
@@ -612,12 +621,11 @@
                 {
                     data: 'variety_additional'
                 },
-                <?php foreach ($variables as $l) : $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $l);?> {
+                <?php foreach ($variables as $l) : $safeClass = preg_replace('/[^a-zA-Z0-9_-]/', '_', $l); ?> {
                         data: '<?= $l ?>',
                         className: '<?= $safeClass ?>_colummn_filter'
                     },
-                <?php endforeach; ?>                
-                {
+                <?php endforeach; ?> {
                     data: 'avarage_temparature'
                 },
                 {
@@ -675,7 +683,7 @@
         function getvariables() {
             let data = {}
             $('.filter-variables').each((i, v) => {
-                if($(v).val() != ''){
+                if ($(v).val() != '') {
                     data[$(v).attr('data-type')] = $(v).val()
                 }
             })
@@ -883,7 +891,7 @@
         $('.show_hide_field_checkbox').prop('checked', true);
 
         function updateColumnVisibility() {
-            $('.show_hide_field_checkbox').each(function () {
+            $('.show_hide_field_checkbox').each(function() {
                 const colName = $(this).val();
                 const isVisible = $(this).is(':checked');
                 const selector = `.${colName.replace(/\s+/g, '_')}_colummn_filter`;
@@ -892,18 +900,59 @@
             });
         }
 
-        $('.show_hide_field_checkbox').on('change', function () {
+        $('.show_hide_field_checkbox').on('change', function() {
             updateColumnVisibility();
         });
 
-        $('#dataTable').on('draw.dt', function () {
+        $('#dataTable').on('draw.dt', function() {
             updateColumnVisibility();
         });
+
+        $('#sState').on('change', function() {
+            updateLocationSelect();
+        })
+        updateLocationSelect();
+
+        function updateLocationSelect() {
+            let states = $('#sState').val();
+            $.ajax({
+                url: "<?= base_url('get-locations-by-state') ?>",
+                type: 'POST',
+                data: {
+                    _token: () => {
+                        return $('input[name="_token"]').val()
+                    },
+                    id: "<?= $crop['id'] ?>",
+                    states: states
+                },
+                success: function(res) {
+                    try {
+                        res = JSON.parse(res);
+                    } catch (error) {
+                        console.log(error);
+                        return;
+                    }
+
+                    if (res.location) {
+                        $('#sLocation').empty();
+                        $.each(res.location, function(index, loc) {
+                            console.log(loc);
+                            $('#sLocation').append(
+                                $('<option>', {
+                                    value: loc.location,
+                                    text: loc.location
+                                })
+                            );
+                        });
+                        $('#sLocation').trigger('change');
+                    }
+                }
+            })
+        }
     });
 
     function showColumnButtonClicked() {
         $('#showColumnModal').modal('show');
     }
-
 </script>
 <?= $this->endSection() ?>
