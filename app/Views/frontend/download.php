@@ -141,12 +141,12 @@
             dom: 'Bfrtip',
             buttons: [
                 'pageLength',
-                {
-                    "extend": 'csv',
-                    "text": 'CSV',
-                    "titleAttr": 'CSV',
-                    "action": newexportaction
-                },
+                // {
+                //     "extend": 'csv',
+                //     "text": 'CSV',
+                //     "titleAttr": 'CSV',
+                //     "action": newexportaction
+                // },
             ]
         });
 

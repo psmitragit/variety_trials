@@ -205,7 +205,6 @@ class CropController extends BaseController
             $fVariables = \json_decode($fVariables, true) ?? [];
             $otherVariables = [];
             foreach ($fVariables as $key => $value) {
-                $otherVariables[] = $key;
             }
 
             $variables = $this->variableModel->where('crop_id', $cropId)->find();
@@ -215,17 +214,26 @@ class CropController extends BaseController
                 if ($value['filter'] == 'numeric') {
                     $numericFilter[] = $value['name'];
                 }
+                $otherVariables[] = $value['name'];
             }
 
             $columns = ['trial_data.year', 'trial_data.state_code', 'trial_data.entry', 'trial_types.name', 'trial_data.location_code', 'trial_data.location', 'trial_data.variety_code', 'v.brand', 'variety', 'variety_additional'];
 
             $select = 'trial_data.*,v.brand,v.short_name as variety,v.additional_name as variety_additional,v.herbicide,l.lat,l.long,trial_types.name as trial_type_name,trial_location.avarage_temparature,trial_location.avarage_percipitation,trial_location.production_pratice,trial_location.water_management';
 
-            if ($order && (count($columns) - 1) < $order['column']) {
-                $index = $order['column'] - (count($columns));
-                $columnName = $otherVariables[$index] ?? '';
-                if (!empty($columnName)) {
-                    $select .= ", LOWER(JSON_UNQUOTE(JSON_EXTRACT(variable, '$.\"$columnName\"'))) AS variable_data";
+            if ($order) {
+                $orderColumnIndex = $order['column'] ?? 0;
+                $orderDir = $order['dir'] ?? 'asc';
+                $baseColumnCount = count($columns);
+                $variableColumnCount = count($variables);
+                $extraColumnsCount = 4;
+
+                if (!($orderColumnIndex < $baseColumnCount) && ($orderColumnIndex < ($baseColumnCount + $variableColumnCount))) {
+                    $index = $order['column'] - (count($columns));
+                    $columnName = $otherVariables[$index] ?? '';
+                    if (!empty($columnName)) {
+                        $select .= ", LOWER(JSON_UNQUOTE(JSON_EXTRACT(variable, '$.\"$columnName\"'))) AS variable_data";
+                    }
                 }
             }
 
@@ -279,8 +287,6 @@ class CropController extends BaseController
                 }
             }
 
-
-
             if ($search) {
                 $trial->groupStart();
                 $trial->where('trial_data.year like ', '%' . $search . '%');
@@ -309,11 +315,6 @@ class CropController extends BaseController
             //     $trial->orderBy('trial_data.year', 'DESC');
             // }
             if ($order) {
-                $orderColumnIndex = $order['column'] ?? 0;
-                $orderDir = $order['dir'] ?? 'asc';
-                $baseColumnCount = count($columns);
-                $variableColumnCount = count($variables);
-                $extraColumnsCount = 4;
                 if ($orderColumnIndex < $baseColumnCount) {
                     $trial->orderBy($columns[$orderColumnIndex], $orderDir);
                 } elseif ($orderColumnIndex < ($baseColumnCount + $variableColumnCount)) {
@@ -330,7 +331,6 @@ class CropController extends BaseController
             }
             $totalEntry = $trial->countAllResults(false);
             $trials = $trial->limit($length, $start)->find();
-
 
             $data = array();
             $coordinates = array();
