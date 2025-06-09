@@ -133,12 +133,19 @@ function dd(...$params)
 }
 
 function getTraitColorByPercentile($val, $p10, $p30, $p70, $p90) {
-    if ($val >= $p90) return '#44b4a6';         // Best
-    if ($val >= $p70) return '#6495d2';         // Above Average
-    if ($val >= $p30) return '#e8ebed';         // Mean Range
-    if ($val >= $p10) return '#f3c076';         // Below Average
-    return '#d26a5c';                           // Worst
+    if ($val >= $p90) return '#008000';         // Best
+    if ($val >= $p70) return '#008000';         // Above Average
+    if ($val >= $p30) return '#ffff00';         // Mean Range
+    if ($val >= $p10) return '#ff0000';         // Below Average
+    return '#ff0000';                           // Worst
 }
+// function getTraitColorByPercentile($val, $p10, $p30, $p70, $p90) {
+//     if ($val >= $p90) return '#44b4a6';         // Best
+//     if ($val >= $p70) return '#6495d2';         // Above Average
+//     if ($val >= $p30) return '#e8ebed';         // Mean Range
+//     if ($val >= $p10) return '#f3c076';         // Below Average
+//     return '#d26a5c';                           // Worst
+// }
 
 // Worst	Bottom 10%	#d26a5c
 // Below Average	10% - 30%	#f3c076

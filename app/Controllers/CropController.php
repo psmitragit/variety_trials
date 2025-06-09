@@ -783,7 +783,7 @@ class CropController extends BaseController
         foreach ($paginatedTrials as $value) {
             $traitVal = floatval($value['trait_value']);
             $bgColor = getTraitColorByPercentile($traitVal, $p10, $p30, $p70, $p90);
-            $color = $bgColor == '#e8ebed' ? '#7b809a' : 'white';
+            $color = $bgColor == '#ffff00' ? 'black' : 'white';
 
             $html .= "<tr>
                 <td>" . htmlspecialchars($value['short_name']) . "</td>
