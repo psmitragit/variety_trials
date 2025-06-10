@@ -358,7 +358,13 @@
 
                         <!-- Management -->
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Management</label>
+                            <?php
+                                if(count($management) > 0){
+                                    ?>
+                                    <label class="form-label fw-semibold">Management</label>
+                                    <?php
+                                }
+                            ?>
                             <?php
                             foreach ($management as $key => $value) {
                                 $array = $varialeData[$value] ?? [];
