@@ -191,7 +191,7 @@
     <?= $this->section('custom-js') ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-           
+
         });
     </script>
 
@@ -228,12 +228,13 @@
                 getVarietyData();
             });
             $('#toggleSwitch').on('change', function() {
-                window.location.href = "<?= base_url().$crop['slug'] ?>/location";
+                window.location.href = "<?= base_url() . $crop['slug'] ?>/location";
             });
         });
 
 
         function getVarietyData(page = 1, order = '', dir = 'asc') {
+            order = order.trim().toLowerCase() === "maturity (dap)" ? 'maturity_dap' : order;
             $.ajax({
                 url: '<?= base_url('get-avarage') ?>',
                 type: 'POST',

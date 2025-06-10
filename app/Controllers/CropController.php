@@ -539,6 +539,142 @@ class CropController extends BaseController
         return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters'));
     }
 
+    // public function getAvarage()
+    // {
+    //     $varieties = $this->request->getPost('varieties');
+    //     $years = $this->request->getPost('years');
+    //     $crop_id = $this->request->getPost('crop_id');
+    //     $page = (int) $this->request->getPost('page');
+    //     $perPage = (int) $this->request->getPost('per_page');
+    //     $orderBy = $this->request->getPost('order_by') ?? '';
+    //     $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+
+    //     $offset = ($page - 1) * $perPage;
+
+    //     $trialDataQuery = $this->trialDataModel
+    //         ->select('varieties.short_name, trial_data.variable,trial_data.year')
+    //         ->where('trial_data.crop_id', $crop_id)
+    //         ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
+
+    //     if (!empty($varieties)) {
+    //         $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
+    //     }
+
+    //     if (!empty($years)) {
+    //         $trialDataQuery->whereIn('trial_data.year', $years);
+    //     }
+
+    //     $allTrials = $trialDataQuery->findAll();
+
+    //     $cropVariableModel = new CropVariable();
+    //     $numeric = $cropVariableModel
+    //         ->select('name')
+    //         ->where('crop_id', $crop_id)
+    //         ->where('filter', 'numeric')
+    //         ->findAll();
+    //     $numericFilters = array_column($numeric, 'name');
+
+    //     // Sort if needed
+    //     if (!empty($orderBy) && in_array($orderBy, $numericFilters)) {
+    //         usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
+    //             $aData = json_decode($a['variable'], true);
+    //             $bData = json_decode($b['variable'], true);
+    //             $valA = $aData[$orderBy] ?? 0;
+    //             $valB = $bData[$orderBy] ?? 0;
+    //             return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
+    //         });
+    //     }
+
+    //     $averages = [];
+    //     $validCounts = [];
+
+    //     foreach ($allTrials as $trial) {
+    //         $jsonData = json_decode($trial['variable'], true);
+    //         foreach ($numericFilters as $field) {
+    //             $val = isset($jsonData[$field]) && is_numeric($jsonData[$field]) ? floatval($jsonData[$field]) : null;
+    //             if ($val !== null) {
+    //                 $averages[$field] = ($averages[$field] ?? 0) + $val;
+    //                 $validCounts[$field] = ($validCounts[$field] ?? 0) + 1;
+    //             }
+    //         }
+    //     }
+
+    //     foreach ($averages as $key => $total) {
+    //         $averages[$key] = round($total / $validCounts[$key], 2);
+    //     }
+
+    //     $totalRecords = count($allTrials);
+    //     $paginatedTrials = array_slice($allTrials, $offset, $perPage);
+
+    //     $html = "<table class='table table-bordered table-striped'>
+    //         <thead class='table-light'>
+    //         <tr>
+    //             <th scope='col' style='padding-bottom:0px;'>
+    //                 <div class='d-flex justify-content-between align-items-center'>
+    //                     <span>Variety</span>
+    //                 </div>
+    //             </th>
+    //             <th scope='col' style='padding-bottom:0px;'>
+    //                 <div class='d-flex justify-content-between align-items-center'>
+    //                     <span>Year</span>
+    //                 </div>
+    //             </th>";
+
+    //     foreach ($numericFilters as $value) {
+    //         $isActive = ($orderBy === $value);
+    //         $ascClass = $isActive && $orderDir === 'asc' ? 'text-primary' : '';
+    //         $descClass = $isActive && $orderDir === 'desc' ? 'text-primary' : '';
+
+    //         $html .= "<th scope='col' class='sortable' data-field='" . $value . "' style='padding-bottom:0px; cursor:pointer;'>
+    //             <div class='d-flex justify-content-between align-items-center'>
+    //                 <span>" . htmlspecialchars($value) . "</span>
+    //                 <span class='sort-icons'>
+    //                     <i class='bi bi-caret-up-fill sort-icon $ascClass' data-dir='asc' title='Sort Asc'></i>
+    //                     <i class='bi bi-caret-down-fill sort-icon $descClass' data-dir='desc' title='Sort Desc'></i>
+    //                 </span>
+    //             </div>
+    //         </th>";
+    //     }
+
+    //     $html .= "</tr><tr><th style='padding-top:0px;'></th><th style='padding-top:0px;'></th>";
+
+    //     foreach ($numericFilters as $field) {
+    //         $avg = $averages[$field] ?? 0;
+    //         $html .= "<th align='center' style='padding-top:0px; text-align:center;'>(" . htmlspecialchars($avg) . ")</th>";
+    //     }
+
+    //     $html .= "</tr></thead><tbody>";
+
+    //     foreach ($paginatedTrials as $value) {
+    //         try {
+    //             $html .= "<tr>";
+    //             $html .= "<td>" . htmlspecialchars($value['short_name']) . "</td>";
+    //             $html .= "<td>" . htmlspecialchars($value['year']) . "</td>";
+    //             $jsonData = json_decode($value['variable'], true);
+    //             foreach ($numericFilters as $field) {
+    //                 $cellValue = !empty($jsonData[$field]) ? $jsonData[$field] : 0;
+    //                 $html .= "<td>" . htmlspecialchars($cellValue) . "</td>";
+    //             }
+    //             $html .= "</tr>";
+    //         } catch (Exception $err) {
+    //             continue;
+    //         }
+    //     }
+
+    //     $html .= "</tbody></table>";
+
+    //     echo json_encode([
+    //         'success' => 1,
+    //         'html' => $html,
+    //         'total_records' => $totalRecords,
+    //         'current_page' => $page,
+    //         'per_page' => $perPage,
+    //         'order_by' => $orderBy,
+    //         'order_dir' => $orderDir
+    //     ]);
+    //     exit;
+    // }
+
     public function getAvarage()
     {
         $varieties = $this->request->getPost('varieties');
@@ -552,7 +688,7 @@ class CropController extends BaseController
         $offset = ($page - 1) * $perPage;
 
         $trialDataQuery = $this->trialDataModel
-            ->select('varieties.short_name, trial_data.variable,trial_data.year')
+            ->select('varieties.short_name, trial_data.variable, trial_data.year')
             ->where('trial_data.crop_id', $crop_id)
             ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
 
@@ -585,8 +721,10 @@ class CropController extends BaseController
             });
         }
 
+        // Calculate averages
         $averages = [];
         $validCounts = [];
+        $traitValuesPerField = [];
 
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
@@ -595,6 +733,7 @@ class CropController extends BaseController
                 if ($val !== null) {
                     $averages[$field] = ($averages[$field] ?? 0) + $val;
                     $validCounts[$field] = ($validCounts[$field] ?? 0) + 1;
+                    $traitValuesPerField[$field][] = $val;
                 }
             }
         }
@@ -603,22 +742,34 @@ class CropController extends BaseController
             $averages[$key] = round($total / $validCounts[$key], 2);
         }
 
+        // Calculate percentiles
+        $percentileRanges = [];
+        foreach ($traitValuesPerField as $field => $values) {
+            sort($values);
+            $percentileRanges[$field] = [
+                'p10' => getPercentile($values, 10),
+                'p30' => getPercentile($values, 30),
+                'p70' => getPercentile($values, 70),
+                'p90' => getPercentile($values, 90),
+            ];
+        }
+
         $totalRecords = count($allTrials);
         $paginatedTrials = array_slice($allTrials, $offset, $perPage);
 
         $html = "<table class='table table-bordered table-striped'>
-            <thead class='table-light'>
-            <tr>
-                <th scope='col' style='padding-bottom:0px;'>
-                    <div class='d-flex justify-content-between align-items-center'>
-                        <span>Variety</span>
-                    </div>
-                </th>
-                <th scope='col' style='padding-bottom:0px;'>
-                    <div class='d-flex justify-content-between align-items-center'>
-                        <span>Year</span>
-                    </div>
-                </th>";
+        <thead class='table-light'>
+        <tr>
+            <th scope='col' style='padding-bottom:0px;'>
+                <div class='d-flex justify-content-between align-items-center'>
+                    <span>Variety</span>
+                </div>
+            </th>
+            <th scope='col' style='padding-bottom:0px;'>
+                <div class='d-flex justify-content-between align-items-center'>
+                    <span>Year</span>
+                </div>
+            </th>";
 
         foreach ($numericFilters as $value) {
             $isActive = ($orderBy === $value);
@@ -626,14 +777,14 @@ class CropController extends BaseController
             $descClass = $isActive && $orderDir === 'desc' ? 'text-primary' : '';
 
             $html .= "<th scope='col' class='sortable' data-field='" . $value . "' style='padding-bottom:0px; cursor:pointer;'>
-                <div class='d-flex justify-content-between align-items-center'>
-                    <span>" . htmlspecialchars($value) . "</span>
-                    <span class='sort-icons'>
-                        <i class='bi bi-caret-up-fill sort-icon $ascClass' data-dir='asc' title='Sort Asc'></i>
-                        <i class='bi bi-caret-down-fill sort-icon $descClass' data-dir='desc' title='Sort Desc'></i>
-                    </span>
-                </div>
-            </th>";
+            <div class='d-flex justify-content-between align-items-center'>
+                <span>" . htmlspecialchars($value) . "</span>
+                <span class='sort-icons'>
+                    <i class='bi bi-caret-up-fill sort-icon $ascClass' data-dir='asc' title='Sort Asc'></i>
+                    <i class='bi bi-caret-down-fill sort-icon $descClass' data-dir='desc' title='Sort Desc'></i>
+                </span>
+            </div>
+        </th>";
         }
 
         $html .= "</tr><tr><th style='padding-top:0px;'></th><th style='padding-top:0px;'></th>";
@@ -651,9 +802,19 @@ class CropController extends BaseController
                 $html .= "<td>" . htmlspecialchars($value['short_name']) . "</td>";
                 $html .= "<td>" . htmlspecialchars($value['year']) . "</td>";
                 $jsonData = json_decode($value['variable'], true);
+
                 foreach ($numericFilters as $field) {
-                    $cellValue = !empty($jsonData[$field]) ? $jsonData[$field] : 0;
-                    $html .= "<td>" . htmlspecialchars($cellValue) . "</td>";
+                    $cellValue = isset($jsonData[$field]) && is_numeric($jsonData[$field]) ? floatval($jsonData[$field]) : 0;
+                    $bgColor = getTraitColorByPercentile(
+                        $cellValue,
+                        $percentileRanges[$field]['p10'],
+                        $percentileRanges[$field]['p30'],
+                        $percentileRanges[$field]['p70'],
+                        $percentileRanges[$field]['p90']
+                    );
+                    $color = $bgColor == '#ffff00' ? 'black' : 'white';
+
+                    $html .= "<td style='background-color: $bgColor; color: $color;'>" . htmlspecialchars($cellValue) . "</td>";
                 }
                 $html .= "</tr>";
             } catch (Exception $err) {
@@ -685,6 +846,7 @@ class CropController extends BaseController
         $perPage = (int) $this->request->getPost('per_page');
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+        $orderBy = $orderBy == "maturity_dap" ? 'Maturity (DAP)' : $orderBy;
 
         $offset = ($page - 1) * $perPage;
         if (empty($traitName)) {
