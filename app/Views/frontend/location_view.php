@@ -110,6 +110,15 @@
                         <!-- Filter By -->
                         <div class="col-md-6">
                             <div class="w-100 mb-3">
+                                <select id="sState" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select States(s)">
+                                    <?php foreach ($states as $s) : ?>
+                                        <option value="<?= $s['code'] ?>"><?= $s['name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
                                 <select id="sLocations" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select Location(s)">
                                     <?php foreach ($locations as $s) : ?>
                                         <option value="<?= $s['location'] ?>"><?= $s['location'] ?></option>
@@ -316,6 +325,54 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             getVarietyData();
-        });
+            $('#sState').on('change', function() {
+                updateLocationSelect();
+            })
+            updateLocationSelect();
+        });       
+
+        function updateLocationSelect() {
+            let states = $('#sState').val();
+            $.ajax({
+                url: "<?= base_url('get-locations-by-state') ?>",
+                type: 'POST',
+                data: {
+                    _token: () => {
+                        return $('input[name="_token"]').val()
+                    },
+                    id: "<?= $crop['id'] ?>",
+                    states: states
+                },
+                success: function(res) {
+                    try {
+                        res = JSON.parse(res);
+                    } catch (error) {
+                        console.log(error);
+                        return;
+                    }
+
+                    if (res.location) {
+                        $('#sLocations').empty();
+                        $.each(res.location, function(index, loc) {
+                            console.log(loc);
+                            $('#sLocations').append(
+                                $('<option>', {
+                                    value: loc.location,
+                                    text: loc.location
+                                })
+                            );
+                        });
+                        $('#sLocations').trigger('change');
+                    }
+                }, 
+                beforeSend: function() {
+                    $('#loader').removeClass('d-none');
+                },
+                complete: function() {
+                    $('#loader').addClass('d-none');
+                }
+            })
+        }
+
     </script>
     <?= $this->endSection() ?>

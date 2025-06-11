@@ -824,6 +824,9 @@
         "Variety Additional",
         <?php foreach ($variables as $l) : ?> "<?= addslashes($l) ?>",
         <?php endforeach; ?>
+        "Average Temparature",
+        "Average Percipitation","Production Pratice",
+        "Water Management"
     ];
 
     $('#dataTable').on('click', 'tbody td', function(e) {

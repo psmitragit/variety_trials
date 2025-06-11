@@ -514,11 +514,16 @@ class CropController extends BaseController
         if (empty($crop)) return \redirect()->back()->with('error', "Crop not found");
 
         //LOCATIONS
-        $locations = $this->trialDataModel->select('location')
-            ->where('crop_id', $crop['id'])->orderBy('location', 'asc')
-            ->groupBy('location')
-            ->distinct()
-            ->findAll();
+        // $locations = $this->trialDataModel->select('location')
+        //     ->where('crop_id', $crop['id'])->orderBy('location', 'asc')
+        //     ->groupBy('location')
+        //     ->distinct()
+        //     ->findAll();
+        $locations = [];
+
+        
+        //STATES
+        $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
 
         //VARIETY
         $varieties  = $this->trialDataModel->select('varieties.code,varieties.short_name')
@@ -536,7 +541,7 @@ class CropController extends BaseController
             ->findAll();
         $numericFilters = array_column($numeric, 'name');
 
-        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters'));
+        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters', 'states'));
     }
 
     // public function getAvarage()
