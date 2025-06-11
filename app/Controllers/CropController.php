@@ -505,7 +505,15 @@ class CropController extends BaseController
             ->distinct()
             ->findAll();
 
-        return view('frontend/avarage', compact('crop', 'years', 'varieties'));
+        $cropVariableModel = new CropVariable();
+        $numeric = $cropVariableModel
+        ->select('name')
+        ->where('crop_id', $crop['id'])
+        ->where('filter', 'numeric')
+        ->findAll();
+        $numericFilters = array_column($numeric, 'name');
+
+        return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters'));
     }
 
     public function location($slug)

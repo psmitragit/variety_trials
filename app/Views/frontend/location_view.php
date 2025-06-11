@@ -329,6 +329,34 @@
                 updateLocationSelect();
             })
             updateLocationSelect();
+
+            $('#table-content').on('click', 'table tbody td', function(e) {
+                $('.current_selected_tr').removeClass('current_selected_tr');
+                let parent = $(this).parent('tr');
+                parent.addClass('current_selected_tr');
+                let tds = $('.current_selected_tr td');
+                let headering = [
+                    "Variety", 
+                    "Location",
+                    $('#sTrait').val()
+                ];
+
+                let html = '<table class="table table-striped"><tbody>';
+                let index = 0;
+
+                tds.each(function() {
+                    const value = $(this).text();
+                    html += `<tr>
+                        <td>${headering[index]}</td>
+                        <td>${value}</td>
+                    </tr>`;
+                    index++;
+                });
+
+                html += '</tbody></table>';
+                $('#showDataCustomModal .modal-body').html(html);
+                $('#showDataCustomModal').modal('show');
+            });
         });       
 
         function updateLocationSelect() {
