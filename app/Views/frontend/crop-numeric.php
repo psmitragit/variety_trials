@@ -28,77 +28,6 @@
     #dataTable_filter {
         display: none;
     }
-
-    .range_container {
-        display: flex;
-        flex-direction: column;
-        margin: 12px 0px;
-    }
-
-    .sliders_control {
-        position: relative;
-        min-height: 15px;
-    }
-
-    .form_control {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        font-size: 24px;
-        color: #635a5a;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        pointer-events: all;
-        width: 24px;
-        height: 24px;
-        background-color: #fff;
-        border-radius: 50%;
-        box-shadow: 0 0 0 1px #C6C6C6;
-        cursor: pointer;
-    }
-
-    input[type=range]::-moz-range-thumb {
-        -webkit-appearance: none;
-        pointer-events: all;
-        width: 24px;
-        height: 24px;
-        background-color: #fff;
-        border-radius: 50%;
-        box-shadow: 0 0 0 1px #C6C6C6;
-        cursor: pointer;
-    }
-
-    input[type=range]::-webkit-slider-thumb:hover {
-        background: #f7f7f7;
-    }
-
-    input[type=range]::-webkit-slider-thumb:active {
-        box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
-        -webkit-box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
-    }
-
-    input[type="range"] {
-        -webkit-appearance: none;
-        appearance: none;
-        height: 2px;
-        width: 100%;
-        position: absolute;
-        background-color: #C6C6C6;
-        pointer-events: none;
-    }
-
-    #fromSlider {
-        height: 0;
-        z-index: 1;
-    }
-
-    .form_control_container__time__input {
-        border: 0px;
-        font-size: 12px;
-        color: #7b809a;
-    }
 </style>
 <div class="row">
     <input type="hidden" name="_token" value="<?= csrf_hash() ?>">
@@ -118,8 +47,8 @@
             </div>
             <div class="card-body px-3 pb-2 search-filter">
                 <!-- <div class="row pb-3"> -->
-                <!-- <div class="col-md-12 mb-3">Filter By</div> -->
-                <!-- <div class="col-md-2 form-group mb-3">
+                <!-- <div class="col-md-12 mb-3">Filter By</div>
+                    <div class="col-md-2 form-group mb-3">
                         <select id="sYear" class="form-control filter-input select2 ps-4">
                             <option value="0">Select Year</option>
                             <?php
@@ -209,20 +138,55 @@
                             <?php endforeach; ?>
                         </select>
                     </div> -->
+                <!-- <div class="col-md-2 form-group mb-3">
+                        <select id="sHerbicide" class="form-control filter-input select2 ps-4">
+                            <option value="0">Select Herbicide</option>
+                            <?php
+                            $insertedHerbicides = [];
+                            ?>
+                            <?php foreach ($herbicides as $s) : ?>
+                                <?php
+                                if (in_array($s['herbicide'], $insertedHerbicides)) {
+                                    continue;
+                                } else {
+                                    $insertedHerbicides[] = strtoupper($s['herbicide']);
+                                }
+                                ?>
+                                <option value="<?= $s['herbicide'] ?>"><?= strtoupper($s['herbicide']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div> -->
+
                 <!-- <?php foreach ($varialeData as $k => $l) : ?>
                         <div class="col-md-2 form-group mb-3">
                             <select id="s<?= ucfirst($k); ?>" class="form-control select2 filter-input ps-4 filter-variables" data-type="<?= $k; ?>">
                                 <option value="0">Select <?= ucfirst($k); ?></option>
+                                <?php
+                                $newArray = [];
+                                ?>
                                 <?php foreach ($l as $s) : ?>
+                                    <?php
+                                    if (in_array(strtoupper($s), $newArray) || empty($s)) {
+                                        continue;
+                                    } else {
+                                        $newArray[] = strtoupper($s);
+                                    }
+                                    ?>
                                     <option value="<?= $s ?>"><?= strtoupper($s) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                     <?php endforeach; ?> -->
+
                 <!-- <div class="col-md-2 d-none">
                         <button class="btn btn-danger custom-h">Reset</button>
                     </div> -->
                 <!-- </div> -->
+                <!-- <div class="row text-center">
+                    <div class="col-md-12">
+                        <button  class="btn btn-danger">Reset</button>
+                    </div>
+                </div> -->
 
                 <button class="btn btn-outline-dark d-md-none mb-3" id="openMobileFilter">
                     <i class="fas fa-filter me-2"></i> Filters
@@ -371,76 +335,55 @@
                                 $index = 0;
                                 foreach ($numeric as $key => $value) {
                                 ?>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold"><?= $key ?>
-                                            <span id="show_value_<?= $index ?>"></span>
-                                        </label>
-                                        <div class="range_container">
-                                            <div class="sliders_control">
-                                                <input class="fromSlider filter-range" data-name="<?= $key ?>" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" />
-                                                <input class="toSlider" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" />
-                                            </div>
-                                            <div class="row align-items-center">
-                                                <div class="col-6 text-start">
-                                                    <label class="form-label fw-semibold m-0">Min</label>
-                                                    <input type="text" class="form-control fromInput" value="<?= $value['min'] ?>"  name="<?= $key ?>_min"/>
-                                                </div>
-                                                <div class="col-6 text-end">
-                                                    <label class="form-label fw-semibold m-0">Max</label>
-                                                    <input type="text" name="<?= $key ?>_max" class="form-control text-end toInput" value="<?= $value['min'] ?>" />
-                                                </div>
-                                            </div>
+                                    <div class="col-md-6 position-relative">
+                                        <label class="form-label fw-semibold"><?= $key ?> <span id="show_value_<?= $index ?>">- <?= $value['min'] ?></span></label>
+
+                                        <input type="range"
+                                            class="form-range filter-range" data-type="<?= $key ?>"
+                                            min="<?= $value['min'] ?>"
+                                            max="<?= $value['max']  + 1 ?>"
+                                            value="<?= $value['min'] ?>"
+                                            data-key="<?= $index ?>" step="0.1" data-min="<?= $value['min'] ?>" />
+
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span><?= $value['min'] ?></span>
+                                            <span><?= $value['max'] ?></span>
                                         </div>
                                     </div>
                                 <?php
                                     $index++;
                                 }
                                 ?>
+                                <div class="col-md-6 position-relative">
+                                    <label class="form-label fw-semibold">Average Temparature <span id="show_value_avarage_temparature">- <?= $min_temp ?></span></label>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Average Temparature
-                                    </label>
-                                    <div class="range_container">
-                                        <div class="sliders_control">
-                                            <input class="fromSlider filter-range" data-name="avarage_temparature" type="range" value="<?= $min_precip ?>" min="<?= $min_precip ?>" max="<?= $max_precip ?>" />
-                                            <input class="toSlider" type="range" value="<?= $min_precip ?>" min="<?= $min_precip ?>" max="<?= $max_precip ?>" />
-                                        </div>
-                                        <div class="row align-items-center">
-                                            <div class="col-6 text-start">
-                                                <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $min_precip ?>" name="avarage_temparature_min"/>
-                                            </div>
-                                            <div class="col-6 text-end">
-                                                <label class="form-label fw-semibold m-0">Max</label>
-                                                <input type="text" class="form-control text-end toInput" value="<?= $min_precip ?>" name="avarage_temparature_max"/>
-                                            </div>
-                                        </div>
+                                    <input type="range"
+                                        class="form-range filter-range" data-type="avarage_temparature"
+                                        min="<?= $min_temp ?>"
+                                        max="<?= $max_temp + 1 ?>"
+                                        value="<?= $min_temp ?>"
+                                        data-key="avarage_temparature" step="0.1" data-min="<?= $min_temp ?>" />
+
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span><?= $min_temp ?></span>
+                                        <span><?= $max_temp ?></span>
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Average Percipitation
-                                    </label>
-                                    <div class="range_container">
-                                        <div class="sliders_control">
-                                            <input class="fromSlider filter-range" data-name="avarage_percipitation" type="range" value="<?= $min_temp ?>" min="<?= $min_temp ?>" max="<?= $max_temp ?>" />
-                                            <input class="toSlider" type="range" value="<?= $min_temp ?>" min="<?= $min_temp ?>" max="<?= $max_temp ?>" />
-                                        </div>
-                                        <div class="row align-items-center">
-                                            <div class="col-6 text-start">
-                                                <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $min_temp ?>" name="avarage_percipitation_min"/>
-                                            </div>
-                                            <div class="col-6 text-end">
-                                                <label class="form-label fw-semibold m-0">Max</label>
-                                                <input type="text" class="form-control text-end toInput" value="<?= $min_temp ?>" name="avarage_percipitation_max" />
-                                            </div>
-                                        </div>
+                                <div class="col-md-6 position-relative">
+                                    <label class="form-label fw-semibold">Average Percipitation <span id="show_value_avarage_percipitation">- <?= $min_precip ?></span></label>
+
+                                    <input type="range"
+                                        class="form-range filter-range" data-type="avarage_percipitation"
+                                        min="<?= $min_precip ?>"
+                                        max="<?= $max_precip + 1 ?>"
+                                        value="<?= $min_precip ?>"
+                                        data-key="avarage_percipitation" step="0.1" data-min="<?= $min_precip ?>" />
+
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span><?= $min_precip ?></span>
+                                        <span><?= $max_precip ?></span>
                                     </div>
                                 </div>
-
                                 <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-3">
                                     <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Show Trials</button>
                                     <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
@@ -451,11 +394,11 @@
                         <!-- Management -->
                         <div class="col-md-6">
                             <?php
-                            if (count($management) > 0) {
-                            ?>
-                                <label class="form-label fw-semibold">Management</label>
-                            <?php
-                            }
+                                if(count($management) > 0){
+                                    ?>
+                                    <label class="form-label fw-semibold">Management</label>
+                                    <?php
+                                }
                             ?>
                             <?php
                             foreach ($management as $key => $value) {
@@ -494,12 +437,24 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- <div class="row text-center">
-                    <div class="col-md-12">
-                        <button  class="btn btn-danger">Reset</button>
+                <!-- <button class="btn btn-outline-dark d-md-none mb-3" id="openMobileFilter">
+                    <i class="fas fa-filter me-2"></i> Filters
+                </button> -->
+                <!-- Mobile Filter Modal -->
+                <!-- <div class="modal fade" id="mobileFilterModal" tabindex="-1">
+                    <div class="modal-dialog modal-fullscreen-sm-down">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Filters</h5>
+                                <button type="button" class="btn closeBtn" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body" id="mobileFilterContainer">
+                            </div>
+                        </div>
                     </div>
                 </div> -->
+
+
                 <div>
                     <div class="table-responsive p-0" id="scrollableTable">
                         <table class="table align-items-center mb-0 crop-table" id="dataTable" style="margin-top: 45px !important;">
@@ -557,6 +512,11 @@
             </div>
             <div class="modal-body">
                 <div id="map" class="cropLocationMap"></div>
+                <!-- <h4>Selected Locations:</h4>
+                <ul id="selected-locations"></ul>
+
+                <button id="search-button">Search</button>
+                <button id="clearSelectionBtn">Clear</button> -->
             </div>
         </div>
     </div>
@@ -602,13 +562,15 @@
     </div>
 </div>
 
+
 <?= $this->endSection() ?>
 
 <?= $this->section('custom-js') ?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&callback=initialMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&callback=initialMap&libraries=drawing" async defer></script>
 <script>
     let coordinates = [];
     let markerName = [];
+
 
     function toggleColumns(dt) {
         $('.show_hide_field_checkbox').each(function() {
@@ -786,15 +748,10 @@
                 }
             })
             $('.filter-range').each((i, v) => {
-                let name = $(v).data('name');
-                let min = $(`input[name="${name}_min"]`).val();
-                let max = $(`input[name="${name}_max"]`).val();
-
-                if (parseFloat(min) != parseFloat(max)) {
-                    data[name] = [min, max]
+                if (parseFloat($(v).val()) > parseFloat($(v).attr('data-min'))) {
+                    data[$(v).attr('data-type')] = $(v).val()
                 }
             });
-            console.log(data);
             return JSON.stringify(data);
         }
     })
@@ -835,6 +792,235 @@
             })(marker, i));
         }
     }
+    //////
+    // function initMap() {
+    //     var myLatLng = coordinates.length > 0 ? coordinates[0] : {
+    //         lat: 40.712776,
+    //         lng: -74.005974
+    //     };
+
+    //     var map = new google.maps.Map(document.getElementById('map'), {
+    //         zoom: 6,
+    //         center: myLatLng
+    //     });
+
+    //     var markers = [];
+
+    //     var infowindow = new google.maps.InfoWindow();
+
+    //     // Create markers
+    //     for (var i = 0; i < coordinates.length; i++) {
+    //         var marker = new google.maps.Marker({
+    //             position: new google.maps.LatLng(coordinates[i]['lat'], coordinates[i]['lng']),
+    //             map: map,
+    //             icon: null
+    //         });
+
+    //         marker.content = markerName[i];
+
+    //         markers.push(marker);
+
+    //         google.maps.event.addListener(marker, 'click', (function(marker) {
+    //             return function() {
+    //                 infowindow.setContent(marker.content);
+    //                 infowindow.open(map, marker);
+    //             }
+    //         })(marker));
+    //     }
+
+    //     var drawingManager = new google.maps.drawing.DrawingManager({
+    //         drawingMode: null,
+    //         drawingControl: true,
+    //         drawingControlOptions: {
+    //             position: google.maps.ControlPosition.TOP_CENTER,
+    //             drawingModes: ['rectangle']
+    //         },
+    //         rectangleOptions: {
+    //             fillColor: '#FF0000',
+    //             fillOpacity: 0.15,
+    //             strokeWeight: 2,
+    //             clickable: false,
+    //             editable: true,
+    //             draggable: true,
+    //         }
+    //     });
+
+    //     drawingManager.setMap(map);
+
+    //     var rectangle = null;
+
+    //     google.maps.event.addListener(drawingManager, 'rectanglecomplete', function(rect) {
+    //         if (rectangle) {
+    //             rectangle.setMap(null);
+    //         }
+
+    //         rectangle = rect;
+
+    //         drawingManager.setDrawingMode(null);
+
+    //         selectMarkersInRectangle();
+
+    //         rectangle.addListener('bounds_changed', selectMarkersInRectangle);
+    //     });
+
+    //     function selectMarkersInRectangle() {
+    //         if (!rectangle) return;
+
+    //         var bounds = rectangle.getBounds();
+    //         var selectedContents = [];
+
+    //         markers.forEach(function(marker) {
+    //             if (bounds.contains(marker.getPosition())) {
+    //                 marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+    //                 selectedContents.push(marker.content);
+    //             } else {
+    //                 marker.setIcon(null);
+    //             }
+    //         });
+
+    //         console.log("Markers inside rectangle:", selectedContents);
+    //     }
+
+    //     // Add event listener to clear selection button
+    //     document.getElementById('clearSelectionBtn').addEventListener('click', function() {
+    //         if (rectangle) {
+    //             rectangle.setMap(null); // Remove rectangle from map
+    //             rectangle = null;
+    //         }
+    //         // Reset all marker icons to default
+    //         markers.forEach(function(marker) {
+    //             marker.setIcon(null);
+    //         });
+    //         console.log("Selection cleared");
+    //     });
+    // }
+    //MULTI SELECT 
+    // const selectedIcon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    // const defaultIcon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+
+    // let selectedLocations = [];
+    // let markers = [];
+
+    // function initMap() {
+    //     const defaultLatLng = coordinates.length > 0 ? coordinates[0] : {
+    //         lat: 40.712776,
+    //         lng: -74.005974
+    //     };
+
+    //     const map = new google.maps.Map(document.getElementById('map'), {
+    //         zoom: 6,
+    //         center: defaultLatLng
+    //     });
+
+    //     const infowindow = new google.maps.InfoWindow();
+
+    //     coordinates.forEach((coord, i) => {
+    //         const marker = new google.maps.Marker({
+    //             position: new google.maps.LatLng(coord.lat, coord.lng),
+    //             map: map,
+    //             icon: defaultIcon
+    //         });
+
+    //         markers.push(marker); // Store marker for reference
+
+    //         marker.addListener('click', () => {
+    //             const name = markerName[i];
+
+    //             const alreadySelected = selectedLocations.includes(name);
+
+    //             if (alreadySelected) {
+    //                 // Unselect
+    //                 selectedLocations = selectedLocations.filter(item => item !== name);
+    //                 marker.setIcon(defaultIcon);
+    //             } else {
+    //                 // Select
+    //                 selectedLocations.push(name);
+    //                 marker.setIcon(selectedIcon);
+    //             }
+
+    //             infowindow.setContent(`<div><strong>${name}</strong><br/><em>Selected: ${selectedLocations.join(', ')}</em></div>`);
+    //             infowindow.open(map, marker);
+
+    //             updateSelectedList();
+    //         });
+    //     });
+    // }
+
+    // function updateSelectedList() {
+    //     const listContainer = document.getElementById("selected-locations");
+    //     if (listContainer) {
+    //         listContainer.innerHTML = selectedLocations.map(name => `<li>${name}</li>`).join('');
+    //     }
+    // }
+
+    // document.getElementById("search-button").addEventListener("click", () => {
+    //     console.log("Search triggered with locations:", selectedLocations);
+    // });
+    // LESSO TOOL 
+    // let markers = [];
+    // let selectedMarkers = [];
+
+    // function initMap() {
+    //     const map = new google.maps.Map(document.getElementById('map'), {
+    //         zoom: 6,
+    //         center: {
+    //             lat: 35.2271,
+    //             lng: -80.8431
+    //         } // Example center
+    //     });
+
+    //     const drawingManager = new google.maps.drawing.DrawingManager({
+    //         drawingMode: google.maps.drawing.OverlayType.POLYGON,
+    //         drawingControl: true,
+    //         drawingControlOptions: {
+    //             position: google.maps.ControlPosition.TOP_CENTER,
+    //             drawingModes: ['polygon']
+    //         },
+    //         polygonOptions: {
+    //             fillColor: '#ffff00',
+    //             fillOpacity: 0.3,
+    //             strokeWeight: 2,
+    //             clickable: false,
+    //             editable: false,
+    //             zIndex: 1
+    //         }
+    //     });
+    //     drawingManager.setMap(map);
+
+    //     // Example markers
+    //     coordinates.forEach((coord, i) => {
+    //         const marker = new google.maps.Marker({
+    //             position: {
+    //                 lat: coord.lat,
+    //                 lng: coord.lng
+    //             },
+    //             map: map,
+    //             icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+    //             title: markerName[i]
+    //         });
+    //         markers.push(marker);
+    //     });
+
+    //     // Handle shape complete
+    //     google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+    //         if (event.type === google.maps.drawing.OverlayType.POLYGON) {
+    //             const polygon = event.overlay;
+    //             selectedMarkers = [];
+
+    //             markers.forEach(marker => {
+    //                 if (google.maps.geometry.poly.containsLocation(marker.getPosition(), polygon)) {
+    //                     marker.setIcon("http://maps.google.com/mapfiles/ms/icons/red-dot.png");
+    //                     selectedMarkers.push(marker.getTitle());
+    //                 } else {
+    //                     marker.setIcon("http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
+    //                 }
+    //             });
+
+    //             console.log("Selected markers:", selectedMarkers);
+    //         }
+    //     });
+    // }
+    //////
 
 
     function initialMap() {
@@ -904,11 +1090,12 @@
         const scrollableWidth = contentWidth - containerWidth;
         const scrollbarWidth = customScrollbar.clientWidth;
         const maxThumbLeft = scrollbarWidth - customThumb.clientWidth;
+
         const scrollChange = (dx / maxThumbLeft) * scrollableWidth;
         scrollContainer.scrollLeft = Math.min(Math.max(startScrollLeft + scrollChange, 0), scrollableWidth);
     });
 
-    const headering = [
+      const headering = [
         "Year",
         "State",
         "Entry",
@@ -920,8 +1107,10 @@
         "Variety",
         "Variety Additional",
         <?php foreach ($variables as $l) : ?> "<?= addslashes($l) ?>",
-        <?php endforeach; ?> "Average Temparature",
-        "Average Percipitation", "Production Pratice",
+        <?php endforeach; ?>
+        "Average Temparature",
+        "Average Percipitation",
+        "Production Pratice",
         "Water Management"
     ];
 
@@ -946,6 +1135,9 @@
         html += '</tbody></table>';
         $('#showDataCustomModal .modal-body').html(html);
         $('#showDataCustomModal').modal('show');
+    });
+    $('input[type="range"]').on('input', function() {
+        $('#show_value_' + $(this).data('key')).html('- ' + $(this).val());
     });
 </script>
 <script>
@@ -1050,99 +1242,6 @@
                 }
             })
         }
-
-        //range 
-        document.querySelectorAll('.range_container').forEach(container => {
-            const fromSlider = container.querySelector('.fromSlider');
-            const toSlider = container.querySelector('.toSlider');
-            const fromInput = container.querySelector('.fromInput');
-            const toInput = container.querySelector('.toInput');
-
-            if (!fromSlider || !toSlider || !fromInput || !toInput) return;
-
-            function getParsed(fromEl, toEl) {
-                return [parseFloat(fromEl.value), parseFloat(toEl.value)];
-            }
-
-            function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
-                const rangeDistance = parseFloat(to.max) - parseFloat(to.min);
-                const fromPosition = from.value - to.min;
-                const toPosition = to.value - to.min;
-                controlSlider.style.background = `linear-gradient(
-                to right,
-                ${sliderColor} 0%,
-                ${sliderColor} ${(fromPosition)/(rangeDistance)*100}%,
-                ${rangeColor} ${(fromPosition)/(rangeDistance)*100}%,
-                ${rangeColor} ${(toPosition)/(rangeDistance)*100}%,
-                ${sliderColor} ${(toPosition)/(rangeDistance)*100}%,
-                ${sliderColor} 100%)`;
-            }
-
-            function setToggleAccessible(currentTarget, toSlider) {
-                if (Number(currentTarget.value) <= 0) {
-                    toSlider.style.zIndex = 2;
-                } else {
-                    toSlider.style.zIndex = 0;
-                }
-            }
-
-            function controlFromSlider() {
-                const [from, to] = getParsed(fromSlider, toSlider);
-                fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-                if (from > to) {
-                    fromSlider.value = to;
-                    fromInput.value = to;
-                } else {
-                    fromInput.value = from;
-                }
-            }
-
-            function controlToSlider() {
-                const [from, to] = getParsed(fromSlider, toSlider);
-                fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-                if (from <= to) {
-                    toSlider.value = to;
-                    toInput.value = to;
-                } else {
-                    toInput.value = from;
-                    toSlider.value = from;
-                }
-                setToggleAccessible(toSlider, toSlider);
-            }
-
-            function controlFromInput() {
-                const [from, to] = getParsed(fromInput, toInput);
-                fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', toSlider);
-                if (from > to) {
-                    fromSlider.value = to;
-                    fromInput.value = to;
-                } else {
-                    fromSlider.value = from;
-                }
-            }
-
-            function controlToInput() {
-                const [from, to] = getParsed(fromInput, toInput);
-                fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', toSlider);
-                if (from <= to) {
-                    toSlider.value = to;
-                    toInput.value = to;
-                } else {
-                    toInput.value = from;
-                }
-                setToggleAccessible(toInput, toSlider);
-            }
-
-            // Initial render
-            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-            setToggleAccessible(toSlider, toSlider);
-
-            // Event bindings
-            fromSlider.addEventListener('input', controlFromSlider);
-            toSlider.addEventListener('input', controlToSlider);
-            fromInput.addEventListener('input', controlFromInput);
-            toInput.addEventListener('input', controlToInput);
-        });
     });
 
     function showColumnButtonClicked() {

@@ -258,11 +258,13 @@ class CropController extends BaseController
             foreach ($fVariables as $k => $v) {
                 if (!empty($v) || ($k == 'water_management' && $v == 0) || ($k == 'production_pratice' && $v == 0)) {
                     if (in_array($k, $numericFilter)) {
-                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <=", $v)->where("JSON_EXTRACT(variable, '$.\"$k\"') >", 0);
+                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') >=", $v[0]);
+                        $trial->where("JSON_EXTRACT(variable, '$.\"$k\"') <=", $v[1]);
                     } else {
                         if (is_array($v)) {
                             if (key_exists($k, $location_table)) {
-                                $trial->whereIn('trial_location.' . $k, $v);
+                                $trial->where('trial_location.' . $k . '>=', $v[0]);
+                                $trial->where('trial_location.' . $k . '<=', $v[1]);
                             } else {
                                 $escaped_values = implode(",", array_map(function ($val) {
                                     return "'" . addslashes($val) . "'";
@@ -277,7 +279,8 @@ class CropController extends BaseController
                                     $v = explode(',', $v);
                                     $trial->whereIn('trial_location.' . $k . ' ' . $location_table[$k], $v);
                                 } else {
-                                    $trial->where('trial_location.' . $k . ' ' . $location_table[$k], $v);
+                                    $trial->where('trial_location.' . $k . '>=', $v[0]);
+                                    $trial->where('trial_location.' . $k . '<=', $v[1]);
                                 }
                             } else {
                                 $trial->where("JSON_EXTRACT(variable, '$.\"$k\"')", $v);
@@ -507,10 +510,10 @@ class CropController extends BaseController
 
         $cropVariableModel = new CropVariable();
         $numeric = $cropVariableModel
-        ->select('name')
-        ->where('crop_id', $crop['id'])
-        ->where('filter', 'numeric')
-        ->findAll();
+            ->select('name')
+            ->where('crop_id', $crop['id'])
+            ->where('filter', 'numeric')
+            ->findAll();
         $numericFilters = array_column($numeric, 'name');
 
         return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters'));
@@ -529,7 +532,7 @@ class CropController extends BaseController
         //     ->findAll();
         $locations = [];
 
-        
+
         //STATES
         $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
 
