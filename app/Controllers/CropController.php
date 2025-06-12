@@ -516,7 +516,59 @@ class CropController extends BaseController
             ->findAll();
         $numericFilters = array_column($numeric, 'name');
 
-        return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters'));
+        $locations = [];
+        //STATES
+        $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
+
+        $trials = $this->trialTypeModel->select('trial_types.id,trial_types.name')->join('trial_data', 'trial_data.trial=trial_types.id')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->groupBy('trial_types.name')
+            ->orderBy('trial_types.name')->distinct()->findAll();
+
+        $allVariables = $this->variableModel->select('crop_variables.show_frontent,crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
+        $numeric = [];
+        $variables = [];
+
+        foreach ($allVariables as $key => $value) {
+            if ($value['show_frontent'] < 1) {
+                continue;
+            }
+            if ($value['filter'] == 'numeric') {
+                $numeric[$value['name']] =  [
+                    'max' => 0,
+                    'min' => 0
+                ];
+            }
+            $variables[] = $value['name'];
+        }
+
+        $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->groupBy('variable')->distinct()->findAll();
+        $decoded = array_map(fn($item) => json_decode($item['variable'], true), $trialVariables);
+
+        $varialeData = [];
+        foreach ($variables as $i) {
+            $varialeData[$i] = [];
+            $valueSet[$i] = [];
+        }
+
+        foreach ($decoded as $trialVariable) {
+            foreach ($variables as $name) {
+                if (array_key_exists($name, $numeric)) {
+                    if (is_numeric($trialVariable[$name])) {
+                        if (empty($numeric[$name]['min'])) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] < $numeric[$name]['min']) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        }
+                        if (empty($numeric[$name]['max'])) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] > $numeric[$name]['max']) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters', 'states', 'locations', 'trials', 'numeric'));
     }
 
     public function location($slug)
@@ -551,162 +603,78 @@ class CropController extends BaseController
             ->where('filter', 'numeric')
             ->findAll();
         $numericFilters = array_column($numeric, 'name');
+        $trials = $this->trialTypeModel->select('trial_types.id,trial_types.name')->join('trial_data', 'trial_data.trial=trial_types.id')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->groupBy('trial_types.name')
+            ->orderBy('trial_types.name')->distinct()->findAll();
 
-        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters', 'states'));
+        $allVariables = $this->variableModel->select('crop_variables.show_frontent,crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
+        $numeric = [];
+        $variables = [];
+
+        foreach ($allVariables as $key => $value) {
+            if ($value['show_frontent'] < 1) {
+                continue;
+            }
+            if ($value['filter'] == 'numeric') {
+                $numeric[$value['name']] =  [
+                    'max' => 0,
+                    'min' => 0
+                ];
+            }
+            $variables[] = $value['name'];
+        }
+
+        $trialVariables = $this->trialDataModel->select('variable')->where('crop_id', $crop['id'])->groupBy('variable')->distinct()->findAll();
+        $decoded = array_map(fn($item) => json_decode($item['variable'], true), $trialVariables);
+
+        $varialeData = [];
+        foreach ($variables as $i) {
+            $varialeData[$i] = [];
+            $valueSet[$i] = [];
+        }
+
+        foreach ($decoded as $trialVariable) {
+            foreach ($variables as $name) {
+                if (array_key_exists($name, $numeric)) {
+                    if (is_numeric($trialVariable[$name])) {
+                        if (empty($numeric[$name]['min'])) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] < $numeric[$name]['min']) {
+                            $numeric[$name]['min'] = $trialVariable[$name] ?? 0;
+                        }
+                        if (empty($numeric[$name]['max'])) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        } else if ($trialVariable[$name] > $numeric[$name]['max']) {
+                            $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
+                        }
+                    }
+                }
+            }
+        }
+        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters', 'states', 'trials', 'numeric'));
     }
-
-    // public function getAvarage()
-    // {
-    //     $varieties = $this->request->getPost('varieties');
-    //     $years = $this->request->getPost('years');
-    //     $crop_id = $this->request->getPost('crop_id');
-    //     $page = (int) $this->request->getPost('page');
-    //     $perPage = (int) $this->request->getPost('per_page');
-    //     $orderBy = $this->request->getPost('order_by') ?? '';
-    //     $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
-
-    //     $offset = ($page - 1) * $perPage;
-
-    //     $trialDataQuery = $this->trialDataModel
-    //         ->select('varieties.short_name, trial_data.variable,trial_data.year')
-    //         ->where('trial_data.crop_id', $crop_id)
-    //         ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
-
-    //     if (!empty($varieties)) {
-    //         $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
-    //     }
-
-    //     if (!empty($years)) {
-    //         $trialDataQuery->whereIn('trial_data.year', $years);
-    //     }
-
-    //     $allTrials = $trialDataQuery->findAll();
-
-    //     $cropVariableModel = new CropVariable();
-    //     $numeric = $cropVariableModel
-    //         ->select('name')
-    //         ->where('crop_id', $crop_id)
-    //         ->where('filter', 'numeric')
-    //         ->findAll();
-    //     $numericFilters = array_column($numeric, 'name');
-
-    //     // Sort if needed
-    //     if (!empty($orderBy) && in_array($orderBy, $numericFilters)) {
-    //         usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
-    //             $aData = json_decode($a['variable'], true);
-    //             $bData = json_decode($b['variable'], true);
-    //             $valA = $aData[$orderBy] ?? 0;
-    //             $valB = $bData[$orderBy] ?? 0;
-    //             return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
-    //         });
-    //     }
-
-    //     $averages = [];
-    //     $validCounts = [];
-
-    //     foreach ($allTrials as $trial) {
-    //         $jsonData = json_decode($trial['variable'], true);
-    //         foreach ($numericFilters as $field) {
-    //             $val = isset($jsonData[$field]) && is_numeric($jsonData[$field]) ? floatval($jsonData[$field]) : null;
-    //             if ($val !== null) {
-    //                 $averages[$field] = ($averages[$field] ?? 0) + $val;
-    //                 $validCounts[$field] = ($validCounts[$field] ?? 0) + 1;
-    //             }
-    //         }
-    //     }
-
-    //     foreach ($averages as $key => $total) {
-    //         $averages[$key] = round($total / $validCounts[$key], 2);
-    //     }
-
-    //     $totalRecords = count($allTrials);
-    //     $paginatedTrials = array_slice($allTrials, $offset, $perPage);
-
-    //     $html = "<table class='table table-bordered table-striped'>
-    //         <thead class='table-light'>
-    //         <tr>
-    //             <th scope='col' style='padding-bottom:0px;'>
-    //                 <div class='d-flex justify-content-between align-items-center'>
-    //                     <span>Variety</span>
-    //                 </div>
-    //             </th>
-    //             <th scope='col' style='padding-bottom:0px;'>
-    //                 <div class='d-flex justify-content-between align-items-center'>
-    //                     <span>Year</span>
-    //                 </div>
-    //             </th>";
-
-    //     foreach ($numericFilters as $value) {
-    //         $isActive = ($orderBy === $value);
-    //         $ascClass = $isActive && $orderDir === 'asc' ? 'text-primary' : '';
-    //         $descClass = $isActive && $orderDir === 'desc' ? 'text-primary' : '';
-
-    //         $html .= "<th scope='col' class='sortable' data-field='" . $value . "' style='padding-bottom:0px; cursor:pointer;'>
-    //             <div class='d-flex justify-content-between align-items-center'>
-    //                 <span>" . htmlspecialchars($value) . "</span>
-    //                 <span class='sort-icons'>
-    //                     <i class='bi bi-caret-up-fill sort-icon $ascClass' data-dir='asc' title='Sort Asc'></i>
-    //                     <i class='bi bi-caret-down-fill sort-icon $descClass' data-dir='desc' title='Sort Desc'></i>
-    //                 </span>
-    //             </div>
-    //         </th>";
-    //     }
-
-    //     $html .= "</tr><tr><th style='padding-top:0px;'></th><th style='padding-top:0px;'></th>";
-
-    //     foreach ($numericFilters as $field) {
-    //         $avg = $averages[$field] ?? 0;
-    //         $html .= "<th align='center' style='padding-top:0px; text-align:center;'>(" . htmlspecialchars($avg) . ")</th>";
-    //     }
-
-    //     $html .= "</tr></thead><tbody>";
-
-    //     foreach ($paginatedTrials as $value) {
-    //         try {
-    //             $html .= "<tr>";
-    //             $html .= "<td>" . htmlspecialchars($value['short_name']) . "</td>";
-    //             $html .= "<td>" . htmlspecialchars($value['year']) . "</td>";
-    //             $jsonData = json_decode($value['variable'], true);
-    //             foreach ($numericFilters as $field) {
-    //                 $cellValue = !empty($jsonData[$field]) ? $jsonData[$field] : 0;
-    //                 $html .= "<td>" . htmlspecialchars($cellValue) . "</td>";
-    //             }
-    //             $html .= "</tr>";
-    //         } catch (Exception $err) {
-    //             continue;
-    //         }
-    //     }
-
-    //     $html .= "</tbody></table>";
-
-    //     echo json_encode([
-    //         'success' => 1,
-    //         'html' => $html,
-    //         'total_records' => $totalRecords,
-    //         'current_page' => $page,
-    //         'per_page' => $perPage,
-    //         'order_by' => $orderBy,
-    //         'order_dir' => $orderDir
-    //     ]);
-    //     exit;
-    // }
 
     public function getAvarage()
     {
         $varieties = $this->request->getPost('varieties');
         $years = $this->request->getPost('years');
+        $locations = $this->request->getPost('locations');
+        $trialTypes = $this->request->getPost('trial_types');
         $crop_id = $this->request->getPost('crop_id');
         $page = (int) $this->request->getPost('page');
         $perPage = (int) $this->request->getPost('per_page');
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
 
+        $variables = $this->request->getPost('veriables');
+
         $offset = ($page - 1) * $perPage;
 
         $trialDataQuery = $this->trialDataModel
             ->select('varieties.short_name, trial_data.variable, trial_data.year')
             ->where('trial_data.crop_id', $crop_id)
-            ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
+            ->join('varieties', 'varieties.code = trial_data.variety_code', 'left')
+            ->join('trial_types', 'trial_types.id = trial_data.trial', 'left')
+            ->groupBy('trial_data.id');
 
         if (!empty($varieties)) {
             $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
@@ -716,7 +684,30 @@ class CropController extends BaseController
             $trialDataQuery->whereIn('trial_data.year', $years);
         }
 
+        if (!empty($locations)) {
+            $trialDataQuery->whereIn('trial_data.location', $locations);
+        }
+
+        if (!empty($trialTypes)) {
+            $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
+        }
+
         $allTrials = $trialDataQuery->findAll();
+
+        if (!empty($variables)) {
+            $variables = json_decode($variables, true);
+            $allTrials = array_filter($allTrials, function ($trial) use ($variables) {
+                $data = json_decode($trial['variable'], true);
+                foreach ($variables as $field => $range) {
+                    if (!isset($data[$field])) return false;
+                    $value = floatval($data[$field]);
+                    if ($value < floatval($range[0]) || $value > floatval($range[1])) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
 
         $cropVariableModel = new CropVariable();
         $numeric = $cropVariableModel
@@ -856,6 +847,7 @@ class CropController extends BaseController
     {
         $varieties = $this->request->getPost('varieties');
         $locations = $this->request->getPost('locations');
+        $trialTypes = $this->request->getPost('trial_types');
         $crop_id = $this->request->getPost('crop_id');
         $traitName = $this->request->getPost('trait_name');
         $page = (int) $this->request->getPost('page');
@@ -863,6 +855,8 @@ class CropController extends BaseController
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
         $orderBy = $orderBy == "maturity_dap" ? 'Maturity (DAP)' : $orderBy;
+
+        $variables = $this->request->getPost('veriables');
 
         $offset = ($page - 1) * $perPage;
         if (empty($traitName)) {
@@ -900,7 +894,26 @@ class CropController extends BaseController
             $trialDataQuery->whereIn('trial_data.location', $locations);
         }
 
+        if (!empty($trialTypes)) {
+            $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
+        }
+
         $allTrials = $trialDataQuery->findAll();
+
+        if (!empty($variables)) {
+            $variables = json_decode($variables, true);
+            $allTrials = array_filter($allTrials, function ($trial) use ($variables) {
+                $data = json_decode($trial['variable'], true);
+                foreach ($variables as $field => $range) {
+                    if (!isset($data[$field])) return false;
+                    $value = floatval($data[$field]);
+                    if ($value < floatval($range[0]) || $value > floatval($range[1])) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
 
         if (!empty($orderBy) && $orderBy === $traitName) {
             usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {

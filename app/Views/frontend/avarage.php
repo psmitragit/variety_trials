@@ -71,6 +71,78 @@
         z-index: 99;
     }
 </style>
+<style>
+    .range_container {
+        display: flex;
+        flex-direction: column;
+        margin: 12px 0px;
+    }
+
+    .sliders_control {
+        position: relative;
+        min-height: 15px;
+    }
+
+    .form_control {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        font-size: 24px;
+        color: #635a5a;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        pointer-events: all;
+        width: 24px;
+        height: 24px;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px #C6C6C6;
+        cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+        -webkit-appearance: none;
+        pointer-events: all;
+        width: 24px;
+        height: 24px;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px #C6C6C6;
+        cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+        background: #f7f7f7;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+        box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+        -webkit-box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+    }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 2px;
+        width: 100%;
+        position: absolute;
+        background-color: #C6C6C6;
+        pointer-events: none;
+    }
+
+    #fromSlider {
+        height: 0;
+        z-index: 1;
+    }
+
+    .form_control_container__time__input {
+        border: 0px;
+        font-size: 12px;
+        color: #7b809a;
+    }
+</style>
 <div id="loader" class="d-none">
     <div class="loading-dots">
         <span></span>
@@ -126,7 +198,34 @@
                         <!-- Filter By -->
                         <div class="col-md-6">
                             <div class="w-100 mb-3">
-                                <select id="sYears" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select Year(s)">
+                                <select id="sState" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select States(s)">
+                                    <?php foreach ($states as $s) : ?>
+                                        <option value="<?= $s['code'] ?>"><?= $s['name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sLocations" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Location(s)">
+                                    <?php foreach ($locations as $s) : ?>
+                                        <option value="<?= $s['location'] ?>"><?= $s['location'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="trial_types" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Trial(s)">
+                                    <?php foreach ($trials as $s) : ?>
+                                        <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sYears" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Year(s)">
                                     <?php foreach ($years as $s) : ?>
                                         <option value="<?= $s['year'] ?>"><?= $s['year'] ?></option>
                                     <?php endforeach; ?>
@@ -136,12 +235,45 @@
 
                         <div class="col-md-6">
                             <div class="w-100 mb-3">
-                                <select id="sVarieties" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select Variety(s)">
+                                <select id="sVarieties" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Variety(s)">
                                     <?php foreach ($varieties as $v) : ?>
                                         <option value="<?= $v['code'] ?>"><?= $v['short_name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                        </div>
+                        <?php
+                        $index = 0;
+                        foreach ($numeric as $key => $value) {
+                        ?>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold"><?= $key ?>
+                                    <span id="show_value_<?= $index ?>"></span>
+                                </label>
+                                <div class="range_container">
+                                    <div class="sliders_control">
+                                        <input class="fromSlider filter-range" data-name="<?= $key ?>" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" />
+                                        <input class="toSlider" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" />
+                                    </div>
+                                    <div class="row align-items-center">
+                                        <div class="col-6 text-start">
+                                            <label class="form-label fw-semibold m-0">Min</label>
+                                            <input type="text" class="form-control fromInput" value="<?= $value['min'] ?>" name="<?= $key ?>_min" />
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <label class="form-label fw-semibold m-0">Max</label>
+                                            <input type="text" name="<?= $key ?>_max" class="form-control text-end toInput" value="<?= $value['min'] ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php
+                            $index++;
+                        }
+                        ?>
+                        <div class="col-md-6 col-lg-6 d-flex align-items-end gap-2 mt-3">
+                            <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Show Trials</button>
+                            <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
                         </div>
                     </div>
 
@@ -221,12 +353,12 @@
                 getVarietyData(1, currentOrder, currentDir);
             });
 
-            $('#sVarieties').on('change', function() {
+            $('.filterTrials').on('change', function() {
                 getVarietyData();
-            });
-            $('#sYears').on('change', function() {
+            });            
+            $('#show_trials').on('click', function() {
                 getVarietyData();
-            });
+            })
             $('#toggleSwitch').on('change', function() {
                 window.location.href = "<?= base_url() . $crop['slug'] ?>/location";
             });
@@ -242,8 +374,11 @@
                 data: {
                     _token: $('input[name="_token"]').val(),
                     years: $('#sYears').val(),
+                    locations: $('#sLocations').val(),
+                    trial_types: $('#trial_types').val(),
                     varieties: $('#sVarieties').val(),
                     crop_id: "<?= $crop['id'] ?>",
+                    veriables: getvariables(),
                     per_page: 10,
                     page: page,
                     order_by: order,
@@ -263,6 +398,20 @@
                     $('#loader').addClass('d-none');
                 }
             });
+        }
+
+        function getvariables(){
+            let data = {}
+            $('.filter-range').each((i, v) => {
+                let name = $(v).data('name');
+                let min = $(`input[name="${name}_min"]`).val();
+                let max = $(`input[name="${name}_max"]`).val();
+
+                if (parseFloat(min) != parseFloat(max)) {
+                    data[name] = [min, max]
+                }
+            });
+            return JSON.stringify(data);
         }
 
         function generatePagination(total, perPage, currentPage, orderBy, orderDir) {
@@ -316,13 +465,11 @@
             getVarietyData();
 
             let headering = [
-                "Variety", 
+                "Variety",
                 "Year",
                 <?php foreach ($numericFilters as $l) : ?> "<?= addslashes($l) ?>",
                 <?php endforeach; ?>
             ];
-
-            console.log(headering);
 
             $('#table-content').on('click', 'table tbody td', function(e) {
                 $('.current_selected_tr').removeClass('current_selected_tr');
@@ -346,6 +493,147 @@
                 $('#showDataCustomModal .modal-body').html(html);
                 $('#showDataCustomModal').modal('show');
             });
+
+            $('#sState').on('change', function() {
+                updateLocationSelect();
+            })
+            updateLocationSelect();
+
+            //range 
+            document.querySelectorAll('.range_container').forEach(container => {
+                const fromSlider = container.querySelector('.fromSlider');
+                const toSlider = container.querySelector('.toSlider');
+                const fromInput = container.querySelector('.fromInput');
+                const toInput = container.querySelector('.toInput');
+
+                if (!fromSlider || !toSlider || !fromInput || !toInput) return;
+
+                function getParsed(fromEl, toEl) {
+                    return [parseFloat(fromEl.value), parseFloat(toEl.value)];
+                }
+
+                function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+                    const rangeDistance = parseFloat(to.max) - parseFloat(to.min);
+                    const fromPosition = from.value - to.min;
+                    const toPosition = to.value - to.min;
+                    controlSlider.style.background = `linear-gradient(
+                    to right,
+                    ${sliderColor} 0%,
+                    ${sliderColor} ${(fromPosition)/(rangeDistance)*100}%,
+                    ${rangeColor} ${(fromPosition)/(rangeDistance)*100}%,
+                    ${rangeColor} ${(toPosition)/(rangeDistance)*100}%,
+                    ${sliderColor} ${(toPosition)/(rangeDistance)*100}%,
+                    ${sliderColor} 100%)`;
+                }
+
+                function setToggleAccessible(currentTarget, toSlider) {
+                    if (Number(currentTarget.value) <= 0) {
+                        toSlider.style.zIndex = 2;
+                    } else {
+                        toSlider.style.zIndex = 0;
+                    }
+                }
+
+                function controlFromSlider() {
+                    const [from, to] = getParsed(fromSlider, toSlider);
+                    fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
+                    if (from > to) {
+                        fromSlider.value = to;
+                        fromInput.value = to;
+                    } else {
+                        fromInput.value = from;
+                    }
+                }
+
+                function controlToSlider() {
+                    const [from, to] = getParsed(fromSlider, toSlider);
+                    fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
+                    if (from <= to) {
+                        toSlider.value = to;
+                        toInput.value = to;
+                    } else {
+                        toInput.value = from;
+                        toSlider.value = from;
+                    }
+                    setToggleAccessible(toSlider, toSlider);
+                }
+
+                function controlFromInput() {
+                    const [from, to] = getParsed(fromInput, toInput);
+                    fillSlider(fromInput, toInput, '#C6C6C6', '#73a942', toSlider);
+                    if (from > to) {
+                        fromSlider.value = to;
+                        fromInput.value = to;
+                    } else {
+                        fromSlider.value = from;
+                    }
+                }
+
+                function controlToInput() {
+                    const [from, to] = getParsed(fromInput, toInput);
+                    fillSlider(fromInput, toInput, '#C6C6C6', '#73a942', toSlider);
+                    if (from <= to) {
+                        toSlider.value = to;
+                        toInput.value = to;
+                    } else {
+                        toInput.value = from;
+                    }
+                    setToggleAccessible(toInput, toSlider);
+                }
+
+                // Initial render
+                fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
+                setToggleAccessible(toSlider, toSlider);
+
+                // Event bindings
+                fromSlider.addEventListener('input', controlFromSlider);
+                toSlider.addEventListener('input', controlToSlider);
+                fromInput.addEventListener('input', controlFromInput);
+                toInput.addEventListener('input', controlToInput);
+            });
         });
+
+        function updateLocationSelect() {
+            let states = $('#sState').val();
+            $.ajax({
+                url: "<?= base_url('get-locations-by-state') ?>",
+                type: 'POST',
+                data: {
+                    _token: () => {
+                        return $('input[name="_token"]').val()
+                    },
+                    id: "<?= $crop['id'] ?>",
+                    states: states
+                },
+                success: function(res) {
+                    try {
+                        res = JSON.parse(res);
+                    } catch (error) {
+                        console.log(error);
+                        return;
+                    }
+
+                    if (res.location) {
+                        $('#sLocations').empty();
+                        $.each(res.location, function(index, loc) {
+                            console.log(loc);
+                            $('#sLocations').append(
+                                $('<option>', {
+                                    value: loc.location,
+                                    text: loc.location
+                                })
+                            );
+                        });
+                        $('#sLocations').trigger('change');
+                    }
+                },
+                beforeSend: function() {
+                    $('#loader').removeClass('d-none');
+                },
+                complete: function() {
+                    $('#loader').addClass('d-none');
+                }
+            })
+        }
     </script>
     <?= $this->endSection() ?>
