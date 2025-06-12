@@ -1088,7 +1088,7 @@
 
             function controlFromSlider() {
                 const [from, to] = getParsed(fromSlider, toSlider);
-                fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+                fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
                 if (from > to) {
                     fromSlider.value = to;
                     fromInput.value = to;
@@ -1099,7 +1099,7 @@
 
             function controlToSlider() {
                 const [from, to] = getParsed(fromSlider, toSlider);
-                fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+                fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
                 if (from <= to) {
                     toSlider.value = to;
                     toInput.value = to;
@@ -1112,7 +1112,7 @@
 
             function controlFromInput() {
                 const [from, to] = getParsed(fromInput, toInput);
-                fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', toSlider);
+                fillSlider(fromInput, toInput, '#C6C6C6', '#73a942', toSlider);
                 if (from > to) {
                     fromSlider.value = to;
                     fromInput.value = to;
@@ -1123,7 +1123,7 @@
 
             function controlToInput() {
                 const [from, to] = getParsed(fromInput, toInput);
-                fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', toSlider);
+                fillSlider(fromInput, toInput, '#C6C6C6', '#73a942', toSlider);
                 if (from <= to) {
                     toSlider.value = to;
                     toInput.value = to;
@@ -1134,7 +1134,7 @@
             }
 
             // Initial render
-            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#73a942', toSlider);
             setToggleAccessible(toSlider, toSlider);
 
             // Event bindings
