@@ -224,9 +224,9 @@
                     </div> -->
                 <!-- </div> -->
 
-                <button class="btn btn-outline-dark d-md-none mb-3" id="openMobileFilter">
+                <!-- <button class="btn btn-outline-dark mb-3" id="openMobileFilter">
                     <i class="fas fa-filter me-2"></i> Filters
-                </button>
+                </button> -->
                 <!-- Mobile Filter Modal -->
                 <div class="modal fade" id="mobileFilterModal" tabindex="-1">
                     <div class="modal-dialog modal-fullscreen-sm-down">
@@ -242,10 +242,21 @@
                     </div>
                 </div>
 
-                <div id="mainFilterContainer" class="d-none d-md-block">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="position-relative">
+                            <div class="position-absolute search-variety-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input type="text" id="search_keyword" placeholder="Search by variety, brand, or location…" class="form-control variety-search">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mainFilterContainer" class="d-none">
                     <div class="row g-4 mb-3">
                         <!-- Filter By -->
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">Filter By</label>
                             <div class="w-100 mb-3">
                                 <select id="sYear" class="form-select mb-3 px-3 select2 filter-input" data-placeholder="Select Year(s)" multiple>
@@ -322,7 +333,7 @@
                         </div>
 
                         <!-- Agronomic Traits -->
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">Agronomic Traits</label>
                             <?php
                             foreach ($trait as $key => $value) {
@@ -365,7 +376,7 @@
                         </div>
 
                         <!-- Numeric -->
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="row">
                                 <?php
                                 $index = 0;
@@ -383,7 +394,7 @@
                                             <div class="row align-items-center">
                                                 <div class="col-6 text-start">
                                                     <label class="form-label fw-semibold m-0">Min</label>
-                                                    <input type="text" class="form-control fromInput" value="<?= $value['min'] ?>"  name="<?= $key ?>_min"/>
+                                                    <input type="text" class="form-control fromInput" value="<?= $value['min'] ?>" name="<?= $key ?>_min" />
                                                 </div>
                                                 <div class="col-6 text-end">
                                                     <label class="form-label fw-semibold m-0">Max</label>
@@ -409,16 +420,16 @@
                                         <div class="row align-items-center">
                                             <div class="col-6 text-start">
                                                 <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $min_precip ?>" name="avarage_temparature_min"/>
+                                                <input type="text" class="form-control fromInput" value="<?= $min_precip ?>" name="avarage_temparature_min" />
                                             </div>
                                             <div class="col-6 text-end">
                                                 <label class="form-label fw-semibold m-0">Max</label>
-                                                <input type="text" class="form-control text-end toInput" value="<?= $min_precip ?>" name="avarage_temparature_max"/>
+                                                <input type="text" class="form-control text-end toInput" value="<?= $min_precip ?>" name="avarage_temparature_max" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
                                         Average Percipitation
@@ -431,7 +442,7 @@
                                         <div class="row align-items-center">
                                             <div class="col-6 text-start">
                                                 <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $min_temp ?>" name="avarage_percipitation_min"/>
+                                                <input type="text" class="form-control fromInput" value="<?= $min_temp ?>" name="avarage_percipitation_min" />
                                             </div>
                                             <div class="col-6 text-end">
                                                 <label class="form-label fw-semibold m-0">Max</label>
@@ -440,16 +451,11 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-3">
-                                    <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Show Trials</button>
-                                    <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Management -->
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <?php
                             if (count($management) > 0) {
                             ?>
@@ -484,13 +490,9 @@
                             ?>
                         </div>
 
-                        <div class="col-12">
-                            <div class="position-relative">
-                                <div class="position-absolute search-variety-icon">
-                                    <i class="fas fa-search"></i>
-                                </div>
-                                <input type="text" id="search_keyword" placeholder="Search by variety, brand, or location…" class="form-control variety-search">
-                            </div>
+                        <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-3">
+                            <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Apply Filters</button>
+                            <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
                         </div>
                     </div>
                 </div>
@@ -952,26 +954,24 @@
     document.addEventListener("DOMContentLoaded", function() {
         const filterContainer = document.getElementById("mainFilterContainer");
         const mobileTarget = document.getElementById("mobileFilterContainer");
-        const openMobileFilterBtn = document.getElementById("openMobileFilter");
+        // const openMobileFilterBtn = document.getElementById("openMobileFilter");
 
         let isInMobile = false;
 
         function moveFilterIfMobile() {
-            const isMobile = window.innerWidth < 768;
-            if (isMobile && !isInMobile) {
-                mobileTarget.appendChild(filterContainer.firstElementChild);
-                isInMobile = true;
-            } else if (!isMobile && isInMobile) {
-                filterContainer.appendChild(mobileTarget.firstElementChild);
-                isInMobile = false;
-            }
+            // const isMobile = window.innerWidth < 768;
+            // if (isMobile && !isInMobile) {
+            //     mobileTarget.appendChild(filterContainer.firstElementChild);
+            //     isInMobile = true;
+            // } else if (!isMobile && isInMobile) {
+            //     filterContainer.appendChild(mobileTarget.firstElementChild);
+            //     isInMobile = false;
+            // }
+            mobileTarget.appendChild(filterContainer.firstElementChild);
+            isInMobile = true;
         }
 
 
-        openMobileFilterBtn.addEventListener("click", function() {
-            const modal = new bootstrap.Modal(document.getElementById("mobileFilterModal"));
-            modal.show();
-        });
 
         moveFilterIfMobile();
         window.addEventListener("resize", moveFilterIfMobile);
@@ -984,6 +984,11 @@
                     `<button class="dt-button custom-button-for-datatable" type="button" id="show-column-button" onClick="showColumnButtonClicked()">
                             <span>Display Column</span>
                         </button>`
+                );
+                $dtButtons.append(
+                    `<button class="btn btn-outline-dark mb-0 ms-3" id="openMobileFilter" onClick="openFilterModal()">
+                    <i class="fas fa-filter me-2"></i> Filters
+                </button> `
                 );
                 clearInterval(insertInterval);
             }
@@ -1144,6 +1149,11 @@
             toInput.addEventListener('input', controlToInput);
         });
     });
+
+    function openFilterModal() {
+        const modal = new bootstrap.Modal(document.getElementById("mobileFilterModal"));
+        modal.show();
+    }
 
     function showColumnButtonClicked() {
         $('#showColumnModal').modal('show');

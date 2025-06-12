@@ -258,7 +258,7 @@
                         }
                         ?>
                         <div class="col-md-6 col-lg-6 d-flex align-items-end gap-2 mt-3">
-                            <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Show Trials</button>
+                            <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Apply Filters</button>
                             <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
                         </div>
                     </div>
