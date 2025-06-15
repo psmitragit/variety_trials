@@ -263,8 +263,12 @@ class CropController extends BaseController
                     } else {
                         if (is_array($v)) {
                             if (key_exists($k, $location_table)) {
-                                $trial->where('trial_location.' . $k . '>=', $v[0]);
-                                $trial->where('trial_location.' . $k . '<=', $v[1]);
+                                if($k == 'avarage_temparature' || $k == 'avarage_percipitation'){
+                                    $trial->where('trial_location.' . $k . '>=', $v[0]);
+                                    $trial->where('trial_location.' . $k . '<=', $v[1]);
+                                }else{
+                                    $trial->whereIn('trial_location.' . $k , $v);
+                                }
                             } else {
                                 $escaped_values = implode(",", array_map(function ($val) {
                                     return "'" . addslashes($val) . "'";
