@@ -164,9 +164,7 @@ class CropController extends BaseController
             exit;
         }
         //LOCATIONS
-        // $locations = $this->trialDataModel->select('location')->where('crop_id', $cropId)->whereIn('state_code', $states)->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
-        $locationModel = new Location();
-        $locations = $locationModel->select('location')->whereIn('state_code', $states)->groupBy('location')->distinct()->findAll();
+        $locations = $this->trialDataModel->select('location')->where('crop_id', $cropId)->whereIn('state_code', $states)->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
         echo json_encode(['success' => 1, 'location' => $locations]);
         exit;
     }
@@ -531,9 +529,6 @@ class CropController extends BaseController
         $allVariables = $this->variableModel->select('crop_variables.show_frontent,crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
         $numeric = [];
         $variables = [];
-        $herbicides = [];
-        $insecticides = [];
-        $brand = [];
 
         foreach ($allVariables as $key => $value) {
             if ($value['show_frontent'] < 1) {
@@ -572,13 +567,6 @@ class CropController extends BaseController
                             $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
                         }
                     }
-                } else {
-                    //SPEFICIF FOR SOYABEAN ONLY AS OTHER CROP DISABLE AND AS PER REQUIREMENT
-                    if ($name == 'Herbicide Package' && !empty($trialVariable[$name]) && !in_array($trialVariable[$name], $herbicides)) {
-                        $herbicides[] = $trialVariable[$name];
-                    } else if ($name == 'Insecticide Package' && !empty($trialVariable[$name]) && !in_array($trialVariable[$name], $insecticides)) {
-                        $insecticides[] = $trialVariable[$name];
-                    }
                 }
             }
         }
@@ -597,18 +585,8 @@ class CropController extends BaseController
         } else {
             $selected_locations_names = [];
         }
-        $locationResult = $this->trialLocationModel
-            ->select('MIN(avarage_temparature) as min_temp, MAX(avarage_temparature) as max_temp, MIN(avarage_percipitation) as min_precip, MAX(avarage_percipitation) as max_precip')
-            ->first();
 
-        $varietyTableData = $this->varietyModel->select('code, brand')->where('crop_id', $crop['id'])->distinct()->findAll();
-        foreach ($varietyTableData as $key => $value) {
-            if (!empty($value['brand']) && !in_array($value['brand'], $brand)) {
-                $brand[] = $value['brand'];
-            }
-        }
-
-        return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters', 'states', 'locations', 'trials', 'numeric', 'selected_locations_names', 'numericFilters', 'locationResult', 'herbicides', 'insecticides', 'brand'));
+        return view('frontend/avarage', compact('crop', 'years', 'varieties', 'numericFilters', 'states', 'locations', 'trials', 'numeric', 'selected_locations_names', 'numericFilters'));
     }
 
     public function location($slug)
@@ -624,8 +602,6 @@ class CropController extends BaseController
         //     ->findAll();
         $locations = [];
 
-        //YEAR
-        $years = $this->trialDataModel->select('year')->where('crop_id', $crop['id'])->orderBy('year', 'desc')->groupBy('year')->distinct()->findAll();
 
         //STATES
         $states = $this->stateModel->select('states.name,states.code')->join('trial_data', 'states.code=trial_data.state_code')->where(['trial_data.crop_id' => $crop['id'], 'trial_data.is_approved' => 1])->orderBy('states.code')->groupBy('trial_data.state_code')->distinct()->findAll();
@@ -651,9 +627,6 @@ class CropController extends BaseController
         $allVariables = $this->variableModel->select('crop_variables.show_frontent,crop_variables.name,crop_variables.filter,crop_variables.multiselect')->where('crop_id', $crop['id'])->findAll();
         $numeric = [];
         $variables = [];
-        $herbicides = [];
-        $insecticides = [];
-        $brand = [];
 
         foreach ($allVariables as $key => $value) {
             if ($value['show_frontent'] < 1) {
@@ -692,13 +665,6 @@ class CropController extends BaseController
                             $numeric[$name]['max'] = $trialVariable[$name] ?? 0;
                         }
                     }
-                } else {
-                    //SPEFICIF FOR SOYABEAN ONLY AS OTHER CROP DISABLE AND AS PER REQUIREMENT
-                    if ($name == 'Herbicide Package' && !empty($trialVariable[$name]) && !in_array($trialVariable[$name], $herbicides)) {
-                        $herbicides[] = $trialVariable[$name];
-                    } else if ($name == 'Insecticide Package' && !empty($trialVariable[$name]) && !in_array($trialVariable[$name], $insecticides)) {
-                        $insecticides[] = $trialVariable[$name];
-                    }
                 }
             }
         }
@@ -718,18 +684,7 @@ class CropController extends BaseController
             $selected_locations_names = [];
         }
 
-        $locationResult = $this->trialLocationModel
-            ->select('MIN(avarage_temparature) as min_temp, MAX(avarage_temparature) as max_temp, MIN(avarage_percipitation) as min_precip, MAX(avarage_percipitation) as max_precip')
-            ->first();
-
-        $varietyTableData = $this->varietyModel->select('code, brand')->where('crop_id', $crop['id'])->distinct()->findAll();
-        foreach ($varietyTableData as $key => $value) {
-            if (!empty($value['brand']) && !in_array($value['brand'], $brand)) {
-                $brand[] = $value['brand'];
-            }
-        }
-
-        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters', 'states', 'trials', 'numeric', 'selected_locations_names', 'locationResult', 'years', 'insecticides', 'herbicides', 'brand'));
+        return view('frontend/location_view', compact('crop', 'locations', 'varieties', 'numericFilters', 'states', 'trials', 'numeric', 'selected_locations_names'));
     }
 
     public function getAvarage()
@@ -746,14 +701,6 @@ class CropController extends BaseController
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
 
         $variables = $this->request->getPost('veriables');
-        try {
-            $environment = json_decode($this->request->getPost('environment'), true);
-        } catch (Exception $err) {
-        }
-
-        $herbicides = $this->request->getPost('herbicides') ?? [];
-        $insecticides = $this->request->getPost('insecticides') ?? [];
-        $brand = $this->request->getPost('brand') ?? [];
 
         $offset = ($page - 1) * $perPage;
 
@@ -772,54 +719,22 @@ class CropController extends BaseController
             $trialDataQuery->whereIn('trial_data.year', $years);
         }
 
-        if (!empty($state)) {
-            $trialDataQuery->whereIn('trial_data.state_code', $state);
-        }
-
         if (!empty($locations)) {
             $trialDataQuery->whereIn('trial_data.location', $locations);
+        }else if(!empty($state)){
+            $trialDataQuery->whereIn('trial_data.state_code', $state);
         }
 
         if (!empty($trialTypes)) {
             $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
         }
 
-        if (!empty($environment)) {
-            $trialDataQuery->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
-
-            foreach ($environment as $field => $range) {
-                if ($field == 'avarage_temparature' || $field == 'avarage_percipitation') {
-                    [$min, $max] = $range;
-                    $trialDataQuery->where("trial_location.$field >=", $min)
-                        ->where("trial_location.$field <=", $max);
-                } else {
-                    if (!empty($range)) {
-                        $trialDataQuery->whereIn("trial_location.$field", $range);
-                    }
-                }
-            }
-        }
-
-        if (!empty($brand)) {
-            $trialDataQuery->whereIn('varieties.brand', $brand);
-        }
-
         $allTrials = $trialDataQuery->findAll();
 
-        if (!empty($variables) || !empty($herbicides) || !empty($insecticides)) {
+        if (!empty($variables)) {
             $variables = json_decode($variables, true);
-            $allTrials = array_filter($allTrials, function ($trial) use ($variables, $herbicides, $insecticides) {
+            $allTrials = array_filter($allTrials, function ($trial) use ($variables) {
                 $data = json_decode($trial['variable'], true);
-                if (!empty($herbicides)) {
-                    if (!isset($data['Herbicide Package']) || !in_array($data['Herbicide Package'], $herbicides)) {
-                        return false;
-                    }
-                }
-                if (!empty($insecticides)) {
-                    if (!isset($data['Insecticide Package']) || !in_array($data['Insecticide Package'], $insecticides)) {
-                        return false;
-                    }
-                }
                 foreach ($variables as $field => $range) {
                     if (!isset($data[$field])) return false;
                     $value = floatval($data[$field]);
@@ -884,7 +799,7 @@ class CropController extends BaseController
             fclose($file);
             echo json_encode([
                 'success' => 1,
-                'download_url' => base_url('download-temp-file/' . basename($filename))
+                'download_url' => base_url('download-temp-file/' . basename($filename))                                    
             ]);
             exit;
         }
@@ -1027,19 +942,8 @@ class CropController extends BaseController
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
         $orderBy = $orderBy == "maturity_dap" ? 'Maturity (DAP)' : $orderBy;
-        $states = $this->request->getPost('states');
-        $years = $this->request->getPost('years');
 
         $variables = $this->request->getPost('veriables');
-        try {
-            $environment = json_decode($this->request->getPost('environment'), true);
-        } catch (Exception $err) {
-        }
-
-        $herbicides = $this->request->getPost('herbicides') ?? [];
-        $insecticides = $this->request->getPost('insecticides') ?? [];
-        $brand = $this->request->getPost('brand') ?? [];
-
 
         $offset = ($page - 1) * $perPage;
         if (empty($traitName)) {
@@ -1049,7 +953,7 @@ class CropController extends BaseController
                     <thead class='table-light'>
                     <tr>
                         <th scope='col'>Variety</th>
-                        <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
+                        <th scope='col'>Location</th>
                         <th scope='col' class='sortable'>-</th>
                     </tr>
                     </thead>
@@ -1065,7 +969,7 @@ class CropController extends BaseController
 
 
         $trialDataQuery = $this->trialDataModel
-            ->select('varieties.short_name, trial_data.variable, trial_data.location, trial_data.location_code')
+            ->select('varieties.short_name, trial_data.variable, trial_data.location')
             ->where('trial_data.crop_id', $crop_id)
             ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
 
@@ -1073,58 +977,20 @@ class CropController extends BaseController
             $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
         }
 
-        if (!empty($states)) {
-            $trialDataQuery->whereIn('trial_data.state_code', $states);
-        }
-
         if (!empty($locations)) {
             $trialDataQuery->whereIn('trial_data.location', $locations);
-        } 
-        
+        }
+
         if (!empty($trialTypes)) {
             $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
         }
 
-        if(!empty($years)){
-            $trialDataQuery->whereIn('trial_data.year', $years);
-        }
-
-        if (!empty($environment)) {
-            $trialDataQuery->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
-
-            foreach ($environment as $field => $range) {
-                if ($field == 'avarage_temparature' || $field == 'avarage_percipitation') {
-                    [$min, $max] = $range;
-                    $trialDataQuery->where("trial_location.$field >=", $min)
-                        ->where("trial_location.$field <=", $max);
-                } else {
-                    if (!empty($range)) {
-                        $trialDataQuery->whereIn("trial_location.$field", $range);
-                    }
-                }
-            }
-        }
-
-        if (!empty($brand)) {
-            $trialDataQuery->whereIn('varieties.brand', $brand);
-        }
-
         $allTrials = $trialDataQuery->findAll();
 
-        if (!empty($variables) || !empty($herbicides) || !empty($insecticides)) {
+        if (!empty($variables)) {
             $variables = json_decode($variables, true);
-            $allTrials = array_filter($allTrials, function ($trial) use ($variables, $herbicides, $insecticides) {
+            $allTrials = array_filter($allTrials, function ($trial) use ($variables) {
                 $data = json_decode($trial['variable'], true);
-                if (!empty($herbicides)) {
-                    if (!isset($data['Herbicide Package']) || !in_array($data['Herbicide Package'], $herbicides)) {
-                        return false;
-                    }
-                }
-                if (!empty($insecticides)) {
-                    if (!isset($data['Insecticide Package']) || !in_array($data['Insecticide Package'], $insecticides)) {
-                        return false;
-                    }
-                }
                 foreach ($variables as $field => $range) {
                     if (!isset($data[$field])) return false;
                     $value = floatval($data[$field]);
@@ -1147,41 +1013,14 @@ class CropController extends BaseController
         }
 
 
-        //ALL ROW EVEN IF VARIETY AND LOCATION SAME
-        // $filteredTrials = [];
-        // foreach ($allTrials as $trial) {
-        //     $jsonData = json_decode($trial['variable'], true);
-        //     $traitVal = $jsonData[$traitName] ?? null;
-        //     if (!empty($traitVal) || $traitVal == 0) {
-        //         $trial['trait_value'] = $traitVal;
-        //         $filteredTrials[] = $trial;
-        //     }
-        // }
-        //AVARAGE IF VARIETY AND LOCATION SAME
-        $groupedData = [];
+        $filteredTrials = [];
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
             $traitVal = $jsonData[$traitName] ?? null;
-
-            if ($traitVal !== null && $traitVal !== '' && is_numeric($traitVal)) {
-                $key = $trial['short_name'] . '||' . $trial['location'];
-                if (!isset($groupedData[$key])) {
-                    $groupedData[$key] = [
-                        'short_name' => $trial['short_name'],
-                        'location' => $trial['location'],
-                        'location_code' => $trial['location_code'],
-                        'values' => []
-                    ];
-                }
-                $groupedData[$key]['values'][] = floatval($traitVal);
+            if (!empty($traitVal)) {
+                $trial['trait_value'] = $traitVal;
+                $filteredTrials[] = $trial;
             }
-        }
-
-        $filteredTrials = [];
-        foreach ($groupedData as $item) {
-            $avg = count($item['values']) > 0 ? array_sum($item['values']) / count($item['values']) : null;
-            $item['trait_value'] = number_format($avg, 2, '.', '');
-            $filteredTrials[] = $item;
         }
 
         $totalRecords = count($filteredTrials);
@@ -1190,7 +1029,7 @@ class CropController extends BaseController
             <thead class='table-light'>
             <tr>
                 <th scope='col'>Variety</th>
-                <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
+                <th scope='col'>Location</th>
                 <th scope='col' class='sortable' data-field='" . htmlspecialchars($traitName) . "'>
                     <div class='d-flex justify-content-between align-items-center'>
                         <span>" . htmlspecialchars($traitName) . "</span>
@@ -1219,7 +1058,6 @@ class CropController extends BaseController
         $p70 = getPercentile($numericTraitValues, 70);
         $p90 = getPercentile($numericTraitValues, 90);
 
-        $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
         foreach ($paginatedTrials as $value) {
             $traitVal = floatval($value['trait_value']);
             $bgColor = getTraitColorByPercentile($traitVal, $p10, $p30, $p70, $p90);
@@ -1227,8 +1065,8 @@ class CropController extends BaseController
 
             $html .= "<tr>
                 <td>" . htmlspecialchars($value['short_name']) . "</td>
-                <td data-bs-toggle='tooltip' title='". htmlspecialchars($value['location'])."'>" . htmlspecialchars($value['location_code']) . "</td>
-                <td style='background-color: " . $bgColor . "; color:" . $color . ";'>" . htmlspecialchars(empty($value['trait_value']) ? '-' : $value['trait_value']) . "</td>
+                <td>" . htmlspecialchars($value['location']) . "</td>
+                <td style='background-color: " . $bgColor . "; color:" . $color . ";'>" . htmlspecialchars($value['trait_value']) . "</td>
             </tr>";
         }
 
@@ -1305,8 +1143,7 @@ class CropController extends BaseController
         exit;
     }
 
-    public function downloadCsv($filename)
-    {
+    public function downloadCsv($filename){
         $filePath = WRITEPATH . 'uploads/' . $filename;
 
         if (!is_file($filePath)) {

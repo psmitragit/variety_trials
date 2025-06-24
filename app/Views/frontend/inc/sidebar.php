@@ -31,9 +31,10 @@
                     </a>
                     <div class="collapse <?= !empty($segment[0]) && $segment[0] == $l['slug'] ? "show" : "" ?>" id="crop<?= $k ?>">
                         <ul class="nav flex-column sub-menu">
-                            <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/trials" ? "active bg-gradient-secondary" : "" ?>" href="<?= base_url($l['slug'] . "/trials") ?>">Trials</a></li>
+                            <!-- <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/trials" ? "active bg-gradient-secondary" : "" ?>" href="<?= base_url($l['slug'] . "/trials") ?>">Trials</a></li> -->
+                            <li class="nav-item"> <a class="nav-link <?= (request()->getPath() == $l['slug'] . "/average") || (request()->getPath() == $l['slug'] . "/average-map")? "active" : "" ?>" href="<?= base_url($l['slug'] . "/average-map") ?>">Average View</a></li>
+                            <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/location" || (request()->getPath() == $l['slug'] . "/location-map") ? "active" : "" ?>" href="<?= base_url($l['slug'] . "/location-map") ?>">Location View</a></li>
                             <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/documents" ? "active" : "" ?>" href="<?= base_url($l['slug'] . "/documents") ?>">Documents</a></li>
-                            <li class="nav-item"> <a class="nav-link <?= request()->getPath() == $l['slug'] . "/average" ? "active" : "" ?>" href="<?= base_url($l['slug'] . "/average") ?>">Average View</a></li>
                         </ul>
                     </div>
                 </li>

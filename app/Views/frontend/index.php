@@ -8,40 +8,71 @@
             </div>
             <div class="row my-5 text-white">
                 <?php foreach (get_crops() as $l): ?>
-                    <div class="col-lg-4 col-6 mb-3">
+                    <div class="col-lg-4 col-12 mb-3 d-flex justify-content-center">
+                        <div class="card text-center card-hover shadow-sm" style="width: 18rem; border: none;">
+                            <div class="overflow-hidden" style="height: 200px;">
+                                <img src="<?= base_url('frontend/img/crops/' . $l['image']) ?>"
+                                    class="card-img-top object-fit-cover w-100 h-100"
+                                    alt="<?= esc($l['name'] ?? 'Crop') ?>">
+                            </div>
+                            <div class="card-body bg-light">
+                                <h5 class="card-title fw-bold"><?= esc($l['name'] ?? 'Crop') ?></h5>
+                                <div class="d-flex gap-2 justify-content-center align-items-center">
+                                    <a href="<?= base_url($l['slug'] . "/average-map") ?>" class="btn btn-outline-dark p-2">Avarage</a>
+                                    <a href="<?= base_url($l['slug'] . "/location-map") ?>" class="btn btn-outline-dark p-2">Location</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                <div class="col-lg-4 col-12 mb-3 d-flex justify-content-center">
+                    <div class="card text-center card-hover shadow-sm" style="width: 18rem; border: none;">
+                        <div class="overflow-hidden" style="height: 200px;">
+                            <img src="<?= base_url('frontend/img/business_13558344.png') ?>"
+                                class="card-img-top object-fit-cover" width="288"
+                                height="200" style="height: 100%;width: 100%; object-fit: contain;padding: 1rem 0;" alt="Document">
+                        </div>
+                        <div class="card-body bg-light">
+                            <h5 class="card-title fw-bold">Document</h5>
+                            <a href="<?= base_url('documents') ?>" class="btn btn-outline-dark">All Crops</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="col-lg-4 col-6 mb-3">
                         <div class="small-box bg-secondary rounded-3">
-                            <div class="inner px-4 py-3">
+                            <div class="inner px-4 pt-3">
                                 <h3>
-                                    <?= $l['name'] ?>
+                                <?= $l['name'] ?>
                                 </h3>
                             </div>
-                            <div class="icon text-center">
-                                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);">
-                                    <path d="m22 3.41-.12-1.26-1.2.4a13.84 13.84 0 0 1-6.41.64 11.87 11.87 0 0 0-6.68.9A7.23 7.23 0 0 0 3.3 9.5a9 9 0 0 0 .39 4.58 16.6 16.6 0 0 1 1.18-2.2 9.85 9.85 0 0 1 4.07-3.43 11.16 11.16 0 0 1 5.06-1A12.08 12.08 0 0 0 9.34 9.2a9.48 9.48 0 0 0-1.86 1.53 11.38 11.38 0 0 0-1.39 1.91 16.39 16.39 0 0 0-1.57 4.54A26.42 26.42 0 0 0 4 22h2a30.69 30.69 0 0 1 .59-4.32 9.25 9.25 0 0 0 4.52 1.11 11 11 0 0 0 4.28-.87C23 14.67 22 3.86 22 3.41z"></path>
-                                </svg> -->
+                            <div class="crop_image_wrapper">
+                                <div class="image_bg" style="background: url('https://search.utcrops.com/wp-content/uploads/2017/02/Soybeans-300x200.jpg');">
+
+                                </div>
                             </div>
                             <div class="text-center">
                                 <a class="doc-dashboard" href="<?= base_url($l['slug'] . '/trials') ?>">Trials</a><a
                                     href="<?= base_url($l['slug'] . '/documents') ?>" class="title-dashboard">Documents</a>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-                <div class="col-lg-4 col-6 mb-3">
+                    </div> -->
+                <!-- <div class="col-lg-4 col-6 mb-3">
                     <div class="small-box bg-customs-color rounded-3">
                         <div class="inner px-4 py-3">
                             <h3>Documents</h3>
                         </div>
-                        <div class="icon ">
-                            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);">
+                        <div class="icon "> -->
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);">
                                     <path d="m22 3.41-.12-1.26-1.2.4a13.84 13.84 0 0 1-6.41.64 11.87 11.87 0 0 0-6.68.9A7.23 7.23 0 0 0 3.3 9.5a9 9 0 0 0 .39 4.58 16.6 16.6 0 0 1 1.18-2.2 9.85 9.85 0 0 1 4.07-3.43 11.16 11.16 0 0 1 5.06-1A12.08 12.08 0 0 0 9.34 9.2a9.48 9.48 0 0 0-1.86 1.53 11.38 11.38 0 0 0-1.39 1.91 16.39 16.39 0 0 0-1.57 4.54A26.42 26.42 0 0 0 4 22h2a30.69 30.69 0 0 1 .59-4.32 9.25 9.25 0 0 0 4.52 1.11 11 11 0 0 0 4.28-.87C23 14.67 22 3.86 22 3.41z"></path>
                                 </svg> -->
-                        </div>
-                        <div class="text-center">
-                            <a href="<?= base_url('documents') ?>" class="title-dashboard">All Crops</a>
+                <!-- </div> -->
+                <!-- <div class="text-center"> -->
+                <!-- <a href=" base_url('documents') ?>" class="title-dashboard">All Crops</a>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -64,107 +95,107 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=<?= env('GOOGLE_MAP_API_KEY') ?>&libraries=maps,marker&callback=initialMap" async defer></script>
 <script>
     // window.addEventListener('load', function() {
-        console.log('Test');
+    console.log('Test');
 
 
-        //Open Map
-        window.helloWorld = () => {
-            initMap();
-            $('#showMap').modal('show');
+    //Open Map
+    window.helloWorld = () => {
+        initMap();
+        $('#showMap').modal('show');
+    }
+
+    let coordinates = [{
+            lat: 40.735657, // Newark, NJ
+            lng: -74.172363
+        },
+        {
+            lat: 40.717754, // Jersey City, NJ
+            lng: -74.043143
+        },
+        {
+            lat: 39.952583, // Philadelphia, PA
+            lng: -75.165222
+        },
+        {
+            lat: 41.765804, // Hartford, CT
+            lng: -72.673372
+        },
+        {
+            lat: 42.360081, // Boston, MA
+            lng: -71.058884
+        },
+        {
+            lat: 39.290386, // Baltimore, MD
+            lng: -76.612190
+        },
+        {
+            lat: 38.907192, // Washington, D.C.
+            lng: -77.036873
         }
+    ];
 
-        let coordinates = [{
-                lat: 40.735657, // Newark, NJ
-                lng: -74.172363
-            },
-            {
-                lat: 40.717754, // Jersey City, NJ
-                lng: -74.043143
-            },
-            {
-                lat: 39.952583, // Philadelphia, PA
-                lng: -75.165222
-            },
-            {
-                lat: 41.765804, // Hartford, CT
-                lng: -72.673372
-            },
-            {
-                lat: 42.360081, // Boston, MA
-                lng: -71.058884
-            },
-            {
-                lat: 39.290386, // Baltimore, MD
-                lng: -76.612190
-            },
-            {
-                lat: 38.907192, // Washington, D.C.
-                lng: -77.036873
-            }
-        ];
-
-        let markerName = [
-            "Newark, NJ",
-            "Jersey City, NJ",
-            "Philadelphia, PA",
-            "Hartford, CT",
-            "Boston, MA",
-            "Baltimore, MD",
-            "Washington, D.C."
-        ];
+    let markerName = [
+        "Newark, NJ",
+        "Jersey City, NJ",
+        "Philadelphia, PA",
+        "Hartford, CT",
+        "Boston, MA",
+        "Baltimore, MD",
+        "Washington, D.C."
+    ];
 
 
 
-        // Initialize the map
-        function initMap() {
-            var myLatLng = coordinates.length > 0 ? coordinates[0] : {
-                lat: 40.712776,
-                lng: -74.005974
-            };
+    // Initialize the map
+    function initMap() {
+        var myLatLng = coordinates.length > 0 ? coordinates[0] : {
+            lat: 40.712776,
+            lng: -74.005974
+        };
 
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 6,
-                center: myLatLng
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: myLatLng
+        });
+
+        var marker, i;
+        var infowindow = new google.maps.InfoWindow({
+            content: ''
+        });
+
+        for (i = 0; i < coordinates.length; i++) {
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(coordinates[i]['lat'], coordinates[i]['lng']),
+                map: map
             });
 
-            var marker, i;
-            var infowindow = new google.maps.InfoWindow({
-                content: ''
-            });
-
-            for (i = 0; i < coordinates.length; i++) {
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(coordinates[i]['lat'], coordinates[i]['lng']),
-                    map: map
-                });
-
-                google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                    return function() {
-                        infowindow.setContent(markerName[i]);
-                        infowindow.open(map, marker);
-                    }
-                })(marker, i));
-            }
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                return function() {
+                    infowindow.setContent(markerName[i]);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
         }
+    }
 
 
-        //On page loadd map init
-        function initialMap() {
-            var myLatLng = coordinates.length > 0 ? coordinates[0] : {
-                lat: 40.712776,
-                lng: -74.005974
-            };
+    //On page loadd map init
+    function initialMap() {
+        var myLatLng = coordinates.length > 0 ? coordinates[0] : {
+            lat: 40.712776,
+            lng: -74.005974
+        };
 
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 6,
-                center: myLatLng
-            });
-            var marker = new google.maps.Marker({
-                position: myLatLng,
-                map: map,
-                title: "New York"
-            });
-        }
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: myLatLng
+        });
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+            title: "New York"
+        });
+    }
 
     // });
 </script>

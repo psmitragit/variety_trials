@@ -387,11 +387,134 @@ object.objs {
   align-items: center;
 }
 
+.closeBtn:hover {
+  background-color: #414141;
+}
+
 .closeBtn i {
   font-size: 20px;
   color: #fff;
 }
 
 #mobileFilterContainer .select2-container {
+  width: 100% !important;
+}
+
+.card-hover {
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.card-img-top {
+  transition: all 0.5s ease-in-out;
+  z-index: 0;
+  position: relative;
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.card-hover .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.card-hover:hover .card-img-top {
+  transform: scale(1.1);
+}
+
+.form-wrapper {
+  background: white;
+  padding: 15px 19px;
+}
+
+.s_state_label {
+  color: black;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 500;
+}
+
+.map-wrapper {
+  height: 65vh;
+  position: relative;
+  overflow: hidden;
+}
+
+#map {
+  height: 100%;
+}
+
+#loading {
+  /* position: absolute; */
+  height: 65vh;
+  width: 100%;
+  z-index: 999;
+  background: rgb(255, 255, 255);
+}
+
+.map-wrapper {
+  height: 65vh;
+  position: relative;
+  overflow: hidden;
+}
+
+#map {
+  height: 100%;
+}
+
+/* Your custom animated loader */
+.loader {
+  width: 40px;
+  height: 40px;
+  --c: no-repeat linear-gradient(orange 0 0);
+  background: var(--c), var(--c), var(--c), var(--c);
+  background-size: 21px 21px;
+  animation: l5 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
+}
+
+@keyframes l5 {
+  0% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  }
+
+  33% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    width: 60px;
+    height: 60px;
+  }
+
+  66% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    width: 60px;
+    height: 60px;
+  }
+
+  100% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+  }
+}
+
+#selected_locations ul {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#selected_locations ul li {
+  margin-right: 5px;
+  background: #608e43;
+  color: white;
+  padding: 2px 7px;
+  border-radius: 7px;
+  margin-bottom: 5px;
+}
+
+.selection_label {
+  color: black;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.select2-search__field{
   width: 100% !important;
 }

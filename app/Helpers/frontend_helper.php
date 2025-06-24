@@ -156,6 +156,9 @@ function getTraitColorByPercentile($val, $p10, $p30, $p70, $p90) {
 function getPercentile($sorted, $percent) {
     $index = ($percent / 100) * (count($sorted) - 1);
     $floor = floor($index);
+    if($floor < 0){
+        return 0;
+    }
     $ceil = ceil($index);
     if ($floor == $ceil) return $sorted[$floor];
     return $sorted[$floor] + ($sorted[$ceil] - $sorted[$floor]) * ($index - $floor);

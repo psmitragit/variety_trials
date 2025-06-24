@@ -26,6 +26,23 @@
 
             </div>
             <div class="card-body px-3 pb-2 search-filter">
+                <!-- <button class="btn btn-outline-dark d-md-none mb-3" id="openMobileFilter">
+                    <i class="fas fa-filter me-2"></i> Filters
+                </button> -->
+                <!-- Mobile Filter Modal -->
+                <!-- <div class="modal fade" id="mobileFilterModal" tabindex="-1">
+                    <div class="modal-dialog modal-fullscreen-sm-down">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Filters</h5>
+                                <button type="button" class="btn closeBtn" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body" id="mobileFilterContainer">
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
                 <div class="container my-4">
                     <div class="d-flex align-items-center justify-content-between" style="max-width: 300px;">
                         <label for="toggleSwitch" class="mb-0">Average View</label>
@@ -39,235 +56,54 @@
                 </div>
 
                 <div>
-                    <h3>
-                        Site Selection
-                    </h3>
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="row">
-                                <label for="" class="selection_label">Environment</label>
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Avg. temp
-                                    </label>
-                                    <div class="range_container">
-                                        <div class="sliders_control">
-                                            <input class="fromSlider filter-range2" data-name="avarage_temparature" type="range" value="0" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="9999" data-type="avg_temp" />
-                                            <input class="toSlider" type="range" value="<?= $locationResult['min_temp'] ?>" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="999" data-type="avg_temp" />
-                                        </div>
-                                        <div class="row align-items-center">
-                                            <div class="col-6 text-start">
-                                                <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $locationResult['min_temp'] ?>" name="avarage_temparature_min" />
-                                            </div>
-                                            <div class="col-6 text-end">
-                                                <label class="form-label fw-semibold m-0">Max</label>
-                                                <input type="text" name="avarage_temparature_max" class="form-control text-end toInput" value="<?= $locationResult['min_temp'] ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Avg. precip
-                                    </label>
-                                    <div class="range_container">
-                                        <div class="sliders_control">
-                                            <input class="fromSlider filter-range2" data-name="avarage_percipitation" type="range" value="0" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="9999" data-type="avg_percip" />
-                                            <input class="toSlider" type="range" value="<?= $locationResult['min_precip'] ?>" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="1000" data-type="avg_percip" />
-                                        </div>
-                                        <div class="row align-items-center">
-                                            <div class="col-6 text-start">
-                                                <label class="form-label fw-semibold m-0">Min</label>
-                                                <input type="text" class="form-control fromInput" value="<?= $locationResult['min_precip'] ?>" name="avarage_percipitation_min" />
-                                            </div>
-                                            <div class="col-6 text-end">
-                                                <label class="form-label fw-semibold m-0">Max</label>
-                                                <input type="text" name="avarage_percipitation_max" class="form-control text-end toInput" value="<?= $locationResult['min_precip'] ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label for="" class="selection_label">Trial</label>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">
-                                        Producttion Practice
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="production_practice" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select Production Practice">
-                                                    <option value="0">Full-Season</option>
-                                                    <option value="1">Double-Crop</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">
-                                        Water Management
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="waterManagement" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Water Management">
-                                                    <option value="0">Irrigated</option>
-                                                    <option value="1">Non-Irrigated</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="row">
-                                <label for="" class="selection_label">Location</label>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">
-                                        State(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="sState" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select States(s)">
-                                                    <?php foreach ($states as $s) : ?>
-                                                        <option value="<?= $s['code'] ?>"><?= $s['name'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">
-                                        Year(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="sYears" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Year(s)">
-                                                    <?php foreach ($years as $s) : ?>
-                                                        <option value="<?= $s['year'] ?>"><?= $s['year'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">
-                                        Location(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="sLocations" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Location(s)">
-                                                    <?php foreach ($selected_locations_names as $s) : ?>
-                                                        <option value="<?= $s ?>" selected><?= $s ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <h3>
-                        Variety Data
-                    </h3>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row">
-                                <label for="" class="selection_label">Variety</label>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label fw-semibold">
-                                        Brand(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="sBrands" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Brand(s)">
-                                                    <?php foreach ($brand as $v) : ?>
-                                                        <option value="<?= $v ?>"><?= $v ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label fw-semibold">
-                                        Variety(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="sVarieties" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Variety(s)">
-                                                    <?php foreach ($varieties as $v) : ?>
-                                                        <option value="<?= $v['code'] ?>"><?= $v['short_name'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label fw-semibold">
-                                        Maturity(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="trial_types" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Maturity(s)">
-                                                    <?php foreach ($trials as $s) : ?>
-                                                        <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label fw-semibold">
-                                        Herbicide(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="herbicides" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Herbicide(s)">
-                                                    <?php foreach ($herbicides as $s) : ?>
-                                                        <option value="<?= $s ?>"><?= $s ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label fw-semibold">
-                                        Insecticide(s)
-                                    </label>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="w-100 mb-3">
-                                                <select id="insecticides" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select insecticide(s)">
-                                                    <?php foreach ($insecticides as $s) : ?>
-                                                        <option value="<?= $s ?>"><?= $s ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row g-4 mb-3">
+                        <!-- Filter By -->
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sState" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select States(s)">
+                                    <?php foreach ($states as $s) : ?>
+                                        <option value="<?= $s['code'] ?>"><?= $s['name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sLocations" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Location(s)">
+                                    <?php foreach ($selected_locations_names as $s) : ?>
+                                        <option value="<?= $s ?>" selected><?= $s ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="trial_types" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Maturity(s)">
+                                    <?php foreach ($trials as $s) : ?>
+                                        <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sYears" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Year(s)">
+                                    <?php foreach ($years as $s) : ?>
+                                        <option value="<?= $s['year'] ?>"><?= $s['year'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="w-100 mb-3">
+                                <select id="sVarieties" class="form-select mb-3 px-3 select2 filter-input filterTrials" multiple data-placeholder="Select Variety(s)">
+                                    <?php foreach ($varieties as $v) : ?>
+                                        <option value="<?= $v['code'] ?>"><?= $v['short_name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
                         <?php
                         $index = 0;
                         foreach ($numeric as $key => $value) {
@@ -297,8 +133,6 @@
                             $index++;
                         }
                         ?>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 col-lg-6 d-flex align-items-end gap-2 mt-3">
                             <button class="btn btn-success w-50" style="background: #4f772d !important;" id="show_trials">Apply Filters</button>
                             <button class="btn btn-success w-50" id="displayColumn" style="background: #4f772d !important;" id="show_trials">Display Column</button>
@@ -463,10 +297,6 @@
                     state: $('#sState').val(),
                     crop_id: "<?= $crop['id'] ?>",
                     veriables: getvariables(),
-                    environment: getEnvironmentData(),
-                    herbicides: $('#herbicides').val(),
-                    insecticides: $('#insecticides').val(),
-                    brand: $('#sBrands').val(),
                     per_page: 10,
                     page: page,
                     order_by: order,
@@ -496,22 +326,6 @@
                     $('#loader').addClass('d-none');
                 }
             });
-        }
-
-        function getEnvironmentData() {
-            let data = {};
-            $('.filter-range2').each((i, v) => {
-                let name = $(v).data('name');
-                let min = $(`input[name="${name}_min"]`).val();
-                let max = $(`input[name="${name}_max"]`).val();
-
-                if (parseFloat(min) != parseFloat(max)) {
-                    data[name] = [min, max]
-                }
-            });
-            data['production_pratice'] = $('#production_practice').val();
-            data['water_management'] = $('#waterManagement').val();
-            return JSON.stringify(data);
         }
 
         function getvariables() {
