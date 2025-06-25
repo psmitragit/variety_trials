@@ -518,3 +518,17 @@ object.objs {
 .select2-search__field{
   width: 100% !important;
 }
+.hamburger-toggle {
+  border: 1px solid #4f772d !important;
+  color: #4f772d !important;
+  background-color: transparent;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+.hamburger-toggle:hover {
+  background-color: #4f772d;
+  color: #fff !important;
+}

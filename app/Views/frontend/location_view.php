@@ -3,6 +3,15 @@
 <?= $crop['name'] . " Location View" ?>
 <?= $this->endSection() ?>
 <?= $this->section('content') ?>
+<style>
+    .select2-selection__arrow {
+        height: 100% !important;
+    }
+
+    #traitSection.highlight .select2-selection.select2-selection--single {
+        border-color: red !important;
+    }
+</style>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <link href="<?= base_url('frontend/css/crop-style.css') ?>" rel="stylesheet">
 <div id="loader" class="d-none">
@@ -94,7 +103,7 @@
                                 <label for="" class="selection_label">Trial</label>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold">
-                                        Producttion Practice
+                                        Production Practice
                                     </label>
                                     <div class="row">
                                         <div class="col-12">
@@ -265,13 +274,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-6 col-12" id="traitSection">
                                     <label class="form-label fw-semibold">
                                         Trait
                                     </label>
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="w-100 mb-3">
+                                            <div class="w-100">
                                                 <select id="sTrait" class="form-select mb-3 px-3 select2 filter-input filterTrials">
                                                     <option value="">Select a Trait</option>
                                                     <?php foreach ($numericFilters as $v) : ?>
@@ -279,6 +288,7 @@
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
+                                            <span class="text-danger trait_error d-none">Please select a trait to continue.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -578,6 +588,12 @@
                 $('#alertModal').modal('show');
                 return;
             }
+            $('#traitSection').removeClass('highlight');
+            $('.trait_error').addClass('d-none');
+            if ($('#sTrait').val() == '') {
+                $('#traitSection').addClass('highlight');
+                $('.trait_error').removeClass('d-none');
+            }
             $.ajax({
                 url: '<?= base_url('get-location-data') ?>',
                 type: 'POST',
@@ -682,36 +698,19 @@
                 updateLocationSelect();
             });
 
-            $('#table-content').on('click', 'table tbody td', function(e) {
-                $('.current_selected_tr').removeClass('current_selected_tr');
-                let parent = $(this).parent('tr');
-                parent.addClass('current_selected_tr');
-                let tds = $('.current_selected_tr td');
-                let headering = [
-                    "Variety",
-                    "Location",
-                    $('#sTrait').val()
-                ];
-
-                let html = '<table class="table table-striped"><tbody>';
-                let index = 0;
-
-                tds.each(function() {
-                    let value = $(this).text();
-                    if ($(this).data('bs-original-title') != null) {
-                        value = $(this).data('bs-original-title');
+            $('#table-content').on('click', '.show_trial_data', function(e) {
+                let id = $(this).data('id');
+                $.ajax({
+                    type: "GET",
+                    url: "<?= base_url('get-trial-data/') ?>" + id,
+                    success: function(res) {
+                        res = JSON.parse(res);
+                        if(res.success){
+                            $('#showDataCustomModal .modal-body').html(res.html);
+                            $('#showDataCustomModal').modal('show');
+                        }
                     }
-
-                    html += `<tr>
-                        <td>${headering[index]}</td>
-                        <td>${value}</td>
-                    </tr>`;
-                    index++;
                 });
-
-                html += '</tbody></table>';
-                $('#showDataCustomModal .modal-body').html(html);
-                $('#showDataCustomModal').modal('show');
             });
         });
 

@@ -93,7 +93,7 @@
                                 <label for="" class="selection_label">Trial</label>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold">
-                                        Producttion Practice
+                                        Production Practice
                                     </label>
                                     <div class="row">
                                         <div class="col-12">
@@ -451,7 +451,7 @@
         function getVarietyData(page = 1, order = '', dir = 'asc', csv = 0) {
             order = order.trim().toLowerCase() === "maturity (dap)" ? 'maturity_dap' : order;
             $.ajax({
-                url: '<?= base_url('get-avarage') ?>',
+                url: '<?= base_url('get-average') ?>',
                 type: 'POST',
                 dataType: 'json',
                 data: {

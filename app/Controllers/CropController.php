@@ -166,7 +166,12 @@ class CropController extends BaseController
         //LOCATIONS
         // $locations = $this->trialDataModel->select('location')->where('crop_id', $cropId)->whereIn('state_code', $states)->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
         $locationModel = new Location();
-        $locations = $locationModel->select('location')->whereIn('state_code', $states)->groupBy('location')->distinct()->findAll();
+        $locations = $locationModel->select('locations.location')
+        ->whereIn('locations.state_code', $states)
+        ->join('trial_data', 'trial_data.location_code=locations.code')
+        ->groupBy('locations.location')
+        ->distinct()
+        ->findAll();
         echo json_encode(['success' => 1, 'location' => $locations]);
         exit;
     }
@@ -1015,6 +1020,240 @@ class CropController extends BaseController
         exit;
     }
 
+    // public function getLocationData()
+    // {
+    //     $varieties = $this->request->getPost('varieties');
+    //     $locations = $this->request->getPost('locations');
+    //     $trialTypes = $this->request->getPost('trial_types');
+    //     $crop_id = $this->request->getPost('crop_id');
+    //     $traitName = $this->request->getPost('trait_name');
+    //     $page = (int) $this->request->getPost('page');
+    //     $perPage = (int) $this->request->getPost('per_page');
+    //     $orderBy = $this->request->getPost('order_by') ?? '';
+    //     $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+    //     $orderBy = $orderBy == "maturity_dap" ? 'Maturity (DAP)' : $orderBy;
+    //     $states = $this->request->getPost('states');
+    //     $years = $this->request->getPost('years');
+
+    //     $variables = $this->request->getPost('veriables');
+    //     try {
+    //         $environment = json_decode($this->request->getPost('environment'), true);
+    //     } catch (Exception $err) {
+    //     }
+
+    //     $herbicides = $this->request->getPost('herbicides') ?? [];
+    //     $insecticides = $this->request->getPost('insecticides') ?? [];
+    //     $brand = $this->request->getPost('brand') ?? [];
+
+
+    //     $offset = ($page - 1) * $perPage;
+    //     if (empty($traitName)) {
+    //         echo json_encode([
+    //             'success' => 2,
+    //             'html' => "<table class='table table-bordered table-striped'>
+    //                 <thead class='table-light'>
+    //                 <tr>
+    //                     <th scope='col'>Variety</th>
+    //                     <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
+    //                     <th scope='col' class='sortable'>-</th>
+    //                 </tr>
+    //                 </thead>
+    //                 <tbody>
+    //                     <tr>
+    //                         <td colspan='3' class='text-center'>Please select a trait</td>
+    //                     </tr>
+    //                 </tbody>
+    //             </table>"
+    //         ]);
+    //         return;
+    //     }
+
+
+    //     $trialDataQuery = $this->trialDataModel
+    //         ->select('varieties.short_name, trial_data.variable, trial_data.location, trial_data.location_code')
+    //         ->where('trial_data.crop_id', $crop_id)
+    //         ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
+
+    //     if (!empty($varieties)) {
+    //         $trialDataQuery->whereIn('trial_data.variety_code', $varieties);
+    //     }
+
+    //     if (!empty($states)) {
+    //         $trialDataQuery->whereIn('trial_data.state_code', $states);
+    //     }
+
+    //     if (!empty($locations)) {
+    //         $trialDataQuery->whereIn('trial_data.location', $locations);
+    //     } else{
+    //         //BECOUSE IF NO LOCATION SELECTED THEN NO DATA SHOULD SHOW
+    //         $trialDataQuery->where('trial_data.location', '----');
+    //     }
+
+    //     if (!empty($trialTypes)) {
+    //         $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
+    //     }
+
+    //     if(!empty($years)){
+    //         $trialDataQuery->whereIn('trial_data.year', $years);
+    //     }
+
+    //     if (!empty($environment)) {
+    //         $trialDataQuery->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
+
+    //         foreach ($environment as $field => $range) {
+    //             if ($field == 'avarage_temparature' || $field == 'avarage_percipitation') {
+    //                 [$min, $max] = $range;
+    //                 $trialDataQuery->where("trial_location.$field >=", $min)
+    //                     ->where("trial_location.$field <=", $max);
+    //             } else {
+    //                 if (!empty($range)) {
+    //                     $trialDataQuery->whereIn("trial_location.$field", $range);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     if (!empty($brand)) {
+    //         $trialDataQuery->whereIn('varieties.brand', $brand);
+    //     }
+
+    //     $allTrials = $trialDataQuery->findAll();
+
+    //     if (!empty($variables) || !empty($herbicides) || !empty($insecticides)) {
+    //         $variables = json_decode($variables, true);
+    //         $allTrials = array_filter($allTrials, function ($trial) use ($variables, $herbicides, $insecticides) {
+    //             $data = json_decode($trial['variable'], true);
+    //             if (!empty($herbicides)) {
+    //                 if (!isset($data['Herbicide Package']) || !in_array($data['Herbicide Package'], $herbicides)) {
+    //                     return false;
+    //                 }
+    //             }
+    //             if (!empty($insecticides)) {
+    //                 if (!isset($data['Insecticide Package']) || !in_array($data['Insecticide Package'], $insecticides)) {
+    //                     return false;
+    //                 }
+    //             }
+    //             foreach ($variables as $field => $range) {
+    //                 if (!isset($data[$field])) return false;
+    //                 $value = floatval($data[$field]);
+    //                 if ($value < floatval($range[0]) || $value > floatval($range[1])) {
+    //                     return false;
+    //                 }
+    //             }
+    //             return true;
+    //         });
+    //     }
+
+    //     if (!empty($orderBy) && $orderBy === $traitName) {
+    //         usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
+    //             $aData = json_decode($a['variable'], true);
+    //             $bData = json_decode($b['variable'], true);
+    //             $valA = $aData[$orderBy] ?? 0;
+    //             $valB = $bData[$orderBy] ?? 0;
+    //             return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
+    //         });
+    //     }
+
+
+    //     //ALL ROW EVEN IF VARIETY AND LOCATION SAME
+    //     $filteredTrials = [];
+    //     foreach ($allTrials as $trial) {
+    //         $jsonData = json_decode($trial['variable'], true);
+    //         $traitVal = $jsonData[$traitName] ?? null;
+    //         if (!empty($traitVal) || $traitVal == 0) {
+    //             $trial['trait_value'] = $traitVal;
+    //             $filteredTrials[] = $trial;
+    //         }
+    //     }
+    //     //AVARAGE IF VARIETY AND LOCATION SAME
+    //     // $groupedData = [];
+    //     // foreach ($allTrials as $trial) {
+    //     //     $jsonData = json_decode($trial['variable'], true);
+    //     //     $traitVal = $jsonData[$traitName] ?? null;
+
+    //     //     if ($traitVal !== null && $traitVal !== '' && is_numeric($traitVal)) {
+    //     //         $key = $trial['short_name'] . '||' . $trial['location'];
+    //     //         if (!isset($groupedData[$key])) {
+    //     //             $groupedData[$key] = [
+    //     //                 'short_name' => $trial['short_name'],
+    //     //                 'location' => $trial['location'],
+    //     //                 'location_code' => $trial['location_code'],
+    //     //                 'values' => []
+    //     //             ];
+    //     //         }
+    //     //         $groupedData[$key]['values'][] = floatval($traitVal);
+    //     //     }
+    //     // }
+
+    //     // $filteredTrials = [];
+    //     // foreach ($groupedData as $item) {
+    //     //     $avg = count($item['values']) > 0 ? array_sum($item['values']) / count($item['values']) : null;
+    //     //     $item['trait_value'] = number_format($avg, 2, '.', '');
+    //     //     $filteredTrials[] = $item;
+    //     // }
+
+    //     $totalRecords = count($filteredTrials);
+    //     $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
+    //     $html = "<table class='table table-bordered table-striped'>
+    //         <thead class='table-light'>
+    //         <tr>
+    //             <th scope='col'>Variety</th>
+    //             <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
+    //             <th scope='col' class='sortable' data-field='" . htmlspecialchars($traitName) . "'>
+    //                 <div class='d-flex justify-content-between align-items-center'>
+    //                     <span>" . htmlspecialchars($traitName) . "</span>
+    //                     <span class='sort-icons'>
+    //                         <i class='bi bi-caret-up-fill sort-icon " . (!empty($orderBy) &&  $orderDir === 'asc' ? 'text-primary' : '') . "' data-dir='asc' title='Sort Asc'></i>
+    //                         <i class='bi bi-caret-down-fill sort-icon " . (!empty($orderBy) && $orderDir === 'desc' ? 'text-primary' : '') . "' data-dir='desc' title='Sort Desc'></i>
+    //                     </span>
+    //                 </div>
+    //             </th>
+    //         </tr>
+    //         </thead>
+    //         <tbody>";
+
+    //     // Step 1: Collect trait values for classification
+    //     $traitValues = array_column($filteredTrials, 'trait_value');
+    //     $numericTraitValues = array_filter($traitValues, 'is_numeric');
+
+    //     // Step 1: Collect and sort numeric trait values
+    //     $traitValues = array_column($filteredTrials, 'trait_value');
+    //     $numericTraitValues = array_filter($traitValues, 'is_numeric');
+    //     sort($numericTraitValues);
+    //     $total = count($numericTraitValues);
+
+    //     $p10 = getPercentile($numericTraitValues, 10);
+    //     $p30 = getPercentile($numericTraitValues, 30);
+    //     $p70 = getPercentile($numericTraitValues, 70);
+    //     $p90 = getPercentile($numericTraitValues, 90);
+
+    //     $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
+    //     foreach ($paginatedTrials as $value) {
+    //         $traitVal = floatval($value['trait_value']);
+    //         $bgColor = getTraitColorByPercentile($traitVal, $p10, $p30, $p70, $p90);
+    //         $color = $bgColor == '#ffff00' ? 'black' : 'white';
+
+    //         $html .= "<tr>
+    //             <td>" . htmlspecialchars($value['short_name']) . "</td>
+    //             <td data-bs-toggle='tooltip' title='". htmlspecialchars($value['location'])."'>" . htmlspecialchars($value['location_code']) . "</td>
+    //             <td style='background-color: " . $bgColor . "; color:" . $color . ";'>" . htmlspecialchars(empty($value['trait_value']) ? '-' : $value['trait_value']) . "</td>
+    //         </tr>";
+    //     }
+
+    //     $html .= "</tbody></table>";
+
+    //     echo json_encode([
+    //         'success' => 1,
+    //         'html' => $html,
+    //         'total_records' => $totalRecords,
+    //         'current_page' => $page,
+    //         'per_page' => $perPage,
+    //         'order_by' => $orderBy,
+    //         'order_dir' => $orderDir
+    //     ]);
+    //     exit;
+    // }
+
     public function getLocationData()
     {
         $varieties = $this->request->getPost('varieties');
@@ -1040,32 +1279,23 @@ class CropController extends BaseController
         $insecticides = $this->request->getPost('insecticides') ?? [];
         $brand = $this->request->getPost('brand') ?? [];
 
-
         $offset = ($page - 1) * $perPage;
-        if (empty($traitName)) {
+        if (empty($traitName) || empty($locations)) {
             echo json_encode([
                 'success' => 2,
                 'html' => "<table class='table table-bordered table-striped'>
-                    <thead class='table-light'>
+                <tbody>
                     <tr>
-                        <th scope='col'>Variety</th>
-                        <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
-                        <th scope='col' class='sortable'>-</th>
+                        <td colspan='3' class='text-center'>Please select a trait & location(s)</td>
                     </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan='3' class='text-center'>Please select a trait</td>
-                        </tr>
-                    </tbody>
-                </table>"
+                </tbody>
+            </table>"
             ]);
             return;
         }
 
-
         $trialDataQuery = $this->trialDataModel
-            ->select('varieties.short_name, trial_data.variable, trial_data.location, trial_data.location_code')
+            ->select('trial_data.id, varieties.short_name, trial_data.variable, trial_data.location, trial_data.location_code')
             ->where('trial_data.crop_id', $crop_id)
             ->join('varieties', 'varieties.code = trial_data.variety_code', 'left');
 
@@ -1079,13 +1309,13 @@ class CropController extends BaseController
 
         if (!empty($locations)) {
             $trialDataQuery->whereIn('trial_data.location', $locations);
-        } 
-        
+        }
+
         if (!empty($trialTypes)) {
             $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
         }
 
-        if(!empty($years)){
+        if (!empty($years)) {
             $trialDataQuery->whereIn('trial_data.year', $years);
         }
 
@@ -1136,100 +1366,78 @@ class CropController extends BaseController
             });
         }
 
-        if (!empty($orderBy) && $orderBy === $traitName) {
-            usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
-                $aData = json_decode($a['variable'], true);
-                $bData = json_decode($b['variable'], true);
-                $valA = $aData[$orderBy] ?? 0;
-                $valB = $bData[$orderBy] ?? 0;
-                return $orderDir === 'desc' ? $valB <=> $valA : $valA <=> $valB;
-            });
-        }
-
-
-        //ALL ROW EVEN IF VARIETY AND LOCATION SAME
-        // $filteredTrials = [];
-        // foreach ($allTrials as $trial) {
-        //     $jsonData = json_decode($trial['variable'], true);
-        //     $traitVal = $jsonData[$traitName] ?? null;
-        //     if (!empty($traitVal) || $traitVal == 0) {
-        //         $trial['trait_value'] = $traitVal;
-        //         $filteredTrials[] = $trial;
-        //     }
-        // }
-        //AVARAGE IF VARIETY AND LOCATION SAME
-        $groupedData = [];
+        $filteredTrials = [];
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
             $traitVal = $jsonData[$traitName] ?? null;
-
-            if ($traitVal !== null && $traitVal !== '' && is_numeric($traitVal)) {
-                $key = $trial['short_name'] . '||' . $trial['location'];
-                if (!isset($groupedData[$key])) {
-                    $groupedData[$key] = [
-                        'short_name' => $trial['short_name'],
-                        'location' => $trial['location'],
-                        'location_code' => $trial['location_code'],
-                        'values' => []
-                    ];
-                }
-                $groupedData[$key]['values'][] = floatval($traitVal);
+            if (!empty($traitVal) || $traitVal === 0 || $traitVal === "0") {
+                $trial['trait_value'] = $traitVal;
+                $filteredTrials[] = $trial;
             }
         }
 
-        $filteredTrials = [];
-        foreach ($groupedData as $item) {
-            $avg = count($item['values']) > 0 ? array_sum($item['values']) / count($item['values']) : null;
-            $item['trait_value'] = number_format($avg, 2, '.', '');
-            $filteredTrials[] = $item;
+        $locationModel = new Location();
+        $locationCodes = $locationModel->select('location,code')->whereIn('location', $locations)->findAll();
+        $locationWithCodes = [];
+        foreach ($locationCodes as $k => $v) {
+            $codes[] = $v['code'];
+            $locationWithCodes[$v['code']] = $v['location'];
+        }
+        $locationHeaders = $codes ?? [];
+
+        foreach ($filteredTrials as $trial) {
+            $locCode = $trial['location_code'];
+            if (!in_array($locCode, $locationHeaders)) {
+                $locationHeaders[] = $locCode;
+            }
+            $val = $trial['trait_value'];
+            if (is_numeric($val)) {
+                $traitValues[] = floatval($val);
+            }
         }
 
-        $totalRecords = count($filteredTrials);
-        $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
+        sort($traitValues);
+        $p10 = getPercentile($traitValues, 10);
+        $p30 = getPercentile($traitValues, 30);
+        $p70 = getPercentile($traitValues, 70);
+        $p90 = getPercentile($traitValues, 90);
+
+        $varietyData = [];
+        foreach ($filteredTrials as $trial) {
+            $variety = $trial['short_name'];
+            $location = $trial['location_code'];
+            $value = $trial['trait_value'];
+
+            if (!isset($varietyData[$variety])) {
+                $varietyData[$variety] = [];
+            }
+            $varietyData[$variety][$location]['value'] = $value;
+            $varietyData[$variety][$location]['id'] = $trial['id'];
+        }
+
         $html = "<table class='table table-bordered table-striped'>
-            <thead class='table-light'>
+        <thead class='table-light'>
             <tr>
-                <th scope='col'>Variety</th>
-                <th scope='col' data-bs-toggle='tooltip' title='Location'>Loc ID</th>
-                <th scope='col' class='sortable' data-field='" . htmlspecialchars($traitName) . "'>
-                    <div class='d-flex justify-content-between align-items-center'>
-                        <span>" . htmlspecialchars($traitName) . "</span>
-                        <span class='sort-icons'>
-                            <i class='bi bi-caret-up-fill sort-icon " . (!empty($orderBy) &&  $orderDir === 'asc' ? 'text-primary' : '') . "' data-dir='asc' title='Sort Asc'></i>
-                            <i class='bi bi-caret-down-fill sort-icon " . (!empty($orderBy) && $orderDir === 'desc' ? 'text-primary' : '') . "' data-dir='desc' title='Sort Desc'></i>
-                        </span>
-                    </div>
-                </th>
-            </tr>
-            </thead>
-            <tbody>";
+                <th>Variety</th>";
+        foreach ($locationHeaders as $loc) {
+            $html .= "<th data-bs-toggle='tooltip' title='" . ($locationWithCodes[$loc] ?? '') . "'>" . htmlspecialchars($loc) . "</th>";
+        }
+        $html .= "</tr></thead><tbody>";
 
-        // Step 1: Collect trait values for classification
-        $traitValues = array_column($filteredTrials, 'trait_value');
-        $numericTraitValues = array_filter($traitValues, 'is_numeric');
+        $paginatedVarieties = array_slice($varietyData, $offset, $perPage, true);
 
-        // Step 1: Collect and sort numeric trait values
-        $traitValues = array_column($filteredTrials, 'trait_value');
-        $numericTraitValues = array_filter($traitValues, 'is_numeric');
-        sort($numericTraitValues);
-        $total = count($numericTraitValues);
+        foreach ($paginatedVarieties as $variety => $locValues) {
+            $html .= "<tr><td >" . htmlspecialchars($variety) . "</td>";
+            foreach ($locationHeaders as $loc) {
+                $val = $locValues[$loc]['value'] ?? null;
+                $display = $val === null ? '-' : $val;
+                $bgColor = is_numeric($val) ? getTraitColorByPercentile(floatval($val), $p10, $p30, $p70, $p90) : '';
+                $color = $bgColor === '#ffff00' ? 'black' : 'white';
+                $style = $bgColor ? "style='background-color: $bgColor; color: $color;'" : '';
 
-        $p10 = getPercentile($numericTraitValues, 10);
-        $p30 = getPercentile($numericTraitValues, 30);
-        $p70 = getPercentile($numericTraitValues, 70);
-        $p90 = getPercentile($numericTraitValues, 90);
-
-        $paginatedTrials = array_slice($filteredTrials, $offset, $perPage);
-        foreach ($paginatedTrials as $value) {
-            $traitVal = floatval($value['trait_value']);
-            $bgColor = getTraitColorByPercentile($traitVal, $p10, $p30, $p70, $p90);
-            $color = $bgColor == '#ffff00' ? 'black' : 'white';
-
-            $html .= "<tr>
-                <td>" . htmlspecialchars($value['short_name']) . "</td>
-                <td data-bs-toggle='tooltip' title='". htmlspecialchars($value['location'])."'>" . htmlspecialchars($value['location_code']) . "</td>
-                <td style='background-color: " . $bgColor . "; color:" . $color . ";'>" . htmlspecialchars(empty($value['trait_value']) ? '-' : $value['trait_value']) . "</td>
-            </tr>";
+                $html .= "<td $style class='show_trial_data' data-id='" . $locValues[$loc]['id'] . "'>" . htmlspecialchars($display) . "</td>";
+            }
+            $html .= "</tr>";
         }
 
         $html .= "</tbody></table>";
@@ -1237,7 +1445,7 @@ class CropController extends BaseController
         echo json_encode([
             'success' => 1,
             'html' => $html,
-            'total_records' => $totalRecords,
+            'total_records' => count($varietyData),
             'current_page' => $page,
             'per_page' => $perPage,
             'order_by' => $orderBy,
@@ -1245,6 +1453,7 @@ class CropController extends BaseController
         ]);
         exit;
     }
+
 
     public function avarageMap($slug)
     {
@@ -1319,5 +1528,37 @@ class CropController extends BaseController
         });
 
         return $response;
+    }
+
+    public function getTrialData($id)
+    {
+        $trialData = $this->trialDataModel
+            ->select('varieties.short_name, trial_data.location, varieties.brand, trial_types.name, states.name as state')
+            ->join('varieties', 'varieties.code=trial_data.variety_code', 'left')
+            ->join('trial_types', 'trial_types.id=trial_data.trial', 'left')
+            ->join('states', 'states.code=trial_data.state_code', 'left')
+            ->where('trial_data.id', $id)
+            ->find();
+        $html = '<table class="table table-bordered table-striped" style="border: 0;"><tbody><tr><td class="text-center">No record found.</td></tr></tbody></table>';
+        if ($trialData) {
+            $html = '<table class="table table-bordered table-striped" style="border: 0;"><tbody>';
+            $trialData = $trialData[0];
+            $heading = [
+                'location' => 'Location',
+                'short_name' => 'Variety',
+                'brand' => 'Brand',
+                'name' => 'Maturity',
+                'state' => 'State'
+            ];
+            foreach ($trialData as $key => $value) {
+                $html .= '<tr>
+                <td>' . ($heading[$key] ?? '') . '</td>
+                <td>' . $value . '</td>
+                <tr>';
+            }
+            $html .= '<tbody></table>';
+        }
+        echo json_encode(['success' => 1, 'html' => $html]);
+        exit;
     }
 }

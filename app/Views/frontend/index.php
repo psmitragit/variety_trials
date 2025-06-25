@@ -18,7 +18,7 @@
                             <div class="card-body bg-light">
                                 <h5 class="card-title fw-bold"><?= esc($l['name'] ?? 'Crop') ?></h5>
                                 <div class="d-flex gap-2 justify-content-center align-items-center">
-                                    <a href="<?= base_url($l['slug'] . "/average-map") ?>" class="btn btn-outline-dark p-2">Avarage</a>
+                                    <a href="<?= base_url($l['slug'] . "/average-map") ?>" class="btn btn-outline-dark p-2">Average</a>
                                     <a href="<?= base_url($l['slug'] . "/location-map") ?>" class="btn btn-outline-dark p-2">Location</a>
                                 </div>
 

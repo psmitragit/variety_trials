@@ -34,12 +34,27 @@ Documents
         <div id="document-container">
         </div>
     </div>
-    <div class="col-9" id="document-preview">
-        <object class="objs" data="" type="">
-            <embed src="" type="">
-        </object>
-    </div>
     <!-- <div class="col-10"></div> -->
+</div>
+<div class="modal fade" id="documentPreviewModal" tabindex="-1" aria-labelledby="sitemapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="showDataCustomModalLabel">Document Preview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="height: 70vh;">
+                <div class="col-9" id="document-preview" style="width: 100%; height: 100%;">
+                    <object class="objs" data="" type="">
+                        <embed src="" type="">
+                    </object>
+                </div>
+            </div>
+            <div class="my-3 d-flex justify-content-center">
+                <button class="btn btn-success m-auto" style="max-width: 250px;" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 <?= $this->endSection() ?>
 
@@ -153,7 +168,9 @@ Documents
         function setPdfUrl(url) {
             $('#document-preview embed').attr('src', '/' + url)
             $('#document-preview object').attr('data', '/' + url)
-            url == "" ? $('#document-preview').hide() : $('#document-preview').show()
+            if (url != '') {
+                $('#documentPreviewModal').modal('show');
+            }
         }
 
     });

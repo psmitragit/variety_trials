@@ -16,6 +16,19 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="mt-1 mb-3">
+                <select id="sLocation" class="form-select mb-3 px-3 select2 filter-input" multiple data-placeholder="Select Location(s)">
+                    <?php foreach ($locations as $value) : ?>
+                        <option value="<?= addslashes($value['code']) ?>"><?= addslashes($value['location']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mt-1 mb-3">
+                <p>
+                    <i class="me-2 fas fa-circle-question"></i><strong>Instruction:</strong> Click the map marker to select a location. To remove a selected location, simply click the map marker again. You can also choose a location from the dropdown above. After selecting and reviewing your location, click "Next" to proceed.
+                </p>
+            </div>
+
         </div>
     </div>
     <div class="col-12 mt-4 d-none" id="map-loader-wrapper">
@@ -166,6 +179,11 @@
         li.textContent = locationName;
         li.dataset.location = locationCode;
         ul.appendChild(li);
+        let locationvalue = $('#sLocation').val();
+        if ($.inArray(locationCode, locationvalue) < 0) {
+            locationvalue.push(locationCode);
+            $('#sLocation').val(locationvalue).trigger('change');
+        }
         updateHiddenInput();
     }
 
@@ -177,6 +195,12 @@
                 ul.removeChild(li);
             }
         });
+        let locationvalue = $('#sLocation').val();
+        let index = $.inArray(locationCode, locationvalue);
+        if (index >= 0) {
+            locationvalue.splice(index, 1);
+            $('#sLocation').val(locationvalue).trigger('change');
+        }
         updateHiddenInput();
     }
 
@@ -186,11 +210,34 @@
         document.getElementById('selected_locations_input').value = selected.join('~');
     }
 
+    function addUpdateSelectedList() {
+        $('#selected_location_list').html('');
+        $('#selected_locations_input').val('');
+        $.each($('#sLocation').val(), function(e, val) {
+            let location = $('#sLocation').find('option[value="' + val + '"]').text();
+            addToSelectedList(location, val);
+        });
+        coordinates.forEach((coord) => {
+            coord.selected = false;
+            coord.marker.setIcon('<?= base_url("frontend/img/map/red.png") ?>');
+        });
+        coordinates.forEach((coord) => {
+            if ($('#selected_locations_input').val().indexOf(coord.code) >= 0) {
+                coord.selected = true;
+                coord.marker.setIcon('<?= base_url("frontend/img/map/green.png") ?>');
+            }
+        });
+    }
+
     window.addEventListener('load', function() {
         $('#sState').val('').trigger('change');
         $('#sState').on('change', function() {
             updateLocationSelect();
         })
+
+        $('#sLocation').on('change', function() {
+            addUpdateSelectedList();
+        });
 
         function updateLocationSelect() {
             let states = $('#sState').val();
@@ -211,7 +258,7 @@
                         console.log(error);
                         return;
                     }
-
+                    let html = '';
                     if (res.location) {
                         coordinates = [];
                         $.each(res.location, function(index, loc) {
@@ -221,8 +268,10 @@
                                 location: loc.location,
                                 code: loc.code
                             });
-                            initMap();
+                            html += `<option value="${loc.code}">${loc.location}</option>`;
                         });
+                        initMap();
+                        // $('#sLocation').html(html).trigger('change');
                     }
                 },
                 beforeSend: function() {

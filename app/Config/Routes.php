@@ -36,11 +36,12 @@ $routes->get('(:segment)/average', [CropController::class, 'avarage']);
 $routes->get('(:segment)/average-map', [CropController::class, 'avarageMap']);
 $routes->get('(:segment)/location', [CropController::class, 'location']);
 $routes->get('(:segment)/location-map', [CropController::class, 'locationMap']);
-$routes->post('get-avarage', [CropController::class, 'getAvarage']);
+$routes->post('get-average', [CropController::class, 'getAvarage']);
 $routes->post('get-location-data', [CropController::class, 'getLocationData']);
 $routes->post('get-locations-by-state', [CropController::class, 'get_locations_by_state']);
 $routes->post('get-location-data-by-state', [CropController::class, 'get_location_data_by_state']);
 $routes->get('download-temp-file/(:segment)', [CropController::class, 'downloadCsv']);
+$routes->get('get-trial-data/(:segment)', [CropController::class, 'getTrialData']);
 
 
 /*
