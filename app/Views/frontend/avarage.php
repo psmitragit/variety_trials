@@ -539,14 +539,14 @@
             let html = '<nav><ul class="pagination mb-0">';
 
             html += `<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="getVarietyData(${currentPage - 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-left"></i></a>
+                        <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${currentPage - 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-left"></i></a>
                     </li>`;
 
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 4);
 
             if (startPage > 1) {
-                html += `<li class="page-item"><a class="page-link" href="#" onclick="getVarietyData(1, '${orderBy}', '${orderDir}')">1</a></li>`;
+                html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="getVarietyData(1, '${orderBy}', '${orderDir}')">1</a></li>`;
                 if (startPage > 2) {
                     html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
                 }
@@ -554,7 +554,7 @@
 
             for (let i = startPage; i <= endPage; i++) {
                 html += `<li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="getVarietyData(${i}, '${orderBy}', '${orderDir}')">${i}</a>
+                            <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${i}, '${orderBy}', '${orderDir}')">${i}</a>
                         </li>`;
             }
 
@@ -562,12 +562,12 @@
                 if (endPage < totalPages - 1) {
                     html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
                 }
-                html += `<li class="page-item"><a class="page-link" href="#" onclick="getVarietyData(${totalPages}, '${orderBy}', '${orderDir}')">${totalPages}</a></li>`;
+                html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${totalPages}, '${orderBy}', '${orderDir}')">${totalPages}</a></li>`;
             }
 
             // Next button
             html += `<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="getVarietyData(${currentPage + 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-right"></i></a>
+                        <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${currentPage + 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-right"></i></a>
                     </li>`;
 
             html += '</ul></nav>';

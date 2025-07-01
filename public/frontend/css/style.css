@@ -532,3 +532,18 @@ object.objs {
   background-color: #4f772d;
   color: #fff !important;
 }
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #fff !important;
+  z-index: 2;
+  /* Needed to stay above other cells */
+}
+
+
+thead .sticky-col {
+  z-index: 3;
+  /* Higher than tbody cells */
+  background: #fff;
+}

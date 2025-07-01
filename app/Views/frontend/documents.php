@@ -67,7 +67,8 @@ Documents
             minViewMode: "years",
             container: 'div#datepicker1',
             title: "From Year",
-            setStartDate: "<?= date('Y', strtotime('-2 years')) ?>"
+            setStartDate: "<?= date('Y', strtotime('-2 years')) ?>",
+            endDate: "<?= $maxYear ?>",
         }).on('changeDate', function(selected) {
             startDate = $("#from").val();
             $('#to').datepicker('setStartDate', startDate);
@@ -82,7 +83,8 @@ Documents
             minViewMode: "years",
             container: 'div#datepicker2',
             title: "To Year",
-            setStartDate: "<?= date('Y') ?>"
+            setStartDate: "<?= date('Y') ?>",
+            endDate: "<?= $maxYear ?>",
         }).on('hide', function() {
 
         });

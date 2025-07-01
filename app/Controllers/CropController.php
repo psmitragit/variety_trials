@@ -167,11 +167,11 @@ class CropController extends BaseController
         // $locations = $this->trialDataModel->select('location')->where('crop_id', $cropId)->whereIn('state_code', $states)->orderBy('location', 'asc')->groupBy('location')->distinct()->findAll();
         $locationModel = new Location();
         $locations = $locationModel->select('locations.location')
-        ->whereIn('locations.state_code', $states)
-        ->join('trial_data', 'trial_data.location_code=locations.code')
-        ->groupBy('locations.location')
-        ->distinct()
-        ->findAll();
+            ->whereIn('locations.state_code', $states)
+            ->join('trial_data', 'trial_data.location_code=locations.code')
+            ->groupBy('locations.location')
+            ->distinct()
+            ->findAll();
         echo json_encode(['success' => 1, 'location' => $locations]);
         exit;
     }
@@ -468,7 +468,9 @@ class CropController extends BaseController
     public function documents()
     {
         $states = $this->stateModel->findAll();
-        return \view('frontend/documents', compact('states'));
+        $maxYear = $this->uploadModel->select('MAX(year) as year')->find();
+        $maxYear = $maxYear[0]['year'] ??date('Y');
+        return \view('frontend/documents', compact('states', 'maxYear'));
     }
 
     public function getDocuments()
@@ -932,7 +934,7 @@ class CropController extends BaseController
         $html = "<table class='table table-bordered table-striped'>
         <thead class='table-light'>
         <tr>
-            <th scope='col' style='padding-bottom:0px;'>
+            <th scope='col' style='padding-bottom:0px;' class='sticky-col'>
                 <div class='d-flex justify-content-between align-items-center'>
                     <span>Variety</span>
                 </div>
@@ -960,7 +962,7 @@ class CropController extends BaseController
         </th>";
         }
 
-        $html .= "</tr><tr><th style='padding-top:0px;'></th><th style='padding-top:0px;'></th>";
+        $html .= "</tr><tr><th style='padding-top:0px;' class='sticky-col'></th><th style='padding-top:0px;'></th>";
 
         foreach ($numericFilters as $field) {
             $avg = $averages[$field] ?? 0;
@@ -973,7 +975,7 @@ class CropController extends BaseController
         foreach ($paginatedTrials as $value) {
             try {
                 $html .= "<tr>";
-                $html .= "<td>" . htmlspecialchars($value['short_name']) . "</td>";
+                $html .= "<td class='sticky-col'>" . htmlspecialchars($value['short_name']) . "</td>";
                 $html .= "<td>" . htmlspecialchars($value['year']) . "</td>";
                 $jsonData = json_decode($value['variable'], true);
 
@@ -1263,11 +1265,12 @@ class CropController extends BaseController
         $traitName = $this->request->getPost('trait_name');
         $page = (int) $this->request->getPost('page');
         $perPage = (int) $this->request->getPost('per_page');
-        $orderBy = $this->request->getPost('order_by') ?? '';
-        $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
-        $orderBy = $orderBy == "maturity_dap" ? 'Maturity (DAP)' : $orderBy;
         $states = $this->request->getPost('states');
         $years = $this->request->getPost('years');
+
+        $orderBy = $this->request->getPost('order_by') ?? '';
+        $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
+        $newOrder = $orderDir == 'desc' ? 'asc' : 'desc';
 
         $variables = $this->request->getPost('veriables');
         try {
@@ -1415,19 +1418,59 @@ class CropController extends BaseController
             $varietyData[$variety][$location]['id'] = $trial['id'];
         }
 
-        $html = "<table class='table table-bordered table-striped'>
-        <thead class='table-light'>
-            <tr>
-                <th>Variety</th>";
+        if (!empty($orderBy)) {
+            uasort($varietyData, function ($a, $b) use ($orderBy, $orderDir) {
+                $valA = $a[$orderBy]['value'] ?? null;
+                $valB = $b[$orderBy]['value'] ?? null;
+
+                $valA = is_numeric($valA) ? floatval($valA) : null;
+                $valB = is_numeric($valB) ? floatval($valB) : null;
+
+                if ($valA === null && $valB === null) return 0;
+
+                if ($valA === null) return 1;
+                if ($valB === null) return -1;
+
+                return $orderDir === 'asc'
+                    ? $valA <=> $valB
+                    : $valB <=> $valA;
+            });
+        }
+
+        $locationAverages = [];
         foreach ($locationHeaders as $loc) {
-            $html .= "<th data-bs-toggle='tooltip' title='" . ($locationWithCodes[$loc] ?? '') . "'>" . htmlspecialchars($loc) . "</th>";
+            $sum = 0;
+            $count = 0;
+            foreach ($varietyData as $var) {
+                if (isset($var[$loc]['value']) && is_numeric($var[$loc]['value'])) {
+                    $sum += floatval($var[$loc]['value']);
+                    $count++;
+                }
+            }
+            $locationAverages[$loc] = $count > 0 ? round($sum / $count, 2) : null;
+        }
+
+        $html = "<table class='table table-bordered table-striped'>
+        <thead class='table-light  variety-table'>
+            <tr>
+                <th class='sticky-col'>Variety</th>";
+        foreach ($locationHeaders as $loc) {
+            $active1 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'asc') ? 'text-primary' : '';
+            $active2 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'desc') ? 'text-primary' : '';
+            $avg = $locationAverages[$loc] !== null ? " (" . $locationAverages[$loc] . ")" : "";
+            $html .= "<th data-bs-toggle='tooltip' title='" . ($locationWithCodes[$loc] ?? '') . "' class='sortable' data-field='" . htmlspecialchars($loc) . "'>" . htmlspecialchars($loc) . $avg . "
+                <span class=\"sort-icons\">
+                    <i class=\"bi bi-caret-up-fill sort-icon ". $active1." \" data-dir=\"asc\" title=\"Sort Asc\"></i>
+                    <i class=\"bi bi-caret-down-fill sort-icon ". $active2 ."\" data-dir=\"desc\" title=\"Sort Desc\"></i>
+                </span>
+                </th>";
         }
         $html .= "</tr></thead><tbody>";
 
         $paginatedVarieties = array_slice($varietyData, $offset, $perPage, true);
 
         foreach ($paginatedVarieties as $variety => $locValues) {
-            $html .= "<tr><td >" . htmlspecialchars($variety) . "</td>";
+            $html .= "<tr><td class='variety_cell sticky-col'>" . htmlspecialchars($variety) . "</td>";
             foreach ($locationHeaders as $loc) {
                 $val = $locValues[$loc]['value'] ?? null;
                 $display = $val === null ? '-' : $val;
@@ -1435,7 +1478,8 @@ class CropController extends BaseController
                 $color = $bgColor === '#ffff00' ? 'black' : 'white';
                 $style = $bgColor ? "style='background-color: $bgColor; color: $color;'" : '';
 
-                $html .= "<td $style class='show_trial_data' data-id='" . $locValues[$loc]['id'] . "'>" . htmlspecialchars($display) . "</td>";
+                $dataId = $locValues[$loc]['id'] ?? '';
+                $html .= "<td $style class='show_trial_data' data-id='" . htmlspecialchars($dataId) . "'>" . htmlspecialchars($display) . "</td>";
             }
             $html .= "</tr>";
         }

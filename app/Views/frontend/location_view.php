@@ -332,6 +332,11 @@
                             <button class="btn btn-outline-secondary w-50 d-none">Quick Picks</button>
                         </div>
                     </div>
+                    <div class="row">
+                        <p>
+                            <i class="me-2 fas fa-circle-question"></i><strong>Instruction:</strong> Hover over each location header to view the full location name.
+                        </p>
+                    </div>
 
                     <div id="table-content" style="overflow: auto;">
                     </div>
@@ -459,6 +464,22 @@
                 }
                 window.location.href = url;
             });
+            $(document).on('click', '.variety_cell', function() {
+                let thHeadings = $('.variety-table th');
+                let tds = $(this).parent('tr').find('td');
+                let html = '<table class="table table-bordered table-striped">';
+                let key = 0;
+                thHeadings.each(function() {
+                    if (key == 0) {
+                        html += `<tr><td><strong>Locations</strong></td><td><strong>Trait values (${$(tds[key++]).text()})</strong></td>`;
+                    } else {
+                        html += `<tr><td>${$(this).data('bs-original-title')} (${$(this).text()})</td><td>${$(tds[key++]).html()}</td>`;
+                    }
+                });
+                $('#showDataCustomModal .modal-body').html(html);
+                $('#showDataCustomModal').modal('show');
+            });
+
             //range 
             document.querySelectorAll('.range_container').forEach(container => {
                 const fromSlider = container.querySelector('.fromSlider');
@@ -656,14 +677,14 @@
             let html = '<nav><ul class="pagination mb-0">';
 
             html += `<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="getVarietyData(${currentPage - 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-left"></i></a>
+                        <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${currentPage - 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-left"></i></a>
                     </li>`;
 
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 4);
 
             if (startPage > 1) {
-                html += `<li class="page-item"><a class="page-link" href="#" onclick="getVarietyData(1, '${orderBy}', '${orderDir}')">1</a></li>`;
+                html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="getVarietyData(1, '${orderBy}', '${orderDir}')">1</a></li>`;
                 if (startPage > 2) {
                     html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
                 }
@@ -671,7 +692,7 @@
 
             for (let i = startPage; i <= endPage; i++) {
                 html += `<li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="getVarietyData(${i}, '${orderBy}', '${orderDir}')">${i}</a>
+                            <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${i}, '${orderBy}', '${orderDir}')">${i}</a>
                         </li>`;
             }
 
@@ -679,11 +700,11 @@
                 if (endPage < totalPages - 1) {
                     html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
                 }
-                html += `<li class="page-item"><a class="page-link" href="#" onclick="getVarietyData(${totalPages}, '${orderBy}', '${orderDir}')">${totalPages}</a></li>`;
+                html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${totalPages}, '${orderBy}', '${orderDir}')">${totalPages}</a></li>`;
             }
 
             html += `<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="getVarietyData(${currentPage + 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-right"></i></a>
+                        <a class="page-link" href="javascript:void(0);" onclick="getVarietyData(${currentPage + 1}, '${orderBy}', '${orderDir}')"><i class="ti ti-angle-double-right"></i></a>
                     </li>`;
 
             html += '</ul></nav>';
@@ -705,7 +726,7 @@
                     url: "<?= base_url('get-trial-data/') ?>" + id,
                     success: function(res) {
                         res = JSON.parse(res);
-                        if(res.success){
+                        if (res.success) {
                             $('#showDataCustomModal .modal-body').html(res.html);
                             $('#showDataCustomModal').modal('show');
                         }
