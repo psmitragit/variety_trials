@@ -163,3 +163,19 @@ function getPercentile($sorted, $percent) {
     if ($floor == $ceil) return $sorted[$floor];
     return $sorted[$floor] + ($sorted[$ceil] - $sorted[$floor]) * ($index - $floor);
 }
+
+function check_blank($txt){
+    if($txt == ''){
+        return true;
+    }
+
+    if($txt == 0){
+        return false;
+    }
+
+    if(empty($txt)){
+        return true;
+    }
+
+    return false;
+}

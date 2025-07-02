@@ -62,8 +62,8 @@
                                     </label>
                                     <div class="range_container">
                                         <div class="sliders_control">
-                                            <input class="fromSlider filter-range2" data-name="avarage_temparature" type="range" value="0" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="9999" data-type="avg_temp" />
-                                            <input class="toSlider" type="range" value="<?= $locationResult['min_temp'] ?>" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="999" data-type="avg_temp" />
+                                            <input class="fromSlider filter-range2" data-name="avarage_temparature" type="range" value="0" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="9999" data-type="avg_temp" data-inp="avarage_temparature_min" />
+                                            <input class="toSlider" type="range" value="<?= $locationResult['min_temp'] ?>" min="<?= $locationResult['min_temp'] ?>" max="<?= $locationResult['max_temp'] ?>" data-key="999" data-type="avg_temp" data-inp="avarage_temparature_max" />
                                         </div>
                                         <div class="row align-items-center">
                                             <div class="col-6 text-start">
@@ -83,8 +83,8 @@
                                     </label>
                                     <div class="range_container">
                                         <div class="sliders_control">
-                                            <input class="fromSlider filter-range2" data-name="avarage_percipitation" type="range" value="0" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="9999" data-type="avg_percip" />
-                                            <input class="toSlider" type="range" value="<?= $locationResult['min_precip'] ?>" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="1000" data-type="avg_percip" />
+                                            <input class="fromSlider filter-range2" data-name="avarage_percipitation" type="range" value="0" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="9999" data-type="avg_percip" data-inp="avarage_percipitation_min" />
+                                            <input class="toSlider" type="range" value="<?= $locationResult['min_precip'] ?>" min="<?= $locationResult['min_precip'] ?>" max="<?= $locationResult['max_precip'] ?>" data-key="1000" data-type="avg_percip" data-inp="avarage_percipitation_max" />
                                         </div>
                                         <div class="row align-items-center">
                                             <div class="col-6 text-start">
@@ -306,15 +306,15 @@
                                 </label>
                                 <div class="range_container">
                                     <div class="sliders_control">
-                                        <input class="fromSlider filter-range rangeInput" data-name="<?= $key ?>" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" data-default="<?= $value['min'] ?>" />
-                                        <input class="toSlider rangeInput" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" data-default="<?= $value['min'] ?>" />
+                                        <input class="fromSlider filter-range rangeInput" data-name="<?= $key ?>" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" data-default="<?= $value['min'] ?>" data-inp="<?= $key ?>_min" />
+                                        <input class="toSlider rangeInput" type="range" value="<?= $value['min'] ?>" min="<?= $value['min'] ?>" max="<?= $value['max'] ?>" data-key="<?= $index ?>" data-type="<?= $key ?>" data-default="<?= $value['min'] ?>" data-inp="<?= $key ?>_max" />
                                     </div>
                                     <div class="row align-items-center">
                                         <div class="col-6 text-start">
                                             <label class="form-label fw-semibold m-0">Min</label>
                                             <input type="text" class="form-control fromInput rangeInput" value="<?= $value['min'] ?>" name="<?= $key ?>_min" data-default="<?= $value['min'] ?>" />
                                         </div>
-                                        <div class="col-6 text-end">
+                                        <div class=" col-6 text-end">
                                             <label class="form-label fw-semibold m-0">Max</label>
                                             <input type="text" name="<?= $key ?>_max" class="form-control text-end toInput rangeInput" value="<?= $value['min'] ?>" data-default="<?= $value['min'] ?>" />
                                         </div>
@@ -642,6 +642,7 @@
                     if (res.success == 1) {
                         $('#table-content').html(res.html);
                         generatePagination(res.total_records, res.per_page, res.current_page, res.order_by, res.order_dir);
+                        updateDropDowns(res);
                     } else if (res.success == 2) {
                         $('#table-content').html(res.html);
                         $('#pagination-links').html('');
@@ -664,6 +665,60 @@
                     }, 100);
                 }
             });
+        }
+
+        function updateDropDowns(res) {
+            updateSelectWithPreservedSelection('#production_practice', res.production_pratice_option_html);
+            updateSelectWithPreservedSelection('#waterManagement', res.water_management_option_html);
+            updateSelectWithPreservedSelection('#sBrands', res.brand_option_html);
+            updateSelectWithPreservedSelection('#sVarieties', res.variety_option_html);
+            updateSelectWithPreservedSelection('#trial_types', res.maturity_option_html);
+            updateSelectWithPreservedSelection('#herbicides', res.herbicide_option_html);
+            updateSelectWithPreservedSelection('#insecticides', res.insecticide_option_html);
+
+            // updateSliderMaxMinValue('avarage_temparature', res.lowest_temp, res.highest_temp);
+            // updateSliderMaxMinValue('avarage_percipitation', res.lowest_percep, res.highest_percep);
+            // updateSliderMaxMinValue($('#sTrait').val(), res.lowest_trait, res.highest_trait);
+        }
+
+        function updateSelectWithPreservedSelection(selector, newOptionsHtml) {
+            const $select = $(selector);
+            const currentVals = $select.val();
+            $select.html(newOptionsHtml);
+            if (currentVals && currentVals.length > 0) {
+                const validSelections = currentVals.filter(val => $select.find(`option[value="${val}"]`).length > 0);
+                $select.val(validSelections);
+            }
+
+            $select.trigger('change.select2');
+        }
+
+        function updateSliderMaxMinValue(name, newMin, newMax) {
+            if (name == undefined || name == '') {
+                return;
+            }
+            const $fromSlider = $(`.fromSlider[data-inp="${name}_min"]`);
+            const $toSlider = $(`.toSlider[data-inp="${name}_max"]`);
+
+            const $fromInput = $(`input[name="${name}_min"]`);
+            const $toInput = $(`input[name="${name}_max"]`);
+
+            let fromVal = parseFloat($fromSlider.val());
+            let toVal = parseFloat($toSlider.val());
+
+            if (fromVal > toVal)[fromVal, toVal] = [toVal, fromVal];
+
+            fromVal = Math.max(newMin, Math.min(fromVal, newMax));
+            toVal = Math.max(newMin, Math.min(toVal, newMax));
+
+            $fromSlider.attr('min', newMin).attr('max', newMax).val(fromVal);
+            $toSlider.attr('min', newMin).attr('max', newMax).val(toVal);
+
+
+            $fromInput.val(fromVal);
+            $toInput.val(toVal);
+            $fromSlider.trigger('input');
+            $toSlider.trigger('input');
         }
 
         function generatePagination(total, perPage, currentPage, orderBy, orderDir) {
