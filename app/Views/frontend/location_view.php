@@ -28,7 +28,16 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="  bg-gradient-primary shadow-primary border-radius-lg pt-3 pb-2">
                     <div class="row px-3 align-items-center">
-                        <h3 class="col-md-9 text-white text-capitalize ps-3"><?= $crop['name'] . " Location View" ?></h3>
+                        <div class="col-md-9">
+                            <h3 class="text-white text-capitalize ps-3">
+                                <?= $crop['name'] . " Location View" ?>
+                            </h3>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-md-end">
+                            <a href="<?= base_url($crop['slug'] . "/location-map") ?>" class="btn btn-primary" style="background: #2a3127 !important;">
+                                <i class="fa-solid fa-arrow-left me-2"></i> Go back
+                            </a>
+                        </div>
                     </div>
                 </div>
 
