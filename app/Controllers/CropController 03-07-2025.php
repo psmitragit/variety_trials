@@ -839,93 +839,6 @@ class CropController extends BaseController
             });
         }
 
-        if (!empty($years) || !empty($locations)) {
-            $validYearIds = null;
-            $validLocationIds = null;
-            if (!empty($years)) {
-                $years = array_map('strval', $years);
-                $yearWiseVarieties = [];
-
-                foreach ($allTrials as $trial) {
-                    $year = strval($trial['year']);
-                    $variety = $trial['variety_name'];
-                    $id = $trial['id'];
-
-                    if (!isset($yearWiseVarieties[$year])) {
-                        $yearWiseVarieties[$year] = [];
-                    }
-
-                    $yearWiseVarieties[$year][$variety] = $id;
-                }
-
-                $baseYear = $years[0];
-                $validYearIds = [];
-
-                foreach ($yearWiseVarieties[$baseYear] as $variety => $id) {
-                    $foundInAllYears = true;
-
-                    foreach ($years as $year) {
-                        if (!isset($yearWiseVarieties[$year][$variety])) {
-                            $foundInAllYears = false;
-                            break;
-                        }
-                    }
-
-                    if ($foundInAllYears) {
-                        foreach ($years as $year) {
-                            $validYearIds[] = $yearWiseVarieties[$year][$variety];
-                        }
-                    }
-                }
-            }
-            if (!empty($locations)) {
-                $locationWiseVarieties = [];
-                foreach ($allTrials as $trial) {
-                    $location = $trial['location'];
-                    $variety = $trial['variety_name'];
-                    $id = $trial['id'];
-                    if (!isset($locationWiseVarieties[$location])) {
-                        $locationWiseVarieties[$location] = [];
-                    }
-                    $locationWiseVarieties[$location][$variety] = $id;
-                }
-                $baseLocation = $locations[0];
-                $validLocationIds = [];
-                foreach ($locationWiseVarieties[$baseLocation] as $variety => $id) {
-                    $foundInAllLocations = true;
-                    foreach ($locations as $loc) {
-                        if (!isset($locationWiseVarieties[$loc][$variety])) {
-                            $foundInAllLocations = false;
-                            break;
-                        }
-                    }
-                    if ($foundInAllLocations) {
-                        foreach ($locations as $loc) {
-                            $validLocationIds[] = $locationWiseVarieties[$loc][$variety];
-                        }
-                    }
-                }
-            }
-            if ($validYearIds !== null && $validLocationIds !== null) {
-                $finalValidIds = array_intersect($validYearIds, $validLocationIds);
-            } elseif ($validYearIds !== null) {
-                $finalValidIds = $validYearIds;
-            } elseif ($validLocationIds !== null) {
-                $finalValidIds = $validLocationIds;
-            } else {
-                $finalValidIds = [];
-            }
-
-            if (!empty($finalValidIds)) {
-                $allTrials = array_filter($allTrials, function ($trial) use ($finalValidIds) {
-                    return in_array($trial['id'], $finalValidIds);
-                });
-                $allTrials = array_values($allTrials);
-            } else {
-                $allTrials = [];
-            }
-        }
-        
         $cropVariableModel = new CropVariable();
         $numeric = $cropVariableModel
             ->select('name')
@@ -934,6 +847,7 @@ class CropController extends BaseController
             ->findAll();
         $numericFilters = array_column($numeric, 'name');
 
+        // Sort if needed
         if (!empty($orderBy) && in_array($orderBy, $numericFilters)) {
             usort($allTrials, function ($a, $b) use ($orderBy, $orderDir) {
                 $aData = json_decode($a['variable'], true);
@@ -1018,6 +932,8 @@ class CropController extends BaseController
                     $traitValuesPerField[$field][] = $val;
                 }
             }
+
+
             //FOR FILTERS
             try {
                 $filterVariables = json_decode($trial['variable'], true);
@@ -1091,6 +1007,7 @@ class CropController extends BaseController
             $averages[$key] = round($total / $validCounts[$key], 2);
         }
 
+        // Calculate percentiles
         $percentileRanges = [];
         foreach ($traitValuesPerField as $field => $values) {
             sort($values);
@@ -1322,42 +1239,6 @@ class CropController extends BaseController
         }
 
         $filteredTrials = [];
-        if (!empty($years)) {
-            $years = array_map('strval', $years);
-            $yearWiseVarieties = [];
-            foreach ($allTrials as $trial) {
-                $year = strval($trial['year']);
-                $variety = $trial['variety_name'];
-                $id = $trial['id'];
-                if (!isset($yearWiseVarieties[$year])) {
-                    $yearWiseVarieties[$year] = [];
-                }
-                $yearWiseVarieties[$year][$variety] = $id;
-            }
-            $baseYear = $years[0];
-            $validVarietyIds = [];
-
-            foreach ($yearWiseVarieties[$baseYear] as $variety => $id) {
-                $foundInAllYears = true;
-
-                foreach ($years as $year) {
-                    if (!isset($yearWiseVarieties[$year][$variety])) {
-                        $foundInAllYears = false;
-                        break;
-                    }
-                }
-
-                if ($foundInAllYears) {
-                    foreach ($years as $year) {
-                        $validVarietyIds[] = $yearWiseVarieties[$year][$variety];
-                    }
-                }
-            }
-            $allTrials = array_filter($allTrials, function ($trial) use ($validVarietyIds) {
-                return in_array($trial['id'], $validVarietyIds);
-            });
-            $allTrials = array_values($allTrials);
-        }
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
             $traitVal = $jsonData[$traitName] ?? null;
@@ -1541,7 +1422,7 @@ class CropController extends BaseController
         <thead class='table-light  variety-table'>
             <tr>
                 <th class='sticky-col'>Variety</th>
-                <th class='sticky-col' style='text-align: center !important'>Average</th>";
+                <th class='sticky-col'>Average</th>";
         foreach ($locationHeaders as $loc) {
             $active1 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'asc') ? 'text-primary' : '';
             $active2 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'desc') ? 'text-primary' : '';
