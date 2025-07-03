@@ -1421,7 +1421,8 @@ class CropController extends BaseController
         $html = "<table class='table table-bordered table-striped'>
         <thead class='table-light  variety-table'>
             <tr>
-                <th class='sticky-col'>Variety</th>";
+                <th class='sticky-col'>Variety</th>
+                <th class='sticky-col'>Average</th>";
         foreach ($locationHeaders as $loc) {
             $active1 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'asc') ? 'text-primary' : '';
             $active2 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'desc') ? 'text-primary' : '';
@@ -1439,9 +1440,19 @@ class CropController extends BaseController
 
         foreach ($paginatedVarieties as $variety => $locValues) {
             $html .= "<tr><td class='variety_cell sticky-col'>" . htmlspecialchars($variety) . "</td>";
+            $sum = 0;
+            $count = 0;
+            foreach ($locationHeaders as $loc) {
+                if (isset($locValues[$loc]['value']) && is_numeric($locValues[$loc]['value'])) {
+                    $sum += floatval($locValues[$loc]['value']);
+                    $count++;
+                }
+            }
+            $avgValue = $count > 0 ? round($sum / $count, 2) : '-';
+            $html .= "<td class='text-center'><strong>" . htmlspecialchars($avgValue) . "</strong></td>";
             foreach ($locationHeaders as $loc) {
                 $val = $locValues[$loc]['value'] ?? null;
-                $display = $val === null ? '-' : $val;
+                $display = $val === null ? '-' : number_format($val, 2);
                 $bgColor = is_numeric($val) ? getTraitColorByPercentile(floatval($val), $p10, $p30, $p70, $p90) : '';
                 $color = $bgColor === '#ffff00' ? 'black' : 'white';
                 $style = $bgColor ? "style='background-color: $bgColor; color: $color;'" : '';
