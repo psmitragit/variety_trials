@@ -765,10 +765,11 @@ class CropController extends BaseController
         $offset = ($page - 1) * $perPage;
 
         $trialDataQuery = $this->trialDataModel
-            ->select('varieties.short_name, trial_data.variable, trial_data.year')
+            ->select('trial_data.id, varieties.short_name, trial_data.variable, trial_data.location, trial_data.location_code, trial_data.year, trial_data.state_code, states.name as state, trial_location.avarage_temparature, trial_location.avarage_percipitation, trial_location.production_pratice, trial_location.water_management, varieties.brand, trial_data.trial as matiruty_id, trial_types.name as maturity, varieties.code as variety_code,varieties.short_name as variety_name')
             ->where('trial_data.crop_id', $crop_id)
             ->join('varieties', 'varieties.code = trial_data.variety_code', 'left')
             ->join('trial_types', 'trial_types.id = trial_data.trial', 'left')
+            ->join('states', 'states.code=trial_data.state_code', 'left')
             ->groupBy('trial_data.id');
 
         if (!empty($varieties)) {
@@ -791,8 +792,8 @@ class CropController extends BaseController
             $trialDataQuery->whereIn('trial_data.trial', $trialTypes);
         }
 
+        $trialDataQuery->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
         if (!empty($environment)) {
-            $trialDataQuery->join('trial_location', 'trial_location.trial_id=trial_data.id', 'left');
 
             foreach ($environment as $field => $range) {
                 if ($field == 'avarage_temparature' || $field == 'avarage_percipitation') {
@@ -900,6 +901,27 @@ class CropController extends BaseController
         $validCounts = [];
         $traitValuesPerField = [];
 
+        $filterOptions = [
+            'production_practice' => [],
+            'water_management' => [],
+            'brand' => [],
+            'maturity' => [],
+            'variety' => [],
+            'herbicide' => [],
+            'insecticide' => []
+        ];
+
+        $production_pratice_option_html = '';
+        $water_management_option_html = '';
+        $brand_option_html = '';
+        $maturity_option_html = '';
+        $variety_option_html = '';
+        $herbicide_option_html = '';
+        $insecticide_option_html = '';
+
+        $lowest_temp = $highest_temp = null;
+        $lowest_percep = $highest_percep = null;
+
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
             foreach ($numericFilters as $field) {
@@ -909,6 +931,75 @@ class CropController extends BaseController
                     $validCounts[$field] = ($validCounts[$field] ?? 0) + 1;
                     $traitValuesPerField[$field][] = $val;
                 }
+            }
+
+
+            //FOR FILTERS
+            try {
+                $filterVariables = json_decode($trial['variable'], true);
+            } catch (Exception $err) {
+                $filterVariables = [];
+            }
+
+            $production_pratice = $trial['production_pratice'] ?? '';
+            $water_management = $trial['water_management'] ?? '';
+            $avarage_temparature = isset($trial['avarage_temparature']) ? (float)$trial['avarage_temparature'] : null;
+            $avarage_percipitation = isset($trial['avarage_percipitation']) ? (float)$trial['avarage_percipitation'] : null;
+
+            if (!check_blank($avarage_temparature) && ($lowest_temp === null || $avarage_temparature < $lowest_temp)) {
+                $lowest_temp = $avarage_temparature;
+            }
+            if (!check_blank($avarage_temparature) && ($highest_temp === null || $avarage_temparature > $highest_temp)) {
+                $highest_temp = $avarage_temparature;
+            }
+
+            if (!check_blank($avarage_percipitation) && ($lowest_percep === null || $avarage_percipitation < $lowest_percep)) {
+                $lowest_percep = $avarage_percipitation;
+            }
+            if (!check_blank($avarage_percipitation) && ($highest_percep === null || $avarage_percipitation > $highest_percep)) {
+                $highest_percep = $avarage_percipitation;
+            }
+
+            $brand_name = $trial['brand'] ?? '';
+            $matiruty_id = $trial['matiruty_id'] ?? '';
+            $maturity = $trial['maturity'] ?? '';
+            $variety_code = $trial['variety_code'] ?? '';
+            $variety_name = $trial['variety_name'] ?? '';
+            $herbicide_value = $filterVariables['Herbicide Package'] ?? '';
+            $insecticide_value = $filterVariables['Insecticide Package'] ?? '';
+
+            if (!check_blank($production_pratice) && !in_array($production_pratice, $filterOptions['production_practice'])) {
+                $filterOptions['production_practice'][] = $production_pratice;
+                $production_pratice_option_html .= '<option value="' . $production_pratice . '">' . ($production_pratice == 0 ? 'Full-Season' : 'Double-Crop') . '</option>';
+            }
+            if (!check_blank($water_management) && !in_array($water_management, $filterOptions['water_management'])) {
+                $filterOptions['water_management'][] = $water_management;
+                $water_management_option_html .= '<option value="' . $water_management . '">' . ($water_management == 0 ? 'Irrigated' : 'Non-Irrigated') . '</option>';
+            }
+            if (!check_blank($brand_name) && !in_array($brand_name, $filterOptions['brand'])) {
+                $filterOptions['brand'][] = $brand_name;
+                $brand_option_html .= '<option value="' . $brand_name . '">' .
+                    $brand_name . '</option>';
+            }
+            if (!check_blank($maturity) && !check_blank($matiruty_id) && !in_array($matiruty_id, $filterOptions['maturity'])) {
+                $filterOptions['maturity'][] = $matiruty_id;
+                $maturity_option_html .= '<option value="' . $matiruty_id . '">' .
+                    $maturity . '</option>';
+            }
+            if (!check_blank($variety_code) && !check_blank($variety_name) && !in_array($variety_code, $filterOptions['variety'])) {
+                $filterOptions['variety'][] = $variety_code;
+                $variety_option_html .= '<option value="' . $variety_code . '">' .
+                    $variety_name . '</option>';
+            }
+            if (!check_blank($herbicide_value) && !in_array($herbicide_value, $filterOptions['herbicide'])) {
+                $filterOptions['herbicide'][] = $herbicide_value;
+                $herbicide_option_html .= '<option value="' . $herbicide_value . '">' .
+                    $herbicide_value . '</option>';
+            }
+            if (!check_blank($insecticide_value) && !in_array($insecticide_value, $filterOptions['insecticide'])) {
+                $filterOptions['insecticide'][] = $insecticide_value;
+                $insecticide_option_html .= '<option value="' . $insecticide_value . '">' .
+                    $insecticide_value . '</option>';
             }
         }
 
@@ -1017,7 +1108,18 @@ class CropController extends BaseController
             'current_page' => $page,
             'per_page' => $perPage,
             'order_by' => $orderBy,
-            'order_dir' => $orderDir
+            'order_dir' => $orderDir,
+            'production_pratice_option_html' => $production_pratice_option_html,
+            'water_management_option_html' => $water_management_option_html,
+            'brand_option_html' => $brand_option_html,
+            'maturity_option_html' => $maturity_option_html,
+            'variety_option_html' => $variety_option_html,
+            'herbicide_option_html' => $herbicide_option_html,
+            'insecticide_option_html' => $insecticide_option_html,
+            'lowest_temp' => $lowest_temp,
+            'highest_temp' => $highest_temp,
+            'lowest_percep' => $lowest_percep,
+            'highest_percep' => $highest_percep,
         ]);
         exit;
     }

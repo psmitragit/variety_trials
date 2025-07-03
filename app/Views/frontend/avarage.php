@@ -484,6 +484,7 @@
                         $('#table-content').html(res.html);
                         generatePagination(res.total_records, res.per_page, res.current_page, res.order_by, res.order_dir);
                         updateColumnVisibility();
+                        updateDropDowns(res);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -496,6 +497,28 @@
                     $('#loader').addClass('d-none');
                 }
             });
+        }
+
+        function updateDropDowns(res) {
+            updateSelectWithPreservedSelection('#production_practice', res.production_pratice_option_html);
+            updateSelectWithPreservedSelection('#waterManagement', res.water_management_option_html);
+            updateSelectWithPreservedSelection('#sBrands', res.brand_option_html);
+            updateSelectWithPreservedSelection('#sVarieties', res.variety_option_html);
+            updateSelectWithPreservedSelection('#trial_types', res.maturity_option_html);
+            updateSelectWithPreservedSelection('#herbicides', res.herbicide_option_html);
+            updateSelectWithPreservedSelection('#insecticides', res.insecticide_option_html);
+        }
+
+        function updateSelectWithPreservedSelection(selector, newOptionsHtml) {
+            const $select = $(selector);
+            const currentVals = $select.val();
+            $select.html(newOptionsHtml);
+            if (currentVals && currentVals.length > 0) {
+                const validSelections = currentVals.filter(val => $select.find(`option[value="${val}"]`).length > 0);
+                $select.val(validSelections);
+            }
+
+            $select.trigger('change.select2');
         }
 
         function getEnvironmentData() {
