@@ -481,8 +481,10 @@
                 thHeadings.each(function() {
                     if (key == 0) {
                         html += `<tr><td><strong>Locations</strong></td><td><strong>Trait values (${$(tds[key++]).text()})</strong></td>`;
+                    } else if (key == 1) {
+                        html += `<tr><td>Average</td><td>${$(tds[key++]).text()}</td>`;
                     } else {
-                        html += `<tr><td>${$(this).data('bs-original-title')} (${$(this).text()})</td><td>${$(tds[key++]).html()}</td>`;
+                        html += `<tr><td>${$(this).data('bs-original-title')} - ${$(this).text()}</td><td>${$(tds[key++]).html()}</td>`;
                     }
                 });
                 $('#showDataCustomModal .modal-body').html(html);

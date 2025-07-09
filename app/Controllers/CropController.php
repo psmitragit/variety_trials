@@ -151,6 +151,7 @@ class CropController extends BaseController
                 }
             }
         }
+
         // dd([$variables]);
         return view('frontend/crop', \compact('crop', 'variables', 'states', 'brands', 'varieties', 'trials', 'years', 'herbicides', 'varialeData', 'trait', 'management', 'numeric', 'other', 'multiselect', 'min_temp', 'max_temp', 'min_precip', 'max_precip'));
     }
@@ -839,6 +840,8 @@ class CropController extends BaseController
             });
         }
 
+        $oldAllTrials = $allTrials;
+
         if (!empty($years) || !empty($locations)) {
             $validYearIds = null;
             $validLocationIds = null;
@@ -858,7 +861,14 @@ class CropController extends BaseController
                     $yearWiseVarieties[$year][$variety] = $id;
                 }
 
-                $baseYear = $years[0];
+                $baseYear = '';
+                foreach ($years as $key => $value) {
+                    $baseYear = $value;
+                    if (isset($yearWiseVarieties[$baseYear])) {
+                        break;
+                    }
+                }
+
                 $validYearIds = [];
 
                 foreach ($yearWiseVarieties[$baseYear] as $variety => $id) {
@@ -890,6 +900,13 @@ class CropController extends BaseController
                     $locationWiseVarieties[$location][$variety] = $id;
                 }
                 $baseLocation = $locations[0];
+                foreach ($locations as $key => $value) {
+                    $baseLocation = $value;
+                    if (isset($locationWiseVarieties[$baseLocation])) {
+                        break;
+                    }
+                }
+
                 $validLocationIds = [];
                 foreach ($locationWiseVarieties[$baseLocation] as $variety => $id) {
                     $foundInAllLocations = true;
@@ -924,8 +941,56 @@ class CropController extends BaseController
             } else {
                 $allTrials = [];
             }
+
+            // MAKE SURE T HE OUTPUT IS AVERAGE OF DATA
+            if (!empty($allTrials)) {
+                foreach ($allTrials as $index => $trial) {
+                    $varietyName = $trial['variety_name'];
+
+                    $matchedTrials = array_filter($oldAllTrials, function ($t) use ($varietyName) {
+                        return $t['variety_name'] === $varietyName;
+                    });
+
+                    $sum = [];
+                    $count = [];
+                    $matchingYears = [];
+
+                    foreach ($matchedTrials as $matchedTrial) {
+                        $variables = json_decode($matchedTrial['variable'], true);
+
+                        foreach ($variables as $varKey => $varValue) {
+                            if ($varValue !== '' && is_numeric($varValue)) {
+                                if (!isset($sum[$varKey])) {
+                                    $sum[$varKey] = 0;
+                                    $count[$varKey] = 0;
+                                }
+                                $sum[$varKey] += floatval($varValue);
+                                $count[$varKey]++;
+                            }
+                        }
+
+                        $matchingYears[] = $matchedTrial['year'];
+                    }
+
+                    $averageVariables = [];
+                    foreach ($sum as $varKey => $total) {
+                        $average = $total / $count[$varKey];
+                        $averageVariables[$varKey] = round($average, 4);
+                    }
+                    $anyTrial = reset($matchedTrials);
+                    $allKeys = array_keys(json_decode($anyTrial['variable'], true));
+                    foreach ($allKeys as $keyName) {
+                        if (!isset($averageVariables[$keyName])) {
+                            $averageVariables[$keyName] = '';
+                        }
+                    }
+
+                    $allTrials[$index]['variable'] = json_encode($averageVariables);
+                    $allTrials[$index]['year'] = implode(', ', array_unique($matchingYears));
+                }
+            }
         }
-        
+
         $cropVariableModel = new CropVariable();
         $numeric = $cropVariableModel
             ->select('name')
@@ -1182,6 +1247,10 @@ class CropController extends BaseController
             }
         }
 
+        if (empty($paginatedTrials)) {
+            $html .= '<tr><td colspan="8" class="text-center">No records found</td></tr>';
+        }
+
         $html .= "</tbody></table>";
 
         echo json_encode([
@@ -1334,8 +1403,15 @@ class CropController extends BaseController
                 }
                 $yearWiseVarieties[$year][$variety] = $id;
             }
-            $baseYear = $years[0];
             $validVarietyIds = [];
+
+            $baseYear = '';
+            foreach ($years as $key => $value) {
+                $baseYear = $value;
+                if (isset($yearWiseVarieties[$baseYear])) {
+                    break;
+                }
+            }
 
             foreach ($yearWiseVarieties[$baseYear] as $variety => $id) {
                 $foundInAllYears = true;
@@ -1419,6 +1495,7 @@ class CropController extends BaseController
         $lowest_trait = $highest_trait = null;
 
         foreach ($filteredTrials as $key => $trial) {
+            // $variety = $trial['short_name'] . ' - ' . $trial['year'];
             $variety = $trial['short_name'];
             $location = $trial['location_code'];
             $value = $trial['trait_value'];
@@ -1603,6 +1680,10 @@ class CropController extends BaseController
                 $html .= "<td $style class='show_trial_data' data-id='" . htmlspecialchars($dataId) . "'>" . htmlspecialchars($display) . "</td>";
             }
             $html .= "</tr>";
+        }
+
+        if (empty($paginatedVarieties)) {
+            $html .= '<tr><td colspan="' . (count($locationHeaders) + 2) . '" class="text-center">No records found.</td></tr>';
         }
 
         $html .= "</tbody></table>";
