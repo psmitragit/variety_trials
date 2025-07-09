@@ -1437,10 +1437,10 @@ class CropController extends BaseController
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
             $traitVal = $jsonData[$traitName] ?? null;
-            if (!empty($traitVal) || $traitVal === 0 || $traitVal === "0") {
+            // if (!empty($traitVal) || $traitVal === 0 || $traitVal === "0") {
                 $trial['trait_value'] = $traitVal;
                 $filteredTrials[] = $trial;
-            }
+            // }
         }
 
         $locationModel = new Location();
@@ -1503,7 +1503,16 @@ class CropController extends BaseController
             if (!isset($varietyData[$variety])) {
                 $varietyData[$variety] = [];
             }
-            $varietyData[$variety][$location]['value'] = $value;
+            if(isset($varietyData[$variety][$location])){
+                $oldValue = $varietyData[$variety][$location]['value'];
+                $rowsCount =  $varietyData[$variety][$location]['total_number_of_rows'] + 1;
+                $newVaue = $value + $oldValue;
+                $varietyData[$variety][$location]['value'] = $newVaue;
+                $varietyData[$variety][$location]['total_number_of_rows'] = $rowsCount;
+            }else{
+                $varietyData[$variety][$location]['value'] = empty($value) ? 0 : $value;
+                $varietyData[$variety][$location]['total_number_of_rows'] = 1;
+            }
             $varietyData[$variety][$location]['id'] = $trial['id'];
 
             //FOR FILTERS
@@ -1579,6 +1588,13 @@ class CropController extends BaseController
                 $filterOptions['insecticide'][] = $insecticide_value;
                 $insecticide_option_html .= '<option value="' . $insecticide_value . '">' .
                     $insecticide_value . '</option>';
+            }
+        }
+
+        foreach ($varietyData as $key => $trial) {
+            foreach ($trial as $k => $value) {
+                $newValue = $value['value'] / $value['total_number_of_rows'];
+                $varietyData[$key][$k]['value'] = $newValue;
             }
         }
 
