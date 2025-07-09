@@ -1505,6 +1505,21 @@ class CropController extends BaseController
             }
         }
 
+        foreach ($varietyData as $variety => &$locValues) {
+            $sum = 0;
+            $count = 0;
+            foreach ($locationHeaders as $loc) {
+                if (isset($locValues[$loc]['value']) && is_numeric($locValues[$loc]['value'])) {
+                    $sum += floatval($locValues[$loc]['value']);
+                    $count++;
+                }
+            }
+            $locValues['average'] = [
+                'value' => $count > 0 ? round($sum / $count, 2) : null
+            ];
+        }
+        unset($locValues);
+
         if (!empty($orderBy)) {
             uasort($varietyData, function ($a, $b) use ($orderBy, $orderDir) {
                 $valA = $a[$orderBy]['value'] ?? null;
@@ -1537,11 +1552,19 @@ class CropController extends BaseController
             $locationAverages[$loc] = $count > 0 ? round($sum / $count, 2) : null;
         }
 
+        $active1 = ($orderBy == 'average' && $orderDir == 'asc') ? 'text-primary' : '';
+        $active2 = ($orderBy == 'average' && $orderDir == 'desc') ? 'text-primary' : '';
         $html = "<table class='table table-bordered table-striped'>
         <thead class='table-light  variety-table'>
             <tr>
                 <th class='sticky-col'>Variety</th>
-                <th class='sticky-col' style='text-align: center !important'>Average</th>";
+                <th class='sticky-col sortable' style='text-align: center !important' data-field='average'>
+                    Average 
+                    <span class=\"sort-icons\">
+                        <i class=\"bi bi-caret-up-fill sort-icon " . $active1 . " \" data-dir=\"asc\" title=\"Sort Asc\"></i>
+                        <i class=\"bi bi-caret-down-fill sort-icon " . $active2 . "\" data-dir=\"desc\" title=\"Sort Desc\"></i>
+                    </span>
+                </th>";
         foreach ($locationHeaders as $loc) {
             $active1 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'asc') ? 'text-primary' : '';
             $active2 = ($orderBy == htmlspecialchars($loc) && $orderDir == 'desc') ? 'text-primary' : '';
@@ -1567,7 +1590,7 @@ class CropController extends BaseController
                     $count++;
                 }
             }
-            $avgValue = $count > 0 ? round($sum / $count, 2) : '-';
+            $avgValue = $locValues['average']['value'] ?? '-';
             $html .= "<td class='text-center'><strong>" . htmlspecialchars($avgValue) . "</strong></td>";
             foreach ($locationHeaders as $loc) {
                 $val = $locValues[$loc]['value'] ?? null;
