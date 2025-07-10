@@ -380,6 +380,22 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="sitemapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content text-white">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="showDataCustomModalLabel">Validation Error</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:black;">You can select up to 10 locations only. Please remove others to search.</p>
+                </div>
+                <div class="my-3 d-flex justify-content-center">
+                    <button class="btn btn-success m-auto" style="max-width: 250px;" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?= $this->endSection() ?>
 
@@ -454,10 +470,26 @@
             $('#downloadCsv').on('click', function() {
                 getVarietyData(1, '', 'asc', 1);
             });
+
+            $('#sLocations').on('change', function(e) {
+                const selected = $(this).val();
+
+                if (selected.length > 9) {
+                    selected.pop();
+                    $(this).val(selected).trigger('change');
+                    $('#alertModal').modal('show');
+                    return;
+                }
+            });
         });
 
 
         function getVarietyData(page = 1, order = '', dir = 'asc', csv = 0) {
+            if ($('#sLocations').val().length > 10) {
+                $('#alertModal').modal('show');
+                return;
+            }
+
             order = order.trim().toLowerCase() === "maturity (dap)" ? 'maturity_dap' : order;
             $.ajax({
                 url: '<?= base_url('get-average') ?>',
