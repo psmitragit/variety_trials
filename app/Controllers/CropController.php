@@ -749,8 +749,7 @@ class CropController extends BaseController
         $trialTypes = $this->request->getPost('trial_types');
         $crop_id = $this->request->getPost('crop_id');
         $page = (int) $this->request->getPost('page');
-        // $perPage = (int) $this->request->getPost('per_page');
-        $perPage = (int) 500;
+        $perPage = (int) $this->request->getPost('per_page');
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
 
@@ -1036,7 +1035,11 @@ class CropController extends BaseController
 
                 $csvData[] = $row;
             }
-            $filename = WRITEPATH . '\uploads\csv_download_' . time() . '.csv';
+            if (ENVIRONMENT == 'development') {
+                $filename = WRITEPATH . '\uploads\csv_download_' . time() . '.csv';
+            } else {
+                $filename = WRITEPATH . 'uploads\csv_download_' . time() . '.csv';
+            }
             $file = fopen($filename, 'w');
             foreach ($csvData as $line) {
                 fputcsv($file, $line);
@@ -1449,8 +1452,8 @@ class CropController extends BaseController
             $jsonData = json_decode($trial['variable'], true);
             $traitVal = $jsonData[$traitName] ?? null;
             // if (!empty($traitVal) || $traitVal === 0 || $traitVal === "0") {
-                $trial['trait_value'] = $traitVal;
-                $filteredTrials[] = $trial;
+            $trial['trait_value'] = $traitVal;
+            $filteredTrials[] = $trial;
             // }
         }
 
@@ -1514,13 +1517,13 @@ class CropController extends BaseController
             if (!isset($varietyData[$variety])) {
                 $varietyData[$variety] = [];
             }
-            if(isset($varietyData[$variety][$location])){
+            if (isset($varietyData[$variety][$location])) {
                 $oldValue = $varietyData[$variety][$location]['value'];
                 $rowsCount =  $varietyData[$variety][$location]['total_number_of_rows'] + 1;
                 $newVaue = $value + $oldValue;
                 $varietyData[$variety][$location]['value'] = $newVaue;
                 $varietyData[$variety][$location]['total_number_of_rows'] = $rowsCount;
-            }else{
+            } else {
                 $varietyData[$variety][$location]['value'] = empty($value) ? 0 : $value;
                 $varietyData[$variety][$location]['total_number_of_rows'] = 1;
             }
@@ -1802,7 +1805,11 @@ class CropController extends BaseController
 
     public function downloadCsv($filename)
     {
-        $filePath = WRITEPATH . 'uploads/' . $filename;
+        if (ENVIRONMENT == 'development') {
+            $filePath = WRITEPATH . 'uploads/' . $filename;
+        } else {
+            $filePath = WRITEPATH . $filename;
+        }
 
         if (!is_file($filePath)) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException("File not found");
