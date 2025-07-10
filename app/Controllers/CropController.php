@@ -749,7 +749,8 @@ class CropController extends BaseController
         $trialTypes = $this->request->getPost('trial_types');
         $crop_id = $this->request->getPost('crop_id');
         $page = (int) $this->request->getPost('page');
-        $perPage = (int) $this->request->getPost('per_page');
+        // $perPage = (int) $this->request->getPost('per_page');
+        $perPage = (int) 500;
         $orderBy = $this->request->getPost('order_by') ?? '';
         $orderDir = $this->request->getPost('order_dir') === 'desc' ? 'desc' : 'asc';
 
@@ -1072,6 +1073,16 @@ class CropController extends BaseController
 
         $lowest_temp = $highest_temp = null;
         $lowest_percep = $highest_percep = null;
+
+        $seenShortNames = [];
+
+        $allTrials = array_filter($allTrials, function ($trial) use (&$seenShortNames) {
+            if (in_array($trial['short_name'], $seenShortNames)) {
+                return false;
+            }
+            $seenShortNames[] = $trial['short_name'];
+            return true;
+        });
 
         foreach ($allTrials as $trial) {
             $jsonData = json_decode($trial['variable'], true);
